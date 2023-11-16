@@ -1,0 +1,43 @@
+
+# ##########################################################
+# Package
+
+[package]
+
+authors = [
+	"Matt Wilson <matthew@synesis.com.au>",
+]
+description = "shwild (for Rust)"
+edition = "2021"
+homepage = "https://github.com/synesissoftware/shwild.Rust"
+license = "BSD-3-Clause"
+name = "shwild"
+readme = "README.md"
+version = "0.0.0"
+
+
+# ##########################################################
+# Targets
+
+[lib]
+name = "shwild"
+path = "src/lib.rs"
+
+
+# ##########################################################
+# Features
+
+[features]
+
+
+# ##########################################################
+# Dependencies
+
+[dependencies]
+
+
+[dev-dependencies]
+
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
