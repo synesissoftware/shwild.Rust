@@ -2141,16 +2141,15 @@ mod tests {
 
                 /*
                 {
-
                     const shwild::Pattern   pattern2("a[b-c]c[d-m]", SHWILD_F_SUPPRESS_RANGE_CONTINUUM_SUPPORT);
 
-                    BDUT_ASSERT_TRUE(pattern2.match("abcd"));
-                    BDUT_ASSERT_TRUE(pattern2.match("a-cd"));
-                    BDUT_ASSERT_TRUE(pattern2.match("accd"));
-                    BDUT_ASSERT_FALSE(pattern2.match("aacd"));
-                    BDUT_ASSERT_TRUE(pattern2.match("accm"));
-                    BDUT_ASSERT_FALSE(pattern2.match("accl"));
-                    BDUT_ASSERT_FALSE(pattern2.match("abcn"));
+                    BDUT_ASSERT_TRUE(matcher.matches("abcd"));
+                    BDUT_ASSERT_TRUE(matcher.matches("a-cd"));
+                    BDUT_ASSERT_TRUE(matcher.matches("accd"));
+                    BDUT_ASSERT_FALSE(matcher.matches("aacd"));
+                    BDUT_ASSERT_TRUE(matcher.matches("accm"));
+                    BDUT_ASSERT_FALSE(matcher.matches("accl"));
+                    BDUT_ASSERT_FALSE(matcher.matches("abcn"));
                 }
                  */
             }
@@ -2182,13 +2181,13 @@ mod tests {
 
                     const shwild::Pattern   pattern2("a[b-c]c[d-m]", SHWILD_F_SUPPRESS_RANGE_CONTINUUM_SUPPORT);
 
-                    BDUT_ASSERT_TRUE(pattern2.match("abcd"));
-                    BDUT_ASSERT_TRUE(pattern2.match("a-cd"));
-                    BDUT_ASSERT_TRUE(pattern2.match("accd"));
-                    BDUT_ASSERT_FALSE(pattern2.match("aacd"));
-                    BDUT_ASSERT_TRUE(pattern2.match("accm"));
-                    BDUT_ASSERT_FALSE(pattern2.match("accl"));
-                    BDUT_ASSERT_FALSE(pattern2.match("abcn"));
+                    BDUT_ASSERT_TRUE(matcher.matches("abcd"));
+                    BDUT_ASSERT_TRUE(matcher.matches("a-cd"));
+                    BDUT_ASSERT_TRUE(matcher.matches("accd"));
+                    BDUT_ASSERT_FALSE(matcher.matches("aacd"));
+                    BDUT_ASSERT_TRUE(matcher.matches("accm"));
+                    BDUT_ASSERT_FALSE(matcher.matches("accl"));
+                    BDUT_ASSERT_FALSE(matcher.matches("abcn"));
                 }
                  */
             }
@@ -2295,7 +2294,7 @@ mod tests {
         }
 
         #[test]
-        fn TEST_matches_EMPTY_PATTERN_2() {
+        fn TEST_matches_INVALID_PATTERN_1() {
             match shwild::matches("[a-9]", "", 0) {
                 Ok(_) => {
                     panic!("unexpected success");
