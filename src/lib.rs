@@ -1092,9 +1092,12 @@ mod utils {
 
                 assert!(!matchers.matches(""));
                 assert!(!matchers.matches("program.exe"));
-                assert!(!matchers.matches("C:/"));
-                assert!(matchers.matches("C:/directory/program.exe"));
-                assert!(matchers.matches("C:/program.exe"));
+                assert!(!matchers.matches(r"C:/"));
+                assert!(!matchers.matches(r"C:\"));
+                assert!(matchers.matches(r"C:/directory/program.exe"));
+                assert!(matchers.matches(r"C:\directory\program.exe"));
+                assert!(matchers.matches(r"C:/program.exe"));
+                assert!(matchers.matches(r"C:\program.exe"));
             }
         }
     }
