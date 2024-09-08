@@ -6,8 +6,8 @@
 # array_width=60 # deprecated
 # attr_fn_like_width=70 # deprecated
 binop_separator="Front"
-blank_lines_lower_bound=0
-blank_lines_upper_bound=3
+blank_lines_lower_bound=1
+blank_lines_upper_bound=2
 brace_style="SameLineWhere"
 # chain_width=60 # deprecated
 color="Auto"

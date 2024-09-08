@@ -23,6 +23,10 @@ version = "0.0.0"
 name = "shwild"
 path = "src/lib.rs"
 
+[[bin]]
+name = "list-matching-files"
+path = "examples/list-matching-files/main.rs"
+
 
 # ##########################################################
 # Features
