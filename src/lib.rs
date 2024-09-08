@@ -11,36 +11,35 @@ use std::{
 pub enum Error {
     Ok,
     ParseError {
-        line : usize,
-        column : usize,
+        line :    usize,
+        column :  usize,
         message : String,
     },
 }
 
 // API functions
 impl Error {
-
 }
 
 // Mutating methods
 impl Error {
-
 }
 
 // Non-mutating methods
 impl Error {
+    #![allow(non_snake_case)]
 
     /// Until we determine a need to separate them, `Debug` and `Display`
     /// implementations produce same representation.
-    #[allow(non_snake_case)]
     fn fmt_for_Debug_or_Display(
         &self,
-        f: &mut std_fmt::Formatter<'_>,
+        f : &mut std_fmt::Formatter<'_>,
     ) -> std_fmt::Result {
         match self {
             Self::Ok => write!(f, "the operating completed successfully"),
-            Self::ParseError { message, .. } => {
-
+            Self::ParseError {
+                message, ..
+            } => {
                 write!(f, "{message}")
             },
         }
@@ -52,9 +51,8 @@ impl Error {
 impl std_fmt::Debug for Error {
     fn fmt(
         &self,
-        f: &mut std_fmt::Formatter<'_>,
+        f : &mut std_fmt::Formatter<'_>,
     ) -> std_fmt::Result {
-
         self.fmt_for_Debug_or_Display(f)
     }
 }
@@ -62,9 +60,8 @@ impl std_fmt::Debug for Error {
 impl std_fmt::Display for Error {
     fn fmt(
         &self,
-        f: &mut std_fmt::Formatter<'_>,
+        f : &mut std_fmt::Formatter<'_>,
     ) -> std_fmt::Result {
-
         self.fmt_for_Debug_or_Display(f)
     }
 }
@@ -86,13 +83,14 @@ mod traits {
 
 
     /// Defines behaviour for specific matchers.
-    pub(crate) trait Match : std_fmt::Debug {
+    pub(crate) trait Match: std_fmt::Debug {
         /// Attempts to match the input string `slice` against this `Match`
         /// instance and, implicitly, any following `Match` instances.
         ///
         /// # Returns:
         /// - `true` - indicates a full match; or
         /// - `false` -
+
         fn try_match(
             &self,
             slice : &str,
@@ -101,13 +99,9 @@ mod traits {
         /// Obtains the minimum required remaining length for the chain
         /// beginning with the called instance, which may be called to
         /// optimise implementations of certain `Match` instances.
-        fn minimum_required(
-            &self
-        ) -> usize;
-    // }
+        fn minimum_required(&self) -> usize;
 
-
-    // pub(crate) trait MatchMut : Match {
+        /// T.B.C.
         fn set_next(
             &mut self,
             next : Option<Box<dyn Match>>,
@@ -123,27 +117,26 @@ mod match_structures {
 
 
     #[derive(Debug)]
-    pub(crate) struct MatchEnd/*<'a>*/ {
-    }
+    pub(crate) struct MatchEnd {}
 
     #[derive(Debug)]
     pub(crate) struct MatchLiteral {
-        next : Option<Box<dyn Match>>,
-        literal : String,
+        next :              Option<Box<dyn Match>>,
+        literal :           String,
         literal_uppercase : Option<String>,
         // flags : i64,
     }
 
     #[derive(Debug)]
     pub(crate) struct MatchNotRange {
-        next : Option<Box<dyn Match>>,
+        next :       Option<Box<dyn Match>>,
         characters : String,
         // flags : i64,
     }
 
     #[derive(Debug)]
     pub(crate) struct MatchRange {
-        next : Option<Box<dyn Match>>,
+        next :       Option<Box<dyn Match>>,
         characters : String,
         // flags : i64,
     }
@@ -167,12 +160,9 @@ mod match_structures {
             literal : String,
             flags : i64,
         ) -> Self {
-
             let literal_uppercase = if 0 != (flags & super::constants::IGNORE_CASE) {
-
                 Some(literal.to_uppercase())
             } else {
-
                 None
             };
 
@@ -191,7 +181,6 @@ mod match_structures {
             characters : &str,
             flags : i64,
         ) -> Self {
-
             let characters = super::utils::prepare_range_string(characters, flags);
 
             Self {
@@ -208,7 +197,6 @@ mod match_structures {
             characters : &str,
             flags : i64,
         ) -> Self {
-
             let characters = super::utils::prepare_range_string(characters, flags);
 
             Self {
@@ -221,19 +209,15 @@ mod match_structures {
 
     // Trait implementations
 
-    impl Match for MatchEnd/*<'_>*/ {
+    impl Match for MatchEnd {
         fn try_match(
             &self,
             slice : &str,
         ) -> bool {
-
             slice.is_empty()
         }
 
-        fn minimum_required(
-            &self
-        ) -> usize
-        {
+        fn minimum_required(&self) -> usize {
             0
         }
 
@@ -241,7 +225,6 @@ mod match_structures {
             &mut self,
             _next : Option<Box<dyn Match>>,
         ) -> Option<Box<dyn Match>> {
-
             assert!(false, "should never be called");
 
             None
@@ -253,26 +236,19 @@ mod match_structures {
             &self,
             slice : &str,
         ) -> bool {
-
-            let slice_starts_with_literal = slice.starts_with(&self.literal) || match &self.literal_uppercase {
-                Some(literal_uppercase) => {
-
-                    if slice.len() >= literal_uppercase.len() {
-
-                        slice.to_uppercase().starts_with(literal_uppercase)
-                    } else {
-
-                        false
-                    }
-                },
-                None => {
-
-                    false
-                },
-            };
+            let slice_starts_with_literal = slice.starts_with(&self.literal)
+                || match &self.literal_uppercase {
+                    Some(literal_uppercase) => {
+                        if slice.len() >= literal_uppercase.len() {
+                            slice.to_uppercase().starts_with(literal_uppercase)
+                        } else {
+                            false
+                        }
+                    },
+                    None => false,
+                };
 
             if !slice_starts_with_literal {
-
                 return false;
             }
 
@@ -281,10 +257,7 @@ mod match_structures {
             next.try_match(&slice[self.literal.len()..])
         }
 
-        fn minimum_required(
-            &self
-        ) -> usize
-        {
+        fn minimum_required(&self) -> usize {
             let next = self.next.as_ref().unwrap();
 
             self.literal.len() + next.minimum_required()
@@ -294,7 +267,6 @@ mod match_structures {
             &mut self,
             next : Option<Box<dyn Match>>,
         ) -> Option<Box<dyn Match>> {
-
             let mut next = next;
 
             std_mem::swap(&mut self.next, &mut next);
@@ -308,16 +280,13 @@ mod match_structures {
             &self,
             slice : &str,
         ) -> bool {
-
             if slice.is_empty() {
-
                 return false;
             }
 
             let c0 = slice.chars().next().unwrap();
 
             if self.characters.contains(c0) {
-
                 return false;
             }
 
@@ -326,10 +295,7 @@ mod match_structures {
             next.try_match(&slice[c0.len_utf8()..])
         }
 
-        fn minimum_required(
-            &self
-        ) -> usize {
-
+        fn minimum_required(&self) -> usize {
             let next = self.next.as_ref().unwrap();
 
             1 + next.minimum_required()
@@ -339,7 +305,6 @@ mod match_structures {
             &mut self,
             next : Option<Box<dyn Match>>,
         ) -> Option<Box<dyn Match>> {
-
             let mut next = next;
 
             std_mem::swap(&mut self.next, &mut next);
@@ -353,16 +318,13 @@ mod match_structures {
             &self,
             slice : &str,
         ) -> bool {
-
             if slice.is_empty() {
-
                 return false;
             }
 
             let c0 = slice.chars().next().unwrap();
 
             if !self.characters.contains(c0) {
-
                 return false;
             }
 
@@ -371,10 +333,7 @@ mod match_structures {
             next.try_match(&slice[c0.len_utf8()..])
         }
 
-        fn minimum_required(
-            &self
-        ) -> usize {
-
+        fn minimum_required(&self) -> usize {
             let next = self.next.as_ref().unwrap();
 
             1 + next.minimum_required()
@@ -384,7 +343,6 @@ mod match_structures {
             &mut self,
             next : Option<Box<dyn Match>>,
         ) -> Option<Box<dyn Match>> {
-
             let mut next = next;
 
             std_mem::swap(&mut self.next, &mut next);
@@ -398,9 +356,7 @@ mod match_structures {
             &self,
             slice : &str,
         ) -> bool {
-
             if slice.is_empty() {
-
                 return false;
             }
 
@@ -411,10 +367,7 @@ mod match_structures {
             next.try_match(&slice[c0.len_utf8()..])
         }
 
-        fn minimum_required(
-            &self
-        ) -> usize {
-
+        fn minimum_required(&self) -> usize {
             let next = self.next.as_ref().unwrap();
 
             1 + next.minimum_required()
@@ -424,7 +377,6 @@ mod match_structures {
             &mut self,
             next : Option<Box<dyn Match>>,
         ) -> Option<Box<dyn Match>> {
-
             let mut next = next;
 
             std_mem::swap(&mut self.next, &mut next);
@@ -438,7 +390,6 @@ mod match_structures {
             &self,
             slice : &str,
         ) -> bool {
-
             let mut offset = 0;
 
             // TODO: consider using `#char_indices()`
@@ -446,29 +397,21 @@ mod match_structures {
             let next = self.next.as_ref().unwrap();
 
             for c in slice.chars() {
-
                 if next.try_match(&slice[offset..]) {
-
                     return true;
-                }
-                else
-                {
+                } else {
                     offset += c.len_utf8();
                 }
             }
 
             if next.try_match(&slice[offset..]) {
-
                 return true;
             }
 
             false
         }
 
-        fn minimum_required(
-            &self
-        ) -> usize {
-
+        fn minimum_required(&self) -> usize {
             let next = self.next.as_ref().unwrap();
 
             0 + next.minimum_required()
@@ -478,7 +421,6 @@ mod match_structures {
             &mut self,
             next : Option<Box<dyn Match>>,
         ) -> Option<Box<dyn Match>> {
-
             let mut next = next;
 
             std_mem::swap(&mut self.next, &mut next);
@@ -503,14 +445,12 @@ mod match_structures {
 
             #[test]
             fn TEST_End_1() {
-
                 let me : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
 
                 let matcher : &dyn Match = me.as_deref().unwrap();
 
                 assert!(matcher.try_match(""));
                 assert!(!matcher.try_match("a"));
-
                 assert_eq!(0, matcher.minimum_required());
             }
         }
@@ -524,20 +464,15 @@ mod match_structures {
 
             #[test]
             fn TEST_Literal_1() {
-
                 let literal = "he".into();
 
                 let me : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
-                let ml : Option<Box<dyn Match>> = Some(Box::new(MatchLiteral::new(
-                    me,
-                    literal,
-                    0,
-                )));
+
+                let ml : Option<Box<dyn Match>> = Some(Box::new(MatchLiteral::new(me, literal, 0)));
 
                 let matcher : &dyn Match = ml.as_deref().unwrap();
 
                 assert_eq!(2, matcher.minimum_required());
-
                 assert!(matcher.try_match("he"));
                 assert!(!matcher.try_match("hen"));
                 assert!(!matcher.try_match("he "));
@@ -545,26 +480,17 @@ mod match_structures {
 
             #[test]
             fn TEST_Literal_2() {
-
                 let literal2 = "ad".into();
+
                 let literal1 = "he".into();
 
                 let me : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
-                let ml2 : Option<Box<dyn Match>> = Some(Box::new(MatchLiteral::new(
-                    me,
-                    literal2,
-                    0,
-                )));
-                let ml1 : Option<Box<dyn Match>> = Some(Box::new(MatchLiteral::new(
-                    ml2,
-                    literal1,
-                    0,
-                )));
+                let ml2 : Option<Box<dyn Match>> = Some(Box::new(MatchLiteral::new(me, literal2, 0)));
+                let ml1 : Option<Box<dyn Match>> = Some(Box::new(MatchLiteral::new(ml2, literal1, 0)));
 
                 let matcher : &dyn Match = ml1.as_deref().unwrap();
 
                 assert_eq!(4, matcher.minimum_required());
-
                 assert!(matcher.try_match("head"));
                 assert!(!matcher.try_match("heads"));
                 assert!(!matcher.try_match("hea"));
@@ -580,20 +506,14 @@ mod match_structures {
 
             #[test]
             fn TEST_Range_1() {
-
                 let characters = "0123456789";
 
-                let me : Option<Box<dyn Match>> = Some(Box::new(MatchEnd { }));
-                let mr : Option<Box<dyn Match>> = Some(Box::new(MatchRange::new(
-                    me,
-                    characters,
-                    0,
-                )));
+                let me : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
+                let mr : Option<Box<dyn Match>> = Some(Box::new(MatchRange::new(me, characters, 0)));
 
                 let matcher : &dyn Match = mr.as_deref().unwrap();
 
                 assert_eq!(1, matcher.minimum_required());
-
                 assert!(!matcher.try_match(""));
                 assert!(matcher.try_match("0"));
                 assert!(matcher.try_match("1"));
@@ -620,15 +540,10 @@ mod match_structures {
 
             #[test]
             fn TEST_NotRange_1() {
-
                 let characters = "0123456789";
 
-                let me : Option<Box<dyn Match>> = Some(Box::new(MatchEnd { }));
-                let mn : Option<Box<dyn Match>> = Some(Box::new(MatchNotRange::new(
-                    me,
-                    characters,
-                    0,
-                )));
+                let me : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
+                let mn : Option<Box<dyn Match>> = Some(Box::new(MatchNotRange::new(me, characters, 0)));
 
                 let matcher : &dyn Match = mn.as_deref().unwrap();
 
@@ -660,10 +575,9 @@ mod match_structures {
 
             #[test]
             fn TEST_Wild_1() {
-
-                let me : Option<Box<dyn Match>> = Some(Box::new(MatchEnd { }));
+                let me : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
                 let m1 : Option<Box<dyn Match>> = Some(Box::new(MatchWild1 {
-                    next : me,
+                    next : me
                 }));
 
                 let matcher : &dyn Match = m1.as_deref().unwrap();
@@ -688,13 +602,12 @@ mod match_structures {
 
             #[test]
             fn TEST_Wild_2() {
-
-                let me : Option<Box<dyn Match>> = Some(Box::new(MatchEnd { }));
+                let me : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
                 let mw2 : Option<Box<dyn Match>> = Some(Box::new(MatchWild1 {
-                    next : me,
+                    next : me
                 }));
                 let mw1 : Option<Box<dyn Match>> = Some(Box::new(MatchWild1 {
-                    next : mw2,
+                    next : mw2
                 }));
 
                 let matcher : &dyn Match = mw1.as_deref().unwrap();
@@ -728,10 +641,9 @@ mod match_structures {
 
             #[test]
             fn TEST_WildN_1() {
-
-                let me : Option<Box<dyn Match>> = Some(Box::new(MatchEnd { }));
+                let me : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
                 let mw : Option<Box<dyn Match>> = Some(Box::new(MatchWildN {
-                    next : me,
+                    next : me
                 }));
 
                 let matcher : &dyn Match = mw.as_deref().unwrap();
@@ -756,18 +668,13 @@ mod match_structures {
 
             #[test]
             fn TEST_Literal_WildN() {
-
                 let literal = "ma".into();
 
-                let me : Option<Box<dyn Match>> = Some(Box::new(MatchEnd { }));
+                let me : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
                 let mw : Option<Box<dyn Match>> = Some(Box::new(MatchWildN {
-                    next : me,
+                    next : me
                 }));
-                let ml : Option<Box<dyn Match>> = Some(Box::new(MatchLiteral::new(
-                    mw,
-                    literal,
-                    0,
-                )));
+                let ml : Option<Box<dyn Match>> = Some(Box::new(MatchLiteral::new(mw, literal, 0)));
 
                 let matcher : &dyn Match = ml.as_deref().unwrap();
 
@@ -783,24 +690,15 @@ mod match_structures {
 
             #[test]
             fn TEST_Literal_WildN_Literal() {
-
                 let literal2 = "d".into();
                 let literal1 = "m".into();
 
-                let me : Option<Box<dyn Match>> = Some(Box::new(MatchEnd { }));
-                let ml2 : Option<Box<dyn Match>> = Some(Box::new(MatchLiteral::new(
-                    me,
-                    literal2,
-                    0,
-                )));
+                let me : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
+                let ml2 : Option<Box<dyn Match>> = Some(Box::new(MatchLiteral::new(me, literal2, 0)));
                 let mw : Option<Box<dyn Match>> = Some(Box::new(MatchWildN {
-                    next : ml2,
+                    next : ml2
                 }));
-                let ml1 : Option<Box<dyn Match>> = Some(Box::new(MatchLiteral::new(
-                    mw,
-                    literal1,
-                    0,
-                )));
+                let ml1 : Option<Box<dyn Match>> = Some(Box::new(MatchLiteral::new(mw, literal1, 0)));
 
                 let matcher : &dyn Match = ml1.as_deref().unwrap();
 
@@ -838,10 +736,7 @@ mod utils {
         s : &str,
         flags : i64,
     ) -> String {
-
-        let mut chars : Vec<char> =
-        if 0 != (super::constants::IGNORE_CASE & flags) {
-
+        let mut chars : Vec<char> = if 0 != (super::constants::IGNORE_CASE & flags) {
             // Two ways to do this:
             //
             // 1. If we only care about ASCII, just double letter chars; or
@@ -868,7 +763,6 @@ mod utils {
 
             ci_chars
         } else {
-
             s.chars().collect()
         };
 
@@ -882,7 +776,7 @@ mod utils {
 
     pub(crate) struct MatcherSequence {
         /// The head of the chain.
-        matcher0 : Option<Box<dyn Match>>,
+        matcher0 :     Option<Box<dyn Match>>,
         /// The number of matchers (excluding the end-element).
         num_matchers : usize,
     }
@@ -890,7 +784,6 @@ mod utils {
     // API functions
     impl MatcherSequence {
         pub(crate) fn new() -> Self {
-
             let matcher0 : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
             let num_matchers = 0;
 
@@ -911,18 +804,13 @@ mod utils {
             literal : String,
             flags : i64,
         ) -> &mut Self {
-
-            let mut next : Option<Box<dyn Match>> = Some(Box::new(MatchEnd{}));
+            let mut next : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
 
             std_mem::swap(&mut self.matcher0, &mut next);
 
             // NOW: `next` is the head of the list, and `self.matcher0` is `MatchEnd`
 
-            let mut matcher : Option<Box<dyn Match>> = Some(Box::new(MatchLiteral::new(
-                next,
-                literal,
-                flags,
-            )));
+            let mut matcher : Option<Box<dyn Match>> = Some(Box::new(MatchLiteral::new(next, literal, flags)));
 
             std_mem::swap(&mut self.matcher0, &mut matcher);
 
@@ -936,18 +824,13 @@ mod utils {
             characters : &str,
             flags : i64,
         ) -> &mut Self {
-
-            let mut next : Option<Box<dyn Match>> = Some(Box::new(MatchEnd{}));
+            let mut next : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
 
             std_mem::swap(&mut self.matcher0, &mut next);
 
             // NOW: `next` is the head of the list, and `self.matcher0` is `MatchEnd`
 
-            let mut matcher : Option<Box<dyn Match>> = Some(Box::new(MatchNotRange::new(
-                next,
-                characters,
-                flags,
-            )));
+            let mut matcher : Option<Box<dyn Match>> = Some(Box::new(MatchNotRange::new(next, characters, flags)));
 
             std_mem::swap(&mut self.matcher0, &mut matcher);
 
@@ -961,18 +844,13 @@ mod utils {
             characters : &str,
             flags : i64,
         ) -> &mut Self {
-
-            let mut next : Option<Box<dyn Match>> = Some(Box::new(MatchEnd{}));
+            let mut next : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
 
             std_mem::swap(&mut self.matcher0, &mut next);
 
             // NOW: `next` is the head of the list, and `self.matcher0` is `MatchEnd`
 
-            let mut matcher : Option<Box<dyn Match>> = Some(Box::new(MatchRange::new(
-                next,
-                characters,
-                flags,
-            )));
+            let mut matcher : Option<Box<dyn Match>> = Some(Box::new(MatchRange::new(next, characters, flags)));
 
             std_mem::swap(&mut self.matcher0, &mut matcher);
 
@@ -981,11 +859,8 @@ mod utils {
             self
         }
 
-        pub(crate) fn prepend_Wild1(
-            &mut self,
-        ) -> &mut Self {
-
-            let mut next : Option<Box<dyn Match>> = Some(Box::new(MatchEnd{}));
+        pub(crate) fn prepend_Wild1(&mut self) -> &mut Self {
+            let mut next : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
 
             std_mem::swap(&mut self.matcher0, &mut next);
 
@@ -1002,11 +877,8 @@ mod utils {
             self
         }
 
-        pub(crate) fn prepend_WildN(
-            &mut self,
-        ) -> &mut Self {
-
-            let mut next : Option<Box<dyn Match>> = Some(Box::new(MatchEnd{}));
+        pub(crate) fn prepend_WildN(&mut self) -> &mut Self {
+            let mut next : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
 
             std_mem::swap(&mut self.matcher0, &mut next);
 
@@ -1028,7 +900,6 @@ mod utils {
     impl MatcherSequence {
         #[cfg(test)]
         pub(crate) fn len(&self) -> usize {
-
             self.num_matchers
         }
 
@@ -1036,7 +907,6 @@ mod utils {
             &self,
             input : &str,
         ) -> bool {
-
             let matcher : &dyn Match = self.matcher0.as_deref().unwrap();
 
             matcher.try_match(input)
@@ -1048,9 +918,8 @@ mod utils {
     impl std_fmt::Debug for MatcherSequence {
         fn fmt(
             &self,
-            f: &mut std_fmt::Formatter<'_>,
+            f : &mut std_fmt::Formatter<'_>,
         ) -> std_fmt::Result {
-
             const TYPE_NAME : &str = "MatcherSequence";
 
             f.debug_struct(TYPE_NAME)
@@ -1078,7 +947,6 @@ mod utils {
 
             #[test]
             fn TEST_MatcherSequence_EMPTY_1() {
-
                 let matchers = MatcherSequence::new();
 
                 assert_eq!(0, matchers.len());
@@ -1090,7 +958,6 @@ mod utils {
 
             #[test]
             fn TEST_MatcherSequence_WITH_Literal_1() {
-
                 let mut matchers = MatcherSequence::new();
 
                 matchers.prepend_Literal("ma".into(), 0);
@@ -1106,7 +973,6 @@ mod utils {
 
             #[test]
             fn TEST_MatcherSequence_WITH_Range_1() {
-
                 let mut matchers = MatcherSequence::new();
 
                 matchers.prepend_Range("abcdef".into(), 0);
@@ -1133,7 +999,6 @@ mod utils {
 
             #[test]
             fn TEST_MatcherSequence_WITH_NotRange_1() {
-
                 let mut matchers = MatcherSequence::new();
 
                 matchers.prepend_NotRange("abcdef".into(), 0);
@@ -1160,7 +1025,6 @@ mod utils {
 
             #[test]
             fn TEST_MatcherSequence_WITH_Range_HAVING__IGNORE_CASE__1() {
-
                 let mut matchers = MatcherSequence::new();
 
                 matchers.prepend_Range("abcdef".into(), IGNORE_CASE);
@@ -1187,7 +1051,6 @@ mod utils {
 
             #[test]
             fn TEST_MatcherSequence_WITH_NotRange_HAVING__IGNORE_CASE__1() {
-
                 let mut matchers = MatcherSequence::new();
 
                 matchers.prepend_NotRange("abcdef".into(), IGNORE_CASE);
@@ -1214,7 +1077,6 @@ mod utils {
 
             #[test]
             fn TEST_MatcherSequence_WITH_MULTIPLE_ELEMENTS_HAVING__IGNORE_CASE___1() {
-
                 let mut matchers = MatcherSequence::new();
                 let flags = IGNORE_CASE;
 
@@ -1255,19 +1117,13 @@ impl CompiledMatcher {
         pattern : &str,
         flags : i64,
     ) -> Result<Self> {
-
         let mut matchers = utils::MatcherSequence::new();
 
-        Self::parse_(
-            &mut matchers,
-            pattern,
-            flags,
-        ).map ( |_|
-
+        Self::parse_(&mut matchers, pattern, flags).map(|_| {
             Self {
                 matchers,
             }
-        )
+        })
     }
 }
 
@@ -1277,12 +1133,10 @@ impl CompiledMatcher {
 
 // Non-mutating methods
 impl CompiledMatcher {
-
     pub fn matches(
         &self,
         input : &str,
     ) -> Result<bool> {
-
         Ok(self.matchers.try_match(input))
     }
 }
@@ -1297,15 +1151,13 @@ enum ParseState {
 
 // Implementation
 impl CompiledMatcher {
-
     fn parse_(
         matchers : &mut utils::MatcherSequence,
         pattern : &str,
         flags : i64,
     ) -> Result<
-        usize // num_matchers
+        usize, // num_matchers
     > {
-
         let mut num_matchers = 0;
         let mut state = ParseState::None;
         let mut s = vec![];
@@ -1314,24 +1166,16 @@ impl CompiledMatcher {
         let mut num_bytes = 0;
 
         for c in pattern.chars() {
-
             debug_assert!(continuum_prior.is_none() || matches!(state, ParseState::InRange | ParseState::InNotRange));
 
             match c {
                 '[' => {
-
                     match state {
                         ParseState::None => {
-
                             state = ParseState::InRange;
                         },
                         ParseState::InLiteral => {
-
-                            num_matchers += match Self::parse_(
-                                matchers,
-                                &pattern[num_bytes..],
-                                flags,
-                            ) {
+                            num_matchers += match Self::parse_(matchers, &pattern[num_bytes..], flags) {
                                 Ok(num_matchers) => num_matchers,
                                 Err(e) => {
                                     return Err(e);
@@ -1339,7 +1183,6 @@ impl CompiledMatcher {
                             };
 
                             if !s.is_empty() {
-
                                 matchers.prepend_Literal(String::from_iter(s.iter()), flags);
 
                                 s.clear();
@@ -1348,35 +1191,25 @@ impl CompiledMatcher {
                             return Ok(num_matchers + 1);
                         },
                         _ => {
-
                             s.push(c);
-                        }
+                        },
                     }
                 },
                 '^' => {
-
                     match state {
                         ParseState::InRange if s.is_empty() => {
-
                             state = ParseState::InNotRange;
                         },
                         _ => {
-
                             s.push(c);
-                        }
+                        },
                     }
                 },
                 ']' => {
-
                     match state {
                         ParseState::InRange => {
-
                             num_bytes += 1;
-                            num_matchers += match Self::parse_(
-                                matchers,
-                                &pattern[num_bytes..],
-                                flags,
-                            ) {
+                            num_matchers += match Self::parse_(matchers, &pattern[num_bytes..], flags) {
                                 Ok(num_matchers) => num_matchers,
                                 Err(e) => {
                                     return Err(e);
@@ -1385,7 +1218,6 @@ impl CompiledMatcher {
 
                             match continuum_prior {
                                 Some(_c) => {
-
                                     // don't care about `_c` because that will already be pushed into `s`
 
                                     s.push('-');
@@ -1400,13 +1232,8 @@ impl CompiledMatcher {
                             return Ok(num_matchers + 1);
                         },
                         ParseState::InNotRange => {
-
                             num_bytes += 1;
-                            num_matchers += match Self::parse_(
-                                matchers,
-                                &pattern[num_bytes..],
-                                flags,
-                            ) {
+                            num_matchers += match Self::parse_(matchers, &pattern[num_bytes..], flags) {
                                 Ok(num_matchers) => num_matchers,
                                 Err(e) => {
                                     return Err(e);
@@ -1415,7 +1242,6 @@ impl CompiledMatcher {
 
                             match continuum_prior {
                                 Some(_c) => {
-
                                     // don't care about `_c` because that will already be pushed into `s`
 
                                     s.push('-');
@@ -1430,70 +1256,50 @@ impl CompiledMatcher {
                             return Ok(num_matchers + 1);
                         },
                         _ => {
-
                             s.push(c);
-                        }
+                        },
                     }
                 },
                 '\\' => {
-
                     match state {
                         ParseState::InRange | ParseState::InNotRange => {
-
                             s.push(c);
                         },
-                        _ =>{
-
+                        _ => {
                             if escaped {
-
                                 s.push('\\');
                                 escaped = false;
                             } else {
-
                                 escaped = true;
                             }
-                        }
+                        },
                     }
-
                 },
                 '-' => {
-
                     if escaped {
-
                         s.push(c);
 
                         escaped = false;
                     } else {
-
                         match state {
                             ParseState::InRange | ParseState::InNotRange if !s.is_empty() => {
-
                                 continuum_prior = Some(*s.last().unwrap());
                             },
                             _ => {
-
                                 s.push(c);
                             },
                         };
                     }
                 },
                 '?' => {
-
                     if escaped {
-
                         s.push(c);
                         escaped = false;
                     } else {
-
                         match state {
                             ParseState::None => {
-
                                 num_bytes += 1;
-                                num_matchers += match Self::parse_(
-                                    matchers,
-                                    &pattern[num_bytes..],
-                                    flags,
-                                ) {
+                                num_matchers += match Self::parse_(matchers, &pattern[num_bytes..], flags) {
                                     Ok(num_matchers) => num_matchers,
                                     Err(e) => {
                                         return Err(e);
@@ -1506,12 +1312,7 @@ impl CompiledMatcher {
                                 return Ok(num_matchers + 1);
                             },
                             ParseState::InLiteral => {
-
-                                num_matchers += match Self::parse_(
-                                    matchers,
-                                    &pattern[num_bytes..],
-                                    flags,
-                                ) {
+                                num_matchers += match Self::parse_(matchers, &pattern[num_bytes..], flags) {
                                     Ok(num_matchers) => num_matchers,
                                     Err(e) => {
                                         return Err(e);
@@ -1519,8 +1320,6 @@ impl CompiledMatcher {
                                 };
 
                                 if !s.is_empty() {
-
-
                                     matchers.prepend_Literal(String::from_iter(s.iter()), flags);
 
                                     s.clear();
@@ -1529,29 +1328,20 @@ impl CompiledMatcher {
                                 return Ok(num_matchers + 1);
                             },
                             _ => {
-
                                 s.push(c);
-                            }
+                            },
                         }
                     }
                 },
                 '*' => {
-
                     if escaped {
-
                         s.push(c);
                         escaped = false;
                     } else {
-
                         match state {
                             ParseState::None => {
-
                                 num_bytes += 1;
-                                num_matchers += match Self::parse_(
-                                    matchers,
-                                    &pattern[num_bytes..],
-                                    flags,
-                                ) {
+                                num_matchers += match Self::parse_(matchers, &pattern[num_bytes..], flags) {
                                     Ok(num_matchers) => num_matchers,
                                     Err(e) => {
                                         return Err(e);
@@ -1564,12 +1354,7 @@ impl CompiledMatcher {
                                 return Ok(num_matchers + 1);
                             },
                             ParseState::InLiteral => {
-
-                                num_matchers += match Self::parse_(
-                                    matchers,
-                                    &pattern[num_bytes..],
-                                    flags,
-                                ) {
+                                num_matchers += match Self::parse_(matchers, &pattern[num_bytes..], flags) {
                                     Ok(num_matchers) => num_matchers,
                                     Err(e) => {
                                         return Err(e);
@@ -1577,8 +1362,6 @@ impl CompiledMatcher {
                                 };
 
                                 if !s.is_empty() {
-
-
                                     matchers.prepend_Literal(String::from_iter(s.iter()), flags);
 
                                     s.clear();
@@ -1587,24 +1370,19 @@ impl CompiledMatcher {
                                 return Ok(num_matchers + 1);
                             },
                             _ => {
-
                                 s.push(c);
-                            }
+                            },
                         }
                     }
                 },
                 _ => {
-
                     match state {
                         ParseState::InRange | ParseState::InNotRange if !s.is_empty() => {
-
                             match continuum_prior {
                                 Some(prior_character) => {
-
                                     match Self::push_continuum_(&mut s, prior_character, c, flags) {
                                         Ok(_) => (),
                                         Err(e) => {
-
                                             return Err(e);
                                         },
                                     };
@@ -1612,19 +1390,16 @@ impl CompiledMatcher {
                                     continuum_prior = None;
                                 },
                                 _ => {
-
                                     s.push(c);
                                 },
                             }
                         },
                         ParseState::None => {
-
                             s.push(c);
 
                             state = ParseState::InLiteral;
                         },
                         _ => {
-
                             s.push(c);
                         },
                     }
@@ -1635,19 +1410,14 @@ impl CompiledMatcher {
         }
 
         match state {
-
             ParseState::None => {},
             ParseState::InLiteral => {
-
                 matchers.prepend_Literal(String::from_iter(s.iter()), flags);
             },
             ParseState::InNotRange => {
-
-
                 matchers.prepend_NotRange(&String::from_iter(s.iter()), flags);
             },
             ParseState::InRange => {
-
                 matchers.prepend_Range(&String::from_iter(s.iter()), flags);
             },
         }
@@ -1661,13 +1431,11 @@ impl CompiledMatcher {
         posterior_character : char,
         flags : i64,
     ) -> Result<()> {
-
         {
             let _ = flags;
         }
 
         if !prior_character.is_ascii_alphabetic() || !posterior_character.is_ascii_alphabetic() {
-
             return Err(Error::ParseError {
                 line : 0,
                 column : usize::MAX,
@@ -1676,27 +1444,20 @@ impl CompiledMatcher {
         }
 
         if prior_character.is_ascii_lowercase() == posterior_character.is_ascii_lowercase() {
-
-            let r =
-            if prior_character > posterior_character {
-
+            let r = if prior_character > posterior_character {
                 posterior_character..=prior_character
             } else {
-
                 prior_character..=posterior_character
             };
 
             s.append(r.into_iter().collect::<Vec<_>>().as_mut());
         } else {
-
             {
                 let prior_lower = prior_character.to_ascii_lowercase();
                 let posterior_lower = posterior_character.to_ascii_lowercase();
                 let r_lower = if prior_lower > posterior_lower {
-
                     posterior_lower..=prior_lower
                 } else {
-
                     prior_lower..=posterior_lower
                 };
 
@@ -1707,10 +1468,8 @@ impl CompiledMatcher {
                 let prior_upper = prior_character.to_ascii_uppercase();
                 let posterior_upper = posterior_character.to_ascii_uppercase();
                 let r_upper = if prior_upper > posterior_upper {
-
                     posterior_upper..=prior_upper
                 } else {
-
                     prior_upper..=posterior_upper
                 };
 
@@ -1720,7 +1479,6 @@ impl CompiledMatcher {
 
         Ok(())
     }
-
 }
 
 // Trait implementations
@@ -1734,12 +1492,8 @@ pub fn matches(
     input : &str,
     flags : i64,
 ) -> Result<bool> {
-
     match CompiledMatcher::from_pattern_and_flags(pattern, flags) {
-        Ok(matcher) => {
-
-            matcher.matches(input)
-        },
+        Ok(matcher) => matcher.matches(input),
         Err(e) => Err(e),
     }
 }
@@ -1763,7 +1517,6 @@ mod tests {
 
         #[test]
         fn TEST_CompiledMatcher_parse_EMPTY() {
-
             let pattern = "";
 
             {
@@ -1801,7 +1554,6 @@ mod tests {
 
         #[test]
         fn TEST_CompiledMatcher_parse_LITERAL_1() {
-
             let pattern = "abcd";
 
             {
@@ -1842,7 +1594,6 @@ mod tests {
 
         #[test]
         fn TEST_CompiledMatcher_parse_LITERAL_2() {
-
             let pattern = r"ab-d";
 
             {
@@ -1883,7 +1634,6 @@ mod tests {
 
         #[test]
         fn TEST_CompiledMatcher_parse_LITERAL_3() {
-
             let pattern = r"ab\-d";
 
             {
@@ -1924,7 +1674,6 @@ mod tests {
 
         #[test]
         fn TEST_CompiledMatcher_parse_RANGE_1() {
-
             let pattern = "[abcd]";
 
             {
@@ -1989,7 +1738,6 @@ mod tests {
 
         #[test]
         fn TEST_CompiledMatcher_parse_NOTRANGE_1() {
-
             let pattern = "[^abcd]";
 
             {
@@ -2054,7 +1802,6 @@ mod tests {
 
         #[test]
         fn TEST_CompiledMatcher_parse_WILD1_1() {
-
             let pattern = "?";
 
             {
@@ -2090,7 +1837,6 @@ mod tests {
 
         #[test]
         fn TEST_CompiledMatcher_parse_WILDN_1() {
-
             let pattern = "*";
 
             {
@@ -2126,7 +1872,6 @@ mod tests {
 
         #[test]
         fn TEST_CompiledMatcher_parse_LITERAL_THEN_WILDN_THEN_RANGE_1() {
-
             let pattern = "ma*[der]";
 
             {
@@ -2168,7 +1913,6 @@ mod tests {
 
         #[test]
         fn TEST_CompiledMatcher_parse_RANGE_THEN_LITERAL_THEN_WILDN_THEN_RANGE_1() {
-
             let pattern = "[mb]a*[der]";
 
             {
@@ -2222,7 +1966,6 @@ mod tests {
 
         #[test]
         fn TEST_CompiledMatcher_parse_RANGE_THEN_LITERAL_THEN_WILD1_THEN_RANGE_1() {
-
             let pattern = "[mb]a?[der]";
 
             {
@@ -2277,7 +2020,6 @@ mod tests {
         // These all taken from https://github.com/synesissoftware/shwild/blob/master/test/unit/test.unit.shwild.pattern/test.unit.shwild.pattern.cpp
         #[test]
         fn TEST_CompiledMatcher_parse_CXX_TEST_1() {
-
             /* Matching literal strings. */
             {
                 let pattern = "abcd";
@@ -2566,7 +2308,6 @@ mod tests {
 
         #[test]
         fn TEST_matches_EMPTY_PATTERN_1() {
-
             assert_eq!(Ok(true), shwild::matches("", "", 0));
             assert_eq!(Ok(false), shwild::matches("", " ", 0));
             assert_eq!(Ok(false), shwild::matches("", "_", 0));
@@ -2576,13 +2317,16 @@ mod tests {
 
         #[test]
         fn TEST_matches_EMPTY_PATTERN_2() {
-
             match shwild::matches("[a-9]", "", 0) {
-                Ok(_) => {panic!("unexpected success");},
+                Ok(_) => {
+                    panic!("unexpected success");
+                },
                 Err(e) => {
-
-                    assert_eq!("the character range a-9 does not define a supported (ASCII) range continuum", format!("{e:?}"));
-                }
+                    assert_eq!(
+                        "the character range a-9 does not define a supported (ASCII) range continuum",
+                        format!("{e:?}")
+                    );
+                },
             };
         }
     }
