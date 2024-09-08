@@ -91,7 +91,7 @@ mod traits {
         /// - `true` - indicates a full match; or
         /// - `false` -
 
-        fn try_match(
+        fn matches(
             &self,
             slice : &str,
         ) -> bool;
@@ -210,7 +210,7 @@ mod match_structures {
     // Trait implementations
 
     impl Match for MatchEnd {
-        fn try_match(
+        fn matches(
             &self,
             slice : &str,
         ) -> bool {
@@ -230,7 +230,7 @@ mod match_structures {
     }
 
     impl Match for MatchLiteral {
-        fn try_match(
+        fn matches(
             &self,
             slice : &str,
         ) -> bool {
@@ -252,7 +252,7 @@ mod match_structures {
 
             let next = self.next.as_ref().unwrap();
 
-            next.try_match(&slice[self.literal.len()..])
+            next.matches(&slice[self.literal.len()..])
         }
 
         fn minimum_required(&self) -> usize {
@@ -274,7 +274,7 @@ mod match_structures {
     }
 
     impl Match for MatchNotRange {
-        fn try_match(
+        fn matches(
             &self,
             slice : &str,
         ) -> bool {
@@ -290,7 +290,7 @@ mod match_structures {
 
             let next = self.next.as_ref().unwrap();
 
-            next.try_match(&slice[c0.len_utf8()..])
+            next.matches(&slice[c0.len_utf8()..])
         }
 
         fn minimum_required(&self) -> usize {
@@ -312,7 +312,7 @@ mod match_structures {
     }
 
     impl Match for MatchRange {
-        fn try_match(
+        fn matches(
             &self,
             slice : &str,
         ) -> bool {
@@ -328,7 +328,7 @@ mod match_structures {
 
             let next = self.next.as_ref().unwrap();
 
-            next.try_match(&slice[c0.len_utf8()..])
+            next.matches(&slice[c0.len_utf8()..])
         }
 
         fn minimum_required(&self) -> usize {
@@ -350,7 +350,7 @@ mod match_structures {
     }
 
     impl Match for MatchWild1 {
-        fn try_match(
+        fn matches(
             &self,
             slice : &str,
         ) -> bool {
@@ -362,7 +362,7 @@ mod match_structures {
 
             let next = self.next.as_ref().unwrap();
 
-            next.try_match(&slice[c0.len_utf8()..])
+            next.matches(&slice[c0.len_utf8()..])
         }
 
         fn minimum_required(&self) -> usize {
@@ -384,7 +384,7 @@ mod match_structures {
     }
 
     impl Match for MatchWildN {
-        fn try_match(
+        fn matches(
             &self,
             slice : &str,
         ) -> bool {
@@ -395,14 +395,14 @@ mod match_structures {
             let next = self.next.as_ref().unwrap();
 
             for c in slice.chars() {
-                if next.try_match(&slice[offset..]) {
+                if next.matches(&slice[offset..]) {
                     return true;
                 } else {
                     offset += c.len_utf8();
                 }
             }
 
-            if next.try_match(&slice[offset..]) {
+            if next.matches(&slice[offset..]) {
                 return true;
             }
 
@@ -449,8 +449,8 @@ mod match_structures {
 
                 let matcher : &dyn Match = me.as_deref().unwrap();
 
-                assert!(matcher.try_match(""));
-                assert!(!matcher.try_match("a"));
+                assert!(matcher.matches(""));
+                assert!(!matcher.matches("a"));
                 assert_eq!(0, matcher.minimum_required());
             }
         }
@@ -473,9 +473,9 @@ mod match_structures {
                 let matcher : &dyn Match = ml.as_deref().unwrap();
 
                 assert_eq!(2, matcher.minimum_required());
-                assert!(matcher.try_match("he"));
-                assert!(!matcher.try_match("hen"));
-                assert!(!matcher.try_match("he "));
+                assert!(matcher.matches("he"));
+                assert!(!matcher.matches("hen"));
+                assert!(!matcher.matches("he "));
             }
 
             #[test]
@@ -491,9 +491,9 @@ mod match_structures {
                 let matcher : &dyn Match = ml1.as_deref().unwrap();
 
                 assert_eq!(4, matcher.minimum_required());
-                assert!(matcher.try_match("head"));
-                assert!(!matcher.try_match("heads"));
-                assert!(!matcher.try_match("hea"));
+                assert!(matcher.matches("head"));
+                assert!(!matcher.matches("heads"));
+                assert!(!matcher.matches("hea"));
             }
         }
 
@@ -514,20 +514,20 @@ mod match_structures {
                 let matcher : &dyn Match = mr.as_deref().unwrap();
 
                 assert_eq!(1, matcher.minimum_required());
-                assert!(!matcher.try_match(""));
-                assert!(matcher.try_match("0"));
-                assert!(matcher.try_match("1"));
-                assert!(matcher.try_match("2"));
-                assert!(matcher.try_match("3"));
-                assert!(matcher.try_match("4"));
-                assert!(matcher.try_match("5"));
-                assert!(matcher.try_match("6"));
-                assert!(matcher.try_match("7"));
-                assert!(matcher.try_match("8"));
-                assert!(matcher.try_match("9"));
-                assert!(!matcher.try_match(" "));
-                assert!(!matcher.try_match("a"));
-                assert!(!matcher.try_match("01"));
+                assert!(!matcher.matches(""));
+                assert!(matcher.matches("0"));
+                assert!(matcher.matches("1"));
+                assert!(matcher.matches("2"));
+                assert!(matcher.matches("3"));
+                assert!(matcher.matches("4"));
+                assert!(matcher.matches("5"));
+                assert!(matcher.matches("6"));
+                assert!(matcher.matches("7"));
+                assert!(matcher.matches("8"));
+                assert!(matcher.matches("9"));
+                assert!(!matcher.matches(" "));
+                assert!(!matcher.matches("a"));
+                assert!(!matcher.matches("01"));
             }
         }
 
@@ -549,20 +549,20 @@ mod match_structures {
 
                 assert_eq!(1, matcher.minimum_required());
 
-                assert!(!matcher.try_match(""));
-                assert!(!matcher.try_match("0"));
-                assert!(!matcher.try_match("1"));
-                assert!(!matcher.try_match("2"));
-                assert!(!matcher.try_match("3"));
-                assert!(!matcher.try_match("4"));
-                assert!(!matcher.try_match("5"));
-                assert!(!matcher.try_match("6"));
-                assert!(!matcher.try_match("7"));
-                assert!(!matcher.try_match("8"));
-                assert!(!matcher.try_match("9"));
-                assert!(matcher.try_match(" "));
-                assert!(matcher.try_match("a"));
-                assert!(!matcher.try_match("01"));
+                assert!(!matcher.matches(""));
+                assert!(!matcher.matches("0"));
+                assert!(!matcher.matches("1"));
+                assert!(!matcher.matches("2"));
+                assert!(!matcher.matches("3"));
+                assert!(!matcher.matches("4"));
+                assert!(!matcher.matches("5"));
+                assert!(!matcher.matches("6"));
+                assert!(!matcher.matches("7"));
+                assert!(!matcher.matches("8"));
+                assert!(!matcher.matches("9"));
+                assert!(matcher.matches(" "));
+                assert!(matcher.matches("a"));
+                assert!(!matcher.matches("01"));
             }
         }
 
@@ -584,20 +584,20 @@ mod match_structures {
 
                 assert_eq!(1, matcher.minimum_required());
 
-                assert!(!matcher.try_match(""));
-                assert!(matcher.try_match("0"));
-                assert!(matcher.try_match("1"));
-                assert!(matcher.try_match("2"));
-                assert!(matcher.try_match("3"));
-                assert!(matcher.try_match("4"));
-                assert!(matcher.try_match("5"));
-                assert!(matcher.try_match("6"));
-                assert!(matcher.try_match("7"));
-                assert!(matcher.try_match("8"));
-                assert!(matcher.try_match("9"));
-                assert!(matcher.try_match(" "));
-                assert!(matcher.try_match("a"));
-                assert!(!matcher.try_match("01"));
+                assert!(!matcher.matches(""));
+                assert!(matcher.matches("0"));
+                assert!(matcher.matches("1"));
+                assert!(matcher.matches("2"));
+                assert!(matcher.matches("3"));
+                assert!(matcher.matches("4"));
+                assert!(matcher.matches("5"));
+                assert!(matcher.matches("6"));
+                assert!(matcher.matches("7"));
+                assert!(matcher.matches("8"));
+                assert!(matcher.matches("9"));
+                assert!(matcher.matches(" "));
+                assert!(matcher.matches("a"));
+                assert!(!matcher.matches("01"));
             }
 
             #[test]
@@ -614,21 +614,21 @@ mod match_structures {
 
                 assert_eq!(2, matcher.minimum_required());
 
-                assert!(!matcher.try_match(""));
-                assert!(!matcher.try_match("0"));
-                assert!(!matcher.try_match("1"));
-                assert!(!matcher.try_match("2"));
-                assert!(!matcher.try_match("3"));
-                assert!(!matcher.try_match("4"));
-                assert!(!matcher.try_match("5"));
-                assert!(!matcher.try_match("6"));
-                assert!(!matcher.try_match("7"));
-                assert!(!matcher.try_match("8"));
-                assert!(!matcher.try_match("9"));
-                assert!(!matcher.try_match(" "));
-                assert!(!matcher.try_match("a"));
-                assert!(matcher.try_match("01"));
-                assert!(!matcher.try_match("012"));
+                assert!(!matcher.matches(""));
+                assert!(!matcher.matches("0"));
+                assert!(!matcher.matches("1"));
+                assert!(!matcher.matches("2"));
+                assert!(!matcher.matches("3"));
+                assert!(!matcher.matches("4"));
+                assert!(!matcher.matches("5"));
+                assert!(!matcher.matches("6"));
+                assert!(!matcher.matches("7"));
+                assert!(!matcher.matches("8"));
+                assert!(!matcher.matches("9"));
+                assert!(!matcher.matches(" "));
+                assert!(!matcher.matches("a"));
+                assert!(matcher.matches("01"));
+                assert!(!matcher.matches("012"));
             }
         }
 
@@ -650,12 +650,12 @@ mod match_structures {
 
                 assert_eq!(0, matcher.minimum_required());
 
-                assert!(matcher.try_match(""));
-                assert!(matcher.try_match("0"));
-                assert!(matcher.try_match("ab"));
-                assert!(matcher.try_match("012"));
-                assert!(matcher.try_match("abcd"));
-                assert!(matcher.try_match("01234"));
+                assert!(matcher.matches(""));
+                assert!(matcher.matches("0"));
+                assert!(matcher.matches("ab"));
+                assert!(matcher.matches("012"));
+                assert!(matcher.matches("abcd"));
+                assert!(matcher.matches("01234"));
             }
         }
 
@@ -680,12 +680,12 @@ mod match_structures {
 
                 assert_eq!(2, matcher.minimum_required());
 
-                assert!(!matcher.try_match(""));
-                assert!(!matcher.try_match("m"));
-                assert!(matcher.try_match("ma"));
-                assert!(!matcher.try_match("me"));
-                assert!(matcher.try_match("mad"));
-                assert!(matcher.try_match("made"));
+                assert!(!matcher.matches(""));
+                assert!(!matcher.matches("m"));
+                assert!(matcher.matches("ma"));
+                assert!(!matcher.matches("me"));
+                assert!(matcher.matches("mad"));
+                assert!(matcher.matches("made"));
             }
 
             #[test]
@@ -704,16 +704,16 @@ mod match_structures {
 
                 assert_eq!(2, matcher.minimum_required());
 
-                assert!(!matcher.try_match(""));
-                assert!(!matcher.try_match("m"));
-                assert!(!matcher.try_match("d"));
-                assert!(!matcher.try_match("ma"));
-                assert!(matcher.try_match("md"));
-                assert!(!matcher.try_match("mar"));
-                assert!(matcher.try_match("mad"));
-                assert!(matcher.try_match("mold"));
-                assert!(matcher.try_match("mould"));
-                assert!(!matcher.try_match("mouldy"));
+                assert!(!matcher.matches(""));
+                assert!(!matcher.matches("m"));
+                assert!(!matcher.matches("d"));
+                assert!(!matcher.matches("ma"));
+                assert!(matcher.matches("md"));
+                assert!(!matcher.matches("mar"));
+                assert!(matcher.matches("mad"));
+                assert!(matcher.matches("mold"));
+                assert!(matcher.matches("mould"));
+                assert!(!matcher.matches("mouldy"));
             }
         }
     }
@@ -904,13 +904,13 @@ mod utils {
             self.num_matchers
         }
 
-        pub(crate) fn try_match(
+        pub(crate) fn matches(
             &self,
             input : &str,
         ) -> bool {
             let matcher : &dyn Match = self.matcher0.as_deref().unwrap();
 
-            matcher.try_match(input)
+            matcher.matches(input)
         }
     }
 
@@ -952,9 +952,9 @@ mod utils {
 
                 assert_eq!(0, matchers.len());
 
-                assert!(matchers.try_match(""));
-                assert!(!matchers.try_match(" "));
-                assert!(!matchers.try_match("a"));
+                assert!(matchers.matches(""));
+                assert!(!matchers.matches(" "));
+                assert!(!matchers.matches("a"));
             }
 
             #[test]
@@ -965,11 +965,11 @@ mod utils {
 
                 assert_eq!(1, matchers.len());
 
-                assert!(!matchers.try_match(""));
-                assert!(!matchers.try_match(" "));
-                assert!(!matchers.try_match("a"));
-                assert!(matchers.try_match("ma"));
-                assert!(!matchers.try_match("mad"));
+                assert!(!matchers.matches(""));
+                assert!(!matchers.matches(" "));
+                assert!(!matchers.matches("a"));
+                assert!(matchers.matches("ma"));
+                assert!(!matchers.matches("mad"));
             }
 
             #[test]
@@ -980,22 +980,22 @@ mod utils {
 
                 assert_eq!(1, matchers.len());
 
-                assert!(!matchers.try_match(""));
-                assert!(!matchers.try_match(" "));
-                assert!(matchers.try_match("a"));
-                assert!(matchers.try_match("b"));
-                assert!(matchers.try_match("c"));
-                assert!(matchers.try_match("d"));
-                assert!(matchers.try_match("e"));
-                assert!(matchers.try_match("f"));
-                assert!(!matchers.try_match("g"));
-                assert!(!matchers.try_match("A"));
-                assert!(!matchers.try_match("B"));
-                assert!(!matchers.try_match("C"));
-                assert!(!matchers.try_match("D"));
-                assert!(!matchers.try_match("E"));
-                assert!(!matchers.try_match("F"));
-                assert!(!matchers.try_match("G"));
+                assert!(!matchers.matches(""));
+                assert!(!matchers.matches(" "));
+                assert!(matchers.matches("a"));
+                assert!(matchers.matches("b"));
+                assert!(matchers.matches("c"));
+                assert!(matchers.matches("d"));
+                assert!(matchers.matches("e"));
+                assert!(matchers.matches("f"));
+                assert!(!matchers.matches("g"));
+                assert!(!matchers.matches("A"));
+                assert!(!matchers.matches("B"));
+                assert!(!matchers.matches("C"));
+                assert!(!matchers.matches("D"));
+                assert!(!matchers.matches("E"));
+                assert!(!matchers.matches("F"));
+                assert!(!matchers.matches("G"));
             }
 
             #[test]
@@ -1006,22 +1006,22 @@ mod utils {
 
                 assert_eq!(1, matchers.len());
 
-                assert!(!matchers.try_match(""));
-                assert!(matchers.try_match(" "));
-                assert!(!matchers.try_match("a"));
-                assert!(!matchers.try_match("b"));
-                assert!(!matchers.try_match("c"));
-                assert!(!matchers.try_match("d"));
-                assert!(!matchers.try_match("e"));
-                assert!(!matchers.try_match("f"));
-                assert!(matchers.try_match("g"));
-                assert!(matchers.try_match("A"));
-                assert!(matchers.try_match("B"));
-                assert!(matchers.try_match("C"));
-                assert!(matchers.try_match("D"));
-                assert!(matchers.try_match("E"));
-                assert!(matchers.try_match("F"));
-                assert!(matchers.try_match("G"));
+                assert!(!matchers.matches(""));
+                assert!(matchers.matches(" "));
+                assert!(!matchers.matches("a"));
+                assert!(!matchers.matches("b"));
+                assert!(!matchers.matches("c"));
+                assert!(!matchers.matches("d"));
+                assert!(!matchers.matches("e"));
+                assert!(!matchers.matches("f"));
+                assert!(matchers.matches("g"));
+                assert!(matchers.matches("A"));
+                assert!(matchers.matches("B"));
+                assert!(matchers.matches("C"));
+                assert!(matchers.matches("D"));
+                assert!(matchers.matches("E"));
+                assert!(matchers.matches("F"));
+                assert!(matchers.matches("G"));
             }
 
             #[test]
@@ -1032,22 +1032,22 @@ mod utils {
 
                 assert_eq!(1, matchers.len());
 
-                assert!(!matchers.try_match(""));
-                assert!(!matchers.try_match(" "));
-                assert!(matchers.try_match("a"));
-                assert!(matchers.try_match("b"));
-                assert!(matchers.try_match("c"));
-                assert!(matchers.try_match("d"));
-                assert!(matchers.try_match("e"));
-                assert!(matchers.try_match("f"));
-                assert!(!matchers.try_match("g"));
-                assert!(matchers.try_match("A"));
-                assert!(matchers.try_match("B"));
-                assert!(matchers.try_match("C"));
-                assert!(matchers.try_match("D"));
-                assert!(matchers.try_match("E"));
-                assert!(matchers.try_match("F"));
-                assert!(!matchers.try_match("G"));
+                assert!(!matchers.matches(""));
+                assert!(!matchers.matches(" "));
+                assert!(matchers.matches("a"));
+                assert!(matchers.matches("b"));
+                assert!(matchers.matches("c"));
+                assert!(matchers.matches("d"));
+                assert!(matchers.matches("e"));
+                assert!(matchers.matches("f"));
+                assert!(!matchers.matches("g"));
+                assert!(matchers.matches("A"));
+                assert!(matchers.matches("B"));
+                assert!(matchers.matches("C"));
+                assert!(matchers.matches("D"));
+                assert!(matchers.matches("E"));
+                assert!(matchers.matches("F"));
+                assert!(!matchers.matches("G"));
             }
 
             #[test]
@@ -1058,22 +1058,22 @@ mod utils {
 
                 assert_eq!(1, matchers.len());
 
-                assert!(!matchers.try_match(""));
-                assert!(matchers.try_match(" "));
-                assert!(!matchers.try_match("a"));
-                assert!(!matchers.try_match("b"));
-                assert!(!matchers.try_match("c"));
-                assert!(!matchers.try_match("d"));
-                assert!(!matchers.try_match("e"));
-                assert!(!matchers.try_match("f"));
-                assert!(matchers.try_match("g"));
-                assert!(!matchers.try_match("A"));
-                assert!(!matchers.try_match("B"));
-                assert!(!matchers.try_match("C"));
-                assert!(!matchers.try_match("D"));
-                assert!(!matchers.try_match("E"));
-                assert!(!matchers.try_match("F"));
-                assert!(matchers.try_match("G"));
+                assert!(!matchers.matches(""));
+                assert!(matchers.matches(" "));
+                assert!(!matchers.matches("a"));
+                assert!(!matchers.matches("b"));
+                assert!(!matchers.matches("c"));
+                assert!(!matchers.matches("d"));
+                assert!(!matchers.matches("e"));
+                assert!(!matchers.matches("f"));
+                assert!(matchers.matches("g"));
+                assert!(!matchers.matches("A"));
+                assert!(!matchers.matches("B"));
+                assert!(!matchers.matches("C"));
+                assert!(!matchers.matches("D"));
+                assert!(!matchers.matches("E"));
+                assert!(!matchers.matches("F"));
+                assert!(matchers.matches("G"));
             }
 
             #[test]
@@ -1090,11 +1090,11 @@ mod utils {
                 matchers.prepend_Literal(r":".into(), flags);
                 matchers.prepend_Range(r"abcdefghijklmnopqrstuvwxyz", flags);
 
-                assert!(!matchers.try_match(""));
-                assert!(!matchers.try_match("program.exe"));
-                assert!(!matchers.try_match("C:/"));
-                assert!(matchers.try_match("C:/directory/program.exe"));
-                assert!(matchers.try_match("C:/program.exe"));
+                assert!(!matchers.matches(""));
+                assert!(!matchers.matches("program.exe"));
+                assert!(!matchers.matches("C:/"));
+                assert!(matchers.matches("C:/directory/program.exe"));
+                assert!(matchers.matches("C:/program.exe"));
             }
         }
     }
@@ -1140,11 +1140,12 @@ impl CompiledMatcher {
         self.matchers.len()
     }
 
+    /// T.B.C.
     pub fn matches(
         &self,
         input : &str,
-    ) -> Result<bool> {
-        Ok(self.matchers.try_match(input))
+    ) -> bool {
+        self.matchers.matches(input)
     }
 }
 
@@ -1493,7 +1494,7 @@ pub fn matches(
     input : &str,
     flags : i64,
 ) -> Result<bool> {
-    CompiledMatcher::from_pattern_and_flags(pattern, flags).and_then(|matcher| matcher.matches(input))
+    CompiledMatcher::from_pattern_and_flags(pattern, flags).and_then(|matcher| Ok(matcher.matches(input)))
 }
 
 
@@ -1524,12 +1525,12 @@ mod tests {
 
                 assert_eq!(0, matcher.len());
 
-                assert_eq!(Ok(false), matcher.matches("a"));
-                assert_eq!(Ok(false), matcher.matches("ab"));
-                assert_eq!(Ok(false), matcher.matches("abc"));
-                assert_eq!(Ok(false), matcher.matches("abcd"));
-                assert_eq!(Ok(false), matcher.matches("ABCD"));
-                assert_eq!(Ok(false), matcher.matches("abcde"));
+                assert!(!matcher.matches("a"));
+                assert!(!matcher.matches("ab"));
+                assert!(!matcher.matches("abc"));
+                assert!(!matcher.matches("abcd"));
+                assert!(!matcher.matches("ABCD"));
+                assert!(!matcher.matches("abcde"));
             }
 
             {
@@ -1539,14 +1540,14 @@ mod tests {
 
                 assert_eq!(0, matcher.len());
 
-                assert_eq!(Ok(true), matcher.matches(""));
-                assert_eq!(Ok(false), matcher.matches(" "));
-                assert_eq!(Ok(false), matcher.matches("a"));
-                assert_eq!(Ok(false), matcher.matches("ab"));
-                assert_eq!(Ok(false), matcher.matches("abc"));
-                assert_eq!(Ok(false), matcher.matches("abcd"));
-                assert_eq!(Ok(false), matcher.matches("ABCD"));
-                assert_eq!(Ok(false), matcher.matches("abcde"));
+                assert!(matcher.matches(""));
+                assert!(!matcher.matches(" "));
+                assert!(!matcher.matches("a"));
+                assert!(!matcher.matches("ab"));
+                assert!(!matcher.matches("abc"));
+                assert!(!matcher.matches("abcd"));
+                assert!(!matcher.matches("ABCD"));
+                assert!(!matcher.matches("abcde"));
             }
         }
 
@@ -1562,14 +1563,14 @@ mod tests {
 
                 assert_eq!(1, matcher.len());
 
-                assert_eq!(Ok(false), matcher.matches(""));
-                assert_eq!(Ok(false), matcher.matches(" "));
-                assert_eq!(Ok(false), matcher.matches("a"));
-                assert_eq!(Ok(false), matcher.matches("ab"));
-                assert_eq!(Ok(false), matcher.matches("abc"));
-                assert_eq!(Ok(true), matcher.matches("abcd"));
-                assert_eq!(Ok(false), matcher.matches("ABCD"));
-                assert_eq!(Ok(false), matcher.matches("abcde"));
+                assert!(!matcher.matches(""));
+                assert!(!matcher.matches(" "));
+                assert!(!matcher.matches("a"));
+                assert!(!matcher.matches("ab"));
+                assert!(!matcher.matches("abc"));
+                assert!(matcher.matches("abcd"));
+                assert!(!matcher.matches("ABCD"));
+                assert!(!matcher.matches("abcde"));
             }
 
             {
@@ -1579,14 +1580,14 @@ mod tests {
 
                 assert_eq!(1, matcher.len());
 
-                assert_eq!(Ok(false), matcher.matches(""));
-                assert_eq!(Ok(false), matcher.matches(" "));
-                assert_eq!(Ok(false), matcher.matches("a"));
-                assert_eq!(Ok(false), matcher.matches("ab"));
-                assert_eq!(Ok(false), matcher.matches("abc"));
-                assert_eq!(Ok(true), matcher.matches("abcd"));
-                assert_eq!(Ok(true), matcher.matches("ABCD"));
-                assert_eq!(Ok(false), matcher.matches("abcde"));
+                assert!(!matcher.matches(""));
+                assert!(!matcher.matches(" "));
+                assert!(!matcher.matches("a"));
+                assert!(!matcher.matches("ab"));
+                assert!(!matcher.matches("abc"));
+                assert!(matcher.matches("abcd"));
+                assert!(matcher.matches("ABCD"));
+                assert!(!matcher.matches("abcde"));
             }
         }
 
@@ -1602,14 +1603,14 @@ mod tests {
 
                 assert_eq!(1, matcher.len());
 
-                assert_eq!(Ok(false), matcher.matches(""));
-                assert_eq!(Ok(false), matcher.matches(" "));
-                assert_eq!(Ok(false), matcher.matches("a"));
-                assert_eq!(Ok(false), matcher.matches("ab"));
-                assert_eq!(Ok(false), matcher.matches("abc"));
-                assert_eq!(Ok(true), matcher.matches("ab-d"));
-                assert_eq!(Ok(false), matcher.matches("AB-D"));
-                assert_eq!(Ok(false), matcher.matches("ab-de"));
+                assert!(!matcher.matches(""));
+                assert!(!matcher.matches(" "));
+                assert!(!matcher.matches("a"));
+                assert!(!matcher.matches("ab"));
+                assert!(!matcher.matches("abc"));
+                assert!(matcher.matches("ab-d"));
+                assert!(!matcher.matches("AB-D"));
+                assert!(!matcher.matches("ab-de"));
             }
 
             {
@@ -1619,14 +1620,14 @@ mod tests {
 
                 assert_eq!(1, matcher.len());
 
-                assert_eq!(Ok(false), matcher.matches(""));
-                assert_eq!(Ok(false), matcher.matches(" "));
-                assert_eq!(Ok(false), matcher.matches("a"));
-                assert_eq!(Ok(false), matcher.matches("ab"));
-                assert_eq!(Ok(false), matcher.matches("abc"));
-                assert_eq!(Ok(true), matcher.matches("ab-d"));
-                assert_eq!(Ok(true), matcher.matches("AB-D"));
-                assert_eq!(Ok(false), matcher.matches("ab-de"));
+                assert!(!matcher.matches(""));
+                assert!(!matcher.matches(" "));
+                assert!(!matcher.matches("a"));
+                assert!(!matcher.matches("ab"));
+                assert!(!matcher.matches("abc"));
+                assert!(matcher.matches("ab-d"));
+                assert!(matcher.matches("AB-D"));
+                assert!(!matcher.matches("ab-de"));
             }
         }
 
@@ -1642,14 +1643,14 @@ mod tests {
 
                 assert_eq!(1, matcher.len());
 
-                assert_eq!(Ok(false), matcher.matches(""));
-                assert_eq!(Ok(false), matcher.matches(" "));
-                assert_eq!(Ok(false), matcher.matches("a"));
-                assert_eq!(Ok(false), matcher.matches("ab"));
-                assert_eq!(Ok(false), matcher.matches("abc"));
-                assert_eq!(Ok(true), matcher.matches("ab-d"));
-                assert_eq!(Ok(false), matcher.matches("AB-D"));
-                assert_eq!(Ok(false), matcher.matches("ab-de"));
+                assert!(!matcher.matches(""));
+                assert!(!matcher.matches(" "));
+                assert!(!matcher.matches("a"));
+                assert!(!matcher.matches("ab"));
+                assert!(!matcher.matches("abc"));
+                assert!(matcher.matches("ab-d"));
+                assert!(!matcher.matches("AB-D"));
+                assert!(!matcher.matches("ab-de"));
             }
 
             {
@@ -1659,14 +1660,14 @@ mod tests {
 
                 assert_eq!(1, matcher.len());
 
-                assert_eq!(Ok(false), matcher.matches(""));
-                assert_eq!(Ok(false), matcher.matches(" "));
-                assert_eq!(Ok(false), matcher.matches("a"));
-                assert_eq!(Ok(false), matcher.matches("ab"));
-                assert_eq!(Ok(false), matcher.matches("abc"));
-                assert_eq!(Ok(true), matcher.matches("ab-d"));
-                assert_eq!(Ok(true), matcher.matches("AB-D"));
-                assert_eq!(Ok(false), matcher.matches("ab-de"));
+                assert!(!matcher.matches(""));
+                assert!(!matcher.matches(" "));
+                assert!(!matcher.matches("a"));
+                assert!(!matcher.matches("ab"));
+                assert!(!matcher.matches("abc"));
+                assert!(matcher.matches("ab-d"));
+                assert!(matcher.matches("AB-D"));
+                assert!(!matcher.matches("ab-de"));
             }
         }
 
@@ -1682,26 +1683,26 @@ mod tests {
 
                 assert_eq!(1, matcher.len());
 
-                assert_eq!(Ok(false), matcher.matches(""));
-                assert_eq!(Ok(false), matcher.matches(" "));
-                assert_eq!(Ok(false), matcher.matches("["));
-                assert_eq!(Ok(false), matcher.matches("]"));
-                assert_eq!(Ok(false), matcher.matches("^"));
-                assert_eq!(Ok(true), matcher.matches("a"));
-                assert_eq!(Ok(true), matcher.matches("b"));
-                assert_eq!(Ok(true), matcher.matches("c"));
-                assert_eq!(Ok(true), matcher.matches("d"));
-                assert_eq!(Ok(false), matcher.matches("e"));
-                assert_eq!(Ok(false), matcher.matches("A"));
-                assert_eq!(Ok(false), matcher.matches("B"));
-                assert_eq!(Ok(false), matcher.matches("C"));
-                assert_eq!(Ok(false), matcher.matches("D"));
-                assert_eq!(Ok(false), matcher.matches("E"));
-                assert_eq!(Ok(false), matcher.matches("ab"));
-                assert_eq!(Ok(false), matcher.matches("abc"));
-                assert_eq!(Ok(false), matcher.matches("abcd"));
-                assert_eq!(Ok(false), matcher.matches("ABCD"));
-                assert_eq!(Ok(false), matcher.matches("abcde"));
+                assert!(!matcher.matches(""));
+                assert!(!matcher.matches(" "));
+                assert!(!matcher.matches("["));
+                assert!(!matcher.matches("]"));
+                assert!(!matcher.matches("^"));
+                assert!(matcher.matches("a"));
+                assert!(matcher.matches("b"));
+                assert!(matcher.matches("c"));
+                assert!(matcher.matches("d"));
+                assert!(!matcher.matches("e"));
+                assert!(!matcher.matches("A"));
+                assert!(!matcher.matches("B"));
+                assert!(!matcher.matches("C"));
+                assert!(!matcher.matches("D"));
+                assert!(!matcher.matches("E"));
+                assert!(!matcher.matches("ab"));
+                assert!(!matcher.matches("abc"));
+                assert!(!matcher.matches("abcd"));
+                assert!(!matcher.matches("ABCD"));
+                assert!(!matcher.matches("abcde"));
             }
 
             {
@@ -1711,26 +1712,26 @@ mod tests {
 
                 assert_eq!(1, matcher.len());
 
-                assert_eq!(Ok(false), matcher.matches(""));
-                assert_eq!(Ok(false), matcher.matches(" "));
-                assert_eq!(Ok(false), matcher.matches("["));
-                assert_eq!(Ok(false), matcher.matches("]"));
-                assert_eq!(Ok(false), matcher.matches("^"));
-                assert_eq!(Ok(true), matcher.matches("a"));
-                assert_eq!(Ok(true), matcher.matches("b"));
-                assert_eq!(Ok(true), matcher.matches("c"));
-                assert_eq!(Ok(true), matcher.matches("d"));
-                assert_eq!(Ok(false), matcher.matches("e"));
-                assert_eq!(Ok(true), matcher.matches("A"));
-                assert_eq!(Ok(true), matcher.matches("B"));
-                assert_eq!(Ok(true), matcher.matches("C"));
-                assert_eq!(Ok(true), matcher.matches("D"));
-                assert_eq!(Ok(false), matcher.matches("E"));
-                assert_eq!(Ok(false), matcher.matches("ab"));
-                assert_eq!(Ok(false), matcher.matches("abc"));
-                assert_eq!(Ok(false), matcher.matches("abcd"));
-                assert_eq!(Ok(false), matcher.matches("ABCD"));
-                assert_eq!(Ok(false), matcher.matches("abcde"));
+                assert!(!matcher.matches(""));
+                assert!(!matcher.matches(" "));
+                assert!(!matcher.matches("["));
+                assert!(!matcher.matches("]"));
+                assert!(!matcher.matches("^"));
+                assert!(matcher.matches("a"));
+                assert!(matcher.matches("b"));
+                assert!(matcher.matches("c"));
+                assert!(matcher.matches("d"));
+                assert!(!matcher.matches("e"));
+                assert!(matcher.matches("A"));
+                assert!(matcher.matches("B"));
+                assert!(matcher.matches("C"));
+                assert!(matcher.matches("D"));
+                assert!(!matcher.matches("E"));
+                assert!(!matcher.matches("ab"));
+                assert!(!matcher.matches("abc"));
+                assert!(!matcher.matches("abcd"));
+                assert!(!matcher.matches("ABCD"));
+                assert!(!matcher.matches("abcde"));
             }
         }
 
@@ -1745,26 +1746,26 @@ mod tests {
 
                 assert_eq!(1, matcher.len());
 
-                assert_eq!(Ok(false), matcher.matches(""));
-                assert_eq!(Ok(true), matcher.matches(" "));
-                assert_eq!(Ok(true), matcher.matches("["));
-                assert_eq!(Ok(true), matcher.matches("]"));
-                assert_eq!(Ok(true), matcher.matches("^"));
-                assert_eq!(Ok(false), matcher.matches("a"));
-                assert_eq!(Ok(false), matcher.matches("b"));
-                assert_eq!(Ok(false), matcher.matches("c"));
-                assert_eq!(Ok(false), matcher.matches("d"));
-                assert_eq!(Ok(true), matcher.matches("e"));
-                assert_eq!(Ok(true), matcher.matches("A"));
-                assert_eq!(Ok(true), matcher.matches("B"));
-                assert_eq!(Ok(true), matcher.matches("C"));
-                assert_eq!(Ok(true), matcher.matches("D"));
-                assert_eq!(Ok(true), matcher.matches("E"));
-                assert_eq!(Ok(false), matcher.matches("ab"));
-                assert_eq!(Ok(false), matcher.matches("abc"));
-                assert_eq!(Ok(false), matcher.matches("abcd"));
-                assert_eq!(Ok(false), matcher.matches("ABCD"));
-                assert_eq!(Ok(false), matcher.matches("abcde"));
+                assert!(!matcher.matches(""));
+                assert!(matcher.matches(" "));
+                assert!(matcher.matches("["));
+                assert!(matcher.matches("]"));
+                assert!(matcher.matches("^"));
+                assert!(!matcher.matches("a"));
+                assert!(!matcher.matches("b"));
+                assert!(!matcher.matches("c"));
+                assert!(!matcher.matches("d"));
+                assert!(matcher.matches("e"));
+                assert!(matcher.matches("A"));
+                assert!(matcher.matches("B"));
+                assert!(matcher.matches("C"));
+                assert!(matcher.matches("D"));
+                assert!(matcher.matches("E"));
+                assert!(!matcher.matches("ab"));
+                assert!(!matcher.matches("abc"));
+                assert!(!matcher.matches("abcd"));
+                assert!(!matcher.matches("ABCD"));
+                assert!(!matcher.matches("abcde"));
             }
 
             {
@@ -1774,26 +1775,26 @@ mod tests {
 
                 assert_eq!(1, matcher.len());
 
-                assert_eq!(Ok(false), matcher.matches(""));
-                assert_eq!(Ok(true), matcher.matches(" "));
-                assert_eq!(Ok(true), matcher.matches("["));
-                assert_eq!(Ok(true), matcher.matches("]"));
-                assert_eq!(Ok(true), matcher.matches("^"));
-                assert_eq!(Ok(false), matcher.matches("a"));
-                assert_eq!(Ok(false), matcher.matches("b"));
-                assert_eq!(Ok(false), matcher.matches("c"));
-                assert_eq!(Ok(false), matcher.matches("d"));
-                assert_eq!(Ok(true), matcher.matches("e"));
-                assert_eq!(Ok(false), matcher.matches("A"));
-                assert_eq!(Ok(false), matcher.matches("B"));
-                assert_eq!(Ok(false), matcher.matches("C"));
-                assert_eq!(Ok(false), matcher.matches("D"));
-                assert_eq!(Ok(true), matcher.matches("E"));
-                assert_eq!(Ok(false), matcher.matches("ab"));
-                assert_eq!(Ok(false), matcher.matches("abc"));
-                assert_eq!(Ok(false), matcher.matches("abcd"));
-                assert_eq!(Ok(false), matcher.matches("ABCD"));
-                assert_eq!(Ok(false), matcher.matches("abcde"));
+                assert!(!matcher.matches(""));
+                assert!(matcher.matches(" "));
+                assert!(matcher.matches("["));
+                assert!(matcher.matches("]"));
+                assert!(matcher.matches("^"));
+                assert!(!matcher.matches("a"));
+                assert!(!matcher.matches("b"));
+                assert!(!matcher.matches("c"));
+                assert!(!matcher.matches("d"));
+                assert!(matcher.matches("e"));
+                assert!(!matcher.matches("A"));
+                assert!(!matcher.matches("B"));
+                assert!(!matcher.matches("C"));
+                assert!(!matcher.matches("D"));
+                assert!(matcher.matches("E"));
+                assert!(!matcher.matches("ab"));
+                assert!(!matcher.matches("abc"));
+                assert!(!matcher.matches("abcd"));
+                assert!(!matcher.matches("ABCD"));
+                assert!(!matcher.matches("abcde"));
             }
         }
 
@@ -1808,26 +1809,26 @@ mod tests {
 
                 assert_eq!(1, matcher.len());
 
-                assert_eq!(Ok(false), matcher.matches(""));
-                assert_eq!(Ok(true), matcher.matches(" "));
-                assert_eq!(Ok(true), matcher.matches("["));
-                assert_eq!(Ok(true), matcher.matches("]"));
-                assert_eq!(Ok(true), matcher.matches("^"));
-                assert_eq!(Ok(true), matcher.matches("a"));
-                assert_eq!(Ok(true), matcher.matches("b"));
-                assert_eq!(Ok(true), matcher.matches("c"));
-                assert_eq!(Ok(true), matcher.matches("d"));
-                assert_eq!(Ok(true), matcher.matches("e"));
-                assert_eq!(Ok(true), matcher.matches("A"));
-                assert_eq!(Ok(true), matcher.matches("B"));
-                assert_eq!(Ok(true), matcher.matches("C"));
-                assert_eq!(Ok(true), matcher.matches("D"));
-                assert_eq!(Ok(true), matcher.matches("E"));
-                assert_eq!(Ok(false), matcher.matches("ab"));
-                assert_eq!(Ok(false), matcher.matches("abc"));
-                assert_eq!(Ok(false), matcher.matches("abcd"));
-                assert_eq!(Ok(false), matcher.matches("ABCD"));
-                assert_eq!(Ok(false), matcher.matches("abcde"));
+                assert!(!matcher.matches(""));
+                assert!(matcher.matches(" "));
+                assert!(matcher.matches("["));
+                assert!(matcher.matches("]"));
+                assert!(matcher.matches("^"));
+                assert!(matcher.matches("a"));
+                assert!(matcher.matches("b"));
+                assert!(matcher.matches("c"));
+                assert!(matcher.matches("d"));
+                assert!(matcher.matches("e"));
+                assert!(matcher.matches("A"));
+                assert!(matcher.matches("B"));
+                assert!(matcher.matches("C"));
+                assert!(matcher.matches("D"));
+                assert!(matcher.matches("E"));
+                assert!(!matcher.matches("ab"));
+                assert!(!matcher.matches("abc"));
+                assert!(!matcher.matches("abcd"));
+                assert!(!matcher.matches("ABCD"));
+                assert!(!matcher.matches("abcde"));
             }
         }
 
@@ -1842,26 +1843,26 @@ mod tests {
 
                 assert_eq!(1, matcher.len());
 
-                assert_eq!(Ok(true), matcher.matches(""));
-                assert_eq!(Ok(true), matcher.matches(" "));
-                assert_eq!(Ok(true), matcher.matches("["));
-                assert_eq!(Ok(true), matcher.matches("]"));
-                assert_eq!(Ok(true), matcher.matches("^"));
-                assert_eq!(Ok(true), matcher.matches("a"));
-                assert_eq!(Ok(true), matcher.matches("b"));
-                assert_eq!(Ok(true), matcher.matches("c"));
-                assert_eq!(Ok(true), matcher.matches("d"));
-                assert_eq!(Ok(true), matcher.matches("e"));
-                assert_eq!(Ok(true), matcher.matches("A"));
-                assert_eq!(Ok(true), matcher.matches("B"));
-                assert_eq!(Ok(true), matcher.matches("C"));
-                assert_eq!(Ok(true), matcher.matches("D"));
-                assert_eq!(Ok(true), matcher.matches("E"));
-                assert_eq!(Ok(true), matcher.matches("ab"));
-                assert_eq!(Ok(true), matcher.matches("abc"));
-                assert_eq!(Ok(true), matcher.matches("abcd"));
-                assert_eq!(Ok(true), matcher.matches("ABCD"));
-                assert_eq!(Ok(true), matcher.matches("abcde"));
+                assert!(matcher.matches(""));
+                assert!(matcher.matches(" "));
+                assert!(matcher.matches("["));
+                assert!(matcher.matches("]"));
+                assert!(matcher.matches("^"));
+                assert!(matcher.matches("a"));
+                assert!(matcher.matches("b"));
+                assert!(matcher.matches("c"));
+                assert!(matcher.matches("d"));
+                assert!(matcher.matches("e"));
+                assert!(matcher.matches("A"));
+                assert!(matcher.matches("B"));
+                assert!(matcher.matches("C"));
+                assert!(matcher.matches("D"));
+                assert!(matcher.matches("E"));
+                assert!(matcher.matches("ab"));
+                assert!(matcher.matches("abc"));
+                assert!(matcher.matches("abcd"));
+                assert!(matcher.matches("ABCD"));
+                assert!(matcher.matches("abcde"));
             }
         }
 
@@ -1876,32 +1877,32 @@ mod tests {
 
                 assert_eq!(3, matcher.len());
 
-                assert_eq!(Ok(false), matcher.matches(""));
-                assert_eq!(Ok(false), matcher.matches(" "));
-                assert_eq!(Ok(false), matcher.matches("["));
-                assert_eq!(Ok(false), matcher.matches("]"));
-                assert_eq!(Ok(false), matcher.matches("^"));
-                assert_eq!(Ok(false), matcher.matches("a"));
-                assert_eq!(Ok(false), matcher.matches("b"));
-                assert_eq!(Ok(false), matcher.matches("c"));
-                assert_eq!(Ok(false), matcher.matches("d"));
-                assert_eq!(Ok(false), matcher.matches("e"));
-                assert_eq!(Ok(false), matcher.matches("A"));
-                assert_eq!(Ok(false), matcher.matches("B"));
-                assert_eq!(Ok(false), matcher.matches("C"));
-                assert_eq!(Ok(false), matcher.matches("D"));
-                assert_eq!(Ok(false), matcher.matches("E"));
-                assert_eq!(Ok(false), matcher.matches("ab"));
-                assert_eq!(Ok(false), matcher.matches("abc"));
-                assert_eq!(Ok(false), matcher.matches("abcd"));
-                assert_eq!(Ok(false), matcher.matches("ABCD"));
-                assert_eq!(Ok(false), matcher.matches("abcde"));
+                assert!(!matcher.matches(""));
+                assert!(!matcher.matches(" "));
+                assert!(!matcher.matches("["));
+                assert!(!matcher.matches("]"));
+                assert!(!matcher.matches("^"));
+                assert!(!matcher.matches("a"));
+                assert!(!matcher.matches("b"));
+                assert!(!matcher.matches("c"));
+                assert!(!matcher.matches("d"));
+                assert!(!matcher.matches("e"));
+                assert!(!matcher.matches("A"));
+                assert!(!matcher.matches("B"));
+                assert!(!matcher.matches("C"));
+                assert!(!matcher.matches("D"));
+                assert!(!matcher.matches("E"));
+                assert!(!matcher.matches("ab"));
+                assert!(!matcher.matches("abc"));
+                assert!(!matcher.matches("abcd"));
+                assert!(!matcher.matches("ABCD"));
+                assert!(!matcher.matches("abcde"));
 
 
-                assert_eq!(Ok(false), matcher.matches("ma"));
-                assert_eq!(Ok(true), matcher.matches("mad"));
-                assert_eq!(Ok(true), matcher.matches("made"));
-                assert_eq!(Ok(true), matcher.matches("madder"));
+                assert!(!matcher.matches("ma"));
+                assert!(matcher.matches("mad"));
+                assert!(matcher.matches("made"));
+                assert!(matcher.matches("madder"));
             }
         }
 
@@ -1916,44 +1917,44 @@ mod tests {
 
                 assert_eq!(4, matcher.len());
 
-                assert_eq!(Ok(false), matcher.matches(""));
-                assert_eq!(Ok(false), matcher.matches(" "));
-                assert_eq!(Ok(false), matcher.matches("["));
-                assert_eq!(Ok(false), matcher.matches("]"));
-                assert_eq!(Ok(false), matcher.matches("^"));
-                assert_eq!(Ok(false), matcher.matches("a"));
-                assert_eq!(Ok(false), matcher.matches("b"));
-                assert_eq!(Ok(false), matcher.matches("c"));
-                assert_eq!(Ok(false), matcher.matches("d"));
-                assert_eq!(Ok(false), matcher.matches("e"));
-                assert_eq!(Ok(false), matcher.matches("A"));
-                assert_eq!(Ok(false), matcher.matches("B"));
-                assert_eq!(Ok(false), matcher.matches("C"));
-                assert_eq!(Ok(false), matcher.matches("D"));
-                assert_eq!(Ok(false), matcher.matches("E"));
-                assert_eq!(Ok(false), matcher.matches("ab"));
-                assert_eq!(Ok(false), matcher.matches("ae"));
-                assert_eq!(Ok(false), matcher.matches("abc"));
-                assert_eq!(Ok(false), matcher.matches("abcd"));
-                assert_eq!(Ok(false), matcher.matches("ABCD"));
-                assert_eq!(Ok(false), matcher.matches("abcde"));
+                assert!(!matcher.matches(""));
+                assert!(!matcher.matches(" "));
+                assert!(!matcher.matches("["));
+                assert!(!matcher.matches("]"));
+                assert!(!matcher.matches("^"));
+                assert!(!matcher.matches("a"));
+                assert!(!matcher.matches("b"));
+                assert!(!matcher.matches("c"));
+                assert!(!matcher.matches("d"));
+                assert!(!matcher.matches("e"));
+                assert!(!matcher.matches("A"));
+                assert!(!matcher.matches("B"));
+                assert!(!matcher.matches("C"));
+                assert!(!matcher.matches("D"));
+                assert!(!matcher.matches("E"));
+                assert!(!matcher.matches("ab"));
+                assert!(!matcher.matches("ae"));
+                assert!(!matcher.matches("abc"));
+                assert!(!matcher.matches("abcd"));
+                assert!(!matcher.matches("ABCD"));
+                assert!(!matcher.matches("abcde"));
 
 
-                assert_eq!(Ok(false), matcher.matches("ma"));
-                assert_eq!(Ok(true), matcher.matches("bad"));
-                assert_eq!(Ok(true), matcher.matches("bar"));
-                assert_eq!(Ok(true), matcher.matches("bald"));
-                assert_eq!(Ok(true), matcher.matches("bard"));
-                assert_eq!(Ok(false), matcher.matches("cad"));
-                assert_eq!(Ok(false), matcher.matches("car"));
-                assert_eq!(Ok(true), matcher.matches("mad"));
-                assert_eq!(Ok(true), matcher.matches("mar"));
-                assert_eq!(Ok(true), matcher.matches("bade"));
-                assert_eq!(Ok(false), matcher.matches("lade"));
-                assert_eq!(Ok(true), matcher.matches("made"));
-                assert_eq!(Ok(true), matcher.matches("badder"));
-                assert_eq!(Ok(false), matcher.matches("ladder"));
-                assert_eq!(Ok(true), matcher.matches("madder"));
+                assert!(!matcher.matches("ma"));
+                assert!(matcher.matches("bad"));
+                assert!(matcher.matches("bar"));
+                assert!(matcher.matches("bald"));
+                assert!(matcher.matches("bard"));
+                assert!(!matcher.matches("cad"));
+                assert!(!matcher.matches("car"));
+                assert!(matcher.matches("mad"));
+                assert!(matcher.matches("mar"));
+                assert!(matcher.matches("bade"));
+                assert!(!matcher.matches("lade"));
+                assert!(matcher.matches("made"));
+                assert!(matcher.matches("badder"));
+                assert!(!matcher.matches("ladder"));
+                assert!(matcher.matches("madder"));
             }
         }
 
@@ -1968,44 +1969,44 @@ mod tests {
 
                 assert_eq!(4, matcher.len());
 
-                assert_eq!(Ok(false), matcher.matches(""));
-                assert_eq!(Ok(false), matcher.matches(" "));
-                assert_eq!(Ok(false), matcher.matches("["));
-                assert_eq!(Ok(false), matcher.matches("]"));
-                assert_eq!(Ok(false), matcher.matches("^"));
-                assert_eq!(Ok(false), matcher.matches("a"));
-                assert_eq!(Ok(false), matcher.matches("b"));
-                assert_eq!(Ok(false), matcher.matches("c"));
-                assert_eq!(Ok(false), matcher.matches("d"));
-                assert_eq!(Ok(false), matcher.matches("e"));
-                assert_eq!(Ok(false), matcher.matches("A"));
-                assert_eq!(Ok(false), matcher.matches("B"));
-                assert_eq!(Ok(false), matcher.matches("C"));
-                assert_eq!(Ok(false), matcher.matches("D"));
-                assert_eq!(Ok(false), matcher.matches("E"));
-                assert_eq!(Ok(false), matcher.matches("ab"));
-                assert_eq!(Ok(false), matcher.matches("ae"));
-                assert_eq!(Ok(false), matcher.matches("abc"));
-                assert_eq!(Ok(false), matcher.matches("abcd"));
-                assert_eq!(Ok(false), matcher.matches("ABCD"));
-                assert_eq!(Ok(false), matcher.matches("abcde"));
+                assert!(!matcher.matches(""));
+                assert!(!matcher.matches(" "));
+                assert!(!matcher.matches("["));
+                assert!(!matcher.matches("]"));
+                assert!(!matcher.matches("^"));
+                assert!(!matcher.matches("a"));
+                assert!(!matcher.matches("b"));
+                assert!(!matcher.matches("c"));
+                assert!(!matcher.matches("d"));
+                assert!(!matcher.matches("e"));
+                assert!(!matcher.matches("A"));
+                assert!(!matcher.matches("B"));
+                assert!(!matcher.matches("C"));
+                assert!(!matcher.matches("D"));
+                assert!(!matcher.matches("E"));
+                assert!(!matcher.matches("ab"));
+                assert!(!matcher.matches("ae"));
+                assert!(!matcher.matches("abc"));
+                assert!(!matcher.matches("abcd"));
+                assert!(!matcher.matches("ABCD"));
+                assert!(!matcher.matches("abcde"));
 
 
-                assert_eq!(Ok(false), matcher.matches("ma"));
-                assert_eq!(Ok(false), matcher.matches("bad"));
-                assert_eq!(Ok(false), matcher.matches("bar"));
-                assert_eq!(Ok(true), matcher.matches("bald"));
-                assert_eq!(Ok(true), matcher.matches("bard"));
-                assert_eq!(Ok(false), matcher.matches("cad"));
-                assert_eq!(Ok(false), matcher.matches("car"));
-                assert_eq!(Ok(false), matcher.matches("mad"));
-                assert_eq!(Ok(false), matcher.matches("mar"));
-                assert_eq!(Ok(true), matcher.matches("bade"));
-                assert_eq!(Ok(false), matcher.matches("lade"));
-                assert_eq!(Ok(true), matcher.matches("made"));
-                assert_eq!(Ok(false), matcher.matches("badder"));
-                assert_eq!(Ok(false), matcher.matches("ladder"));
-                assert_eq!(Ok(false), matcher.matches("madder"));
+                assert!(!matcher.matches("ma"));
+                assert!(!matcher.matches("bad"));
+                assert!(!matcher.matches("bar"));
+                assert!(matcher.matches("bald"));
+                assert!(matcher.matches("bard"));
+                assert!(!matcher.matches("cad"));
+                assert!(!matcher.matches("car"));
+                assert!(!matcher.matches("mad"));
+                assert!(!matcher.matches("mar"));
+                assert!(matcher.matches("bade"));
+                assert!(!matcher.matches("lade"));
+                assert!(matcher.matches("made"));
+                assert!(!matcher.matches("badder"));
+                assert!(!matcher.matches("ladder"));
+                assert!(!matcher.matches("madder"));
             }
         }
 
@@ -2022,8 +2023,8 @@ mod tests {
 
                     assert_eq!(1, matcher.len());
 
-                    assert_eq!(Ok(true), matcher.matches("abcd"));
-                    assert_eq!(Ok(false), matcher.matches("ABCD"));
+                    assert!(matcher.matches("abcd"));
+                    assert!(!matcher.matches("ABCD"));
                 }
 
                 {
@@ -2032,8 +2033,8 @@ mod tests {
 
                     assert_eq!(1, matcher.len());
 
-                    assert_eq!(Ok(true), matcher.matches("abcd"));
-                    assert_eq!(Ok(true), matcher.matches("ABCD"));
+                    assert!(matcher.matches("abcd"));
+                    assert!(matcher.matches("ABCD"));
                 }
             }
 
@@ -2045,12 +2046,12 @@ mod tests {
 
                 assert_eq!(4, matcher.len());
 
-                assert_eq!(Ok(true), matcher.matches("abcd"));
-                assert_eq!(Ok(true), matcher.matches("a*c?"));
-                assert_eq!(Ok(true), matcher.matches("abbbbbbbbcd"));
-                assert_eq!(Ok(true), matcher.matches("acd"));
-                assert_eq!(Ok(false), matcher.matches("abdc"));
-                assert_eq!(Ok(true), matcher.matches("abc?"));
+                assert!(matcher.matches("abcd"));
+                assert!(matcher.matches("a*c?"));
+                assert!(matcher.matches("abbbbbbbbcd"));
+                assert!(matcher.matches("acd"));
+                assert!(!matcher.matches("abdc"));
+                assert!(matcher.matches("abc?"));
             }
 
             /* Using escaped characters. */
@@ -2063,12 +2064,12 @@ mod tests {
 
                     assert_eq!(1, matcher.len());
 
-                    assert_eq!(Ok(false), matcher.matches("abcd"));
-                    assert_eq!(Ok(true), matcher.matches("a*c?"));
-                    assert_eq!(Ok(false), matcher.matches("abbbbbbbbcd"));
-                    assert_eq!(Ok(false), matcher.matches("acd"));
-                    assert_eq!(Ok(false), matcher.matches("abdc"));
-                    assert_eq!(Ok(false), matcher.matches("abc?"));
+                    assert!(!matcher.matches("abcd"));
+                    assert!(matcher.matches("a*c?"));
+                    assert!(!matcher.matches("abbbbbbbbcd"));
+                    assert!(!matcher.matches("acd"));
+                    assert!(!matcher.matches("abdc"));
+                    assert!(!matcher.matches("abc?"));
                 }
 
                 /*
@@ -2078,8 +2079,8 @@ mod tests {
 
                     assert_eq!(1, matcher.len());
 
-                    assert_eq!(Ok(false), matcher.matches("abcd"));
-                    assert_eq!(Ok(true), matcher.matches("a\\*c\\?"));
+                    assert!(!matcher.matches("abcd"));
+                    assert!(matcher.matches("a\\*c\\?"));
                 }
                  */
             }
@@ -2094,11 +2095,11 @@ mod tests {
 
                     assert_eq!(4, matcher.len());
 
-                    assert_eq!(Ok(true), matcher.matches("abcd"));
-                    assert_eq!(Ok(false), matcher.matches("aacd"));
-                    assert_eq!(Ok(true), matcher.matches("accm"));
-                    assert_eq!(Ok(false), matcher.matches("abcn"));
-                    assert_eq!(Ok(false), matcher.matches("a[bc]c[defghijklm]"));
+                    assert!(matcher.matches("abcd"));
+                    assert!(!matcher.matches("aacd"));
+                    assert!(matcher.matches("accm"));
+                    assert!(!matcher.matches("abcn"));
+                    assert!(!matcher.matches("a[bc]c[defghijklm]"));
                 }
 
                 /*
@@ -2108,11 +2109,11 @@ mod tests {
 
                     assert_eq!(1, matcher.len());
 
-                    assert_eq!(Ok(false), matcher.matches("abcd"));
-                    assert_eq!(Ok(false), matcher.matches("aacd"));
-                    assert_eq!(Ok(false), matcher.matches("accm"));
-                    assert_eq!(Ok(false), matcher.matches("abcn"));
-                    assert_eq!(Ok(true), matcher.matches("a[bc]c[defghijklm]"));
+                    assert!(!matcher.matches("abcd"));
+                    assert!(!matcher.matches("aacd"));
+                    assert!(!matcher.matches("accm"));
+                    assert!(!matcher.matches("abcn"));
+                    assert!(matcher.matches("a[bc]c[defghijklm]"));
                 }
                  */
             }
@@ -2127,16 +2128,16 @@ mod tests {
 
                     assert_eq!(4, matcher.len());
 
-                    assert_eq!(Ok(true), matcher.matches("abcd"));
-                    assert_eq!(Ok(true), matcher.matches("abce"));
-                    assert_eq!(Ok(true), matcher.matches("abcf"));
-                    assert_eq!(Ok(true), matcher.matches("abcg"));
-                    assert_eq!(Ok(false), matcher.matches("aacd"));
-                    assert_eq!(Ok(true), matcher.matches("accm"));
-                    assert_eq!(Ok(false), matcher.matches("abcn"));
+                    assert!(matcher.matches("abcd"));
+                    assert!(matcher.matches("abce"));
+                    assert!(matcher.matches("abcf"));
+                    assert!(matcher.matches("abcg"));
+                    assert!(!matcher.matches("aacd"));
+                    assert!(matcher.matches("accm"));
+                    assert!(!matcher.matches("abcn"));
 
-                    assert_eq!(Ok(false), matcher.matches("a-cm"));
-                    assert_eq!(Ok(false), matcher.matches("acc-"));
+                    assert!(!matcher.matches("a-cm"));
+                    assert!(!matcher.matches("acc-"));
                 }
 
                 /*
@@ -2164,16 +2165,16 @@ mod tests {
 
                     assert_eq!(4, matcher.len());
 
-                    assert_eq!(Ok(true), matcher.matches("abcd"));
-                    assert_eq!(Ok(true), matcher.matches("abce"));
-                    assert_eq!(Ok(true), matcher.matches("abcf"));
-                    assert_eq!(Ok(true), matcher.matches("abcg"));
-                    assert_eq!(Ok(false), matcher.matches("aacd"));
-                    assert_eq!(Ok(true), matcher.matches("accm"));
-                    assert_eq!(Ok(false), matcher.matches("abcn"));
+                    assert!(matcher.matches("abcd"));
+                    assert!(matcher.matches("abce"));
+                    assert!(matcher.matches("abcf"));
+                    assert!(matcher.matches("abcg"));
+                    assert!(!matcher.matches("aacd"));
+                    assert!(matcher.matches("accm"));
+                    assert!(!matcher.matches("abcn"));
 
-                    assert_eq!(Ok(false), matcher.matches("a-cm"));
-                    assert_eq!(Ok(false), matcher.matches("acc-"));
+                    assert!(!matcher.matches("a-cm"));
+                    assert!(!matcher.matches("acc-"));
                 }
 
                 /*
@@ -2202,21 +2203,21 @@ mod tests {
 
                     assert_eq!(4, matcher.len());
 
-                    assert_eq!(Ok(true), matcher.matches("abcd"));
-                    assert_eq!(Ok(false), matcher.matches("aacd"));
-                    assert_eq!(Ok(true), matcher.matches("aCcJ"));
-                    assert_eq!(Ok(false), matcher.matches("abcn"));
+                    assert!(matcher.matches("abcd"));
+                    assert!(!matcher.matches("aacd"));
+                    assert!(matcher.matches("aCcJ"));
+                    assert!(!matcher.matches("abcn"));
 
-                    assert_eq!(Ok(true), matcher.matches("abcd"));
-                    assert_eq!(Ok(true), matcher.matches("abce"));
-                    assert_eq!(Ok(true), matcher.matches("abcf"));
-                    assert_eq!(Ok(true), matcher.matches("abcg"));
-                    assert_eq!(Ok(false), matcher.matches("aacd"));
-                    assert_eq!(Ok(true), matcher.matches("accm"));
-                    assert_eq!(Ok(false), matcher.matches("abcn"));
+                    assert!(matcher.matches("abcd"));
+                    assert!(matcher.matches("abce"));
+                    assert!(matcher.matches("abcf"));
+                    assert!(matcher.matches("abcg"));
+                    assert!(!matcher.matches("aacd"));
+                    assert!(matcher.matches("accm"));
+                    assert!(!matcher.matches("abcn"));
 
-                    assert_eq!(Ok(false), matcher.matches("a-cm"));
-                    assert_eq!(Ok(false), matcher.matches("acc-"));
+                    assert!(!matcher.matches("a-cm"));
+                    assert!(!matcher.matches("acc-"));
                 }
             }
 
@@ -2230,12 +2231,12 @@ mod tests {
 
                     assert_eq!(4, matcher.len());
 
-                    assert_eq!(Ok(false), matcher.matches("abcd"));
-                    assert_eq!(Ok(true), matcher.matches("a*c?"));
-                    assert_eq!(Ok(false), matcher.matches("abbbbbbbbcd"));
-                    assert_eq!(Ok(false), matcher.matches("acd"));
-                    assert_eq!(Ok(false), matcher.matches("abdc"));
-                    assert_eq!(Ok(false), matcher.matches("abc?"));
+                    assert!(!matcher.matches("abcd"));
+                    assert!(matcher.matches("a*c?"));
+                    assert!(!matcher.matches("abbbbbbbbcd"));
+                    assert!(!matcher.matches("acd"));
+                    assert!(!matcher.matches("abdc"));
+                    assert!(!matcher.matches("abc?"));
                 }
             }
 
@@ -2249,11 +2250,11 @@ mod tests {
 
                     assert_eq!(4, matcher.len());
 
-                    assert_eq!(Ok(true), matcher.matches("abcd"));
-                    assert_eq!(Ok(true), matcher.matches("aacd"));
-                    assert_eq!(Ok(true), matcher.matches("acc-"));
-                    assert_eq!(Ok(true), matcher.matches("a-c-"));
-                    assert_eq!(Ok(false), matcher.matches("abce"));
+                    assert!(matcher.matches("abcd"));
+                    assert!(matcher.matches("aacd"));
+                    assert!(matcher.matches("acc-"));
+                    assert!(matcher.matches("a-c-"));
+                    assert!(!matcher.matches("abce"));
                 }
             }
 
@@ -2267,11 +2268,11 @@ mod tests {
 
                     assert_eq!(4, matcher.len());
 
-                    assert_eq!(Ok(false), matcher.matches("abcd"));
-                    assert_eq!(Ok(false), matcher.matches("aacd"));
-                    assert_eq!(Ok(true), matcher.matches("abcc"));
-                    assert_eq!(Ok(false), matcher.matches("accm"));
-                    assert_eq!(Ok(true), matcher.matches("abcn"));
+                    assert!(!matcher.matches("abcd"));
+                    assert!(!matcher.matches("aacd"));
+                    assert!(matcher.matches("abcc"));
+                    assert!(!matcher.matches("accm"));
+                    assert!(matcher.matches("abcn"));
                 }
             }
         }
@@ -2310,7 +2311,6 @@ mod tests {
 
         #[test]
         fn TEST_matches_WINDOWS_PROGRAM_PATH_PATTERN_1() {
-
             let pattern = r"[A-Z]\?*\?*.[ce][ox][em]";
 
             assert_eq!(Ok(false), shwild::matches(pattern, "", 0));
