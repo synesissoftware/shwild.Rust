@@ -898,6 +898,7 @@ mod utils {
 
     // Non-mutating methods
     impl MatcherSequence {
+        /// Number of matchers (excluding the mandatory `MatchEnd` instance).
         #[cfg(test)]
         pub(crate) fn len(&self) -> usize {
             self.num_matchers
@@ -1133,6 +1134,12 @@ impl CompiledMatcher {
 
 // Non-mutating methods
 impl CompiledMatcher {
+    /// Number of matchers (excluding the mandatory `MatchEnd` instance).
+    #[cfg(test)]
+    pub(crate) fn len(&self) -> usize {
+        self.matchers.len()
+    }
+
     pub fn matches(
         &self,
         input : &str,
@@ -1515,7 +1522,7 @@ mod tests {
 
                 let matcher = shwild::CompiledMatcher::from_pattern_and_flags(pattern, flags).unwrap();
 
-                // assert_eq!(0, matcher.len());
+                assert_eq!(0, matcher.len());
 
                 assert_eq!(Ok(false), matcher.matches("a"));
                 assert_eq!(Ok(false), matcher.matches("ab"));
@@ -1530,7 +1537,7 @@ mod tests {
 
                 let matcher = shwild::CompiledMatcher::from_pattern_and_flags(pattern, flags).unwrap();
 
-                // assert_eq!(0, matcher.len());
+                assert_eq!(0, matcher.len());
 
                 assert_eq!(Ok(true), matcher.matches(""));
                 assert_eq!(Ok(false), matcher.matches(" "));
@@ -1553,7 +1560,7 @@ mod tests {
                 let matcher = shwild::CompiledMatcher::from_pattern_and_flags(pattern, flags).unwrap();
 
 
-                // assert_eq!(0, matcher.len());
+                assert_eq!(1, matcher.len());
 
                 assert_eq!(Ok(false), matcher.matches(""));
                 assert_eq!(Ok(false), matcher.matches(" "));
@@ -1570,7 +1577,7 @@ mod tests {
 
                 let matcher = shwild::CompiledMatcher::from_pattern_and_flags(pattern, flags).unwrap();
 
-                // assert_eq!(0, matcher.len());
+                assert_eq!(1, matcher.len());
 
                 assert_eq!(Ok(false), matcher.matches(""));
                 assert_eq!(Ok(false), matcher.matches(" "));
@@ -1593,7 +1600,7 @@ mod tests {
                 let matcher = shwild::CompiledMatcher::from_pattern_and_flags(pattern, flags).unwrap();
 
 
-                // assert_eq!(0, matcher.len());
+                assert_eq!(1, matcher.len());
 
                 assert_eq!(Ok(false), matcher.matches(""));
                 assert_eq!(Ok(false), matcher.matches(" "));
@@ -1610,7 +1617,7 @@ mod tests {
 
                 let matcher = shwild::CompiledMatcher::from_pattern_and_flags(pattern, flags).unwrap();
 
-                // assert_eq!(0, matcher.len());
+                assert_eq!(1, matcher.len());
 
                 assert_eq!(Ok(false), matcher.matches(""));
                 assert_eq!(Ok(false), matcher.matches(" "));
@@ -1633,7 +1640,7 @@ mod tests {
                 let matcher = shwild::CompiledMatcher::from_pattern_and_flags(pattern, flags).unwrap();
 
 
-                // assert_eq!(0, matcher.len());
+                assert_eq!(1, matcher.len());
 
                 assert_eq!(Ok(false), matcher.matches(""));
                 assert_eq!(Ok(false), matcher.matches(" "));
@@ -1650,7 +1657,7 @@ mod tests {
 
                 let matcher = shwild::CompiledMatcher::from_pattern_and_flags(pattern, flags).unwrap();
 
-                // assert_eq!(0, matcher.len());
+                assert_eq!(1, matcher.len());
 
                 assert_eq!(Ok(false), matcher.matches(""));
                 assert_eq!(Ok(false), matcher.matches(" "));
@@ -1673,7 +1680,7 @@ mod tests {
                 let matcher = shwild::CompiledMatcher::from_pattern_and_flags(pattern, flags).unwrap();
 
 
-                // assert_eq!(0, matcher.len());
+                assert_eq!(1, matcher.len());
 
                 assert_eq!(Ok(false), matcher.matches(""));
                 assert_eq!(Ok(false), matcher.matches(" "));
@@ -1702,7 +1709,7 @@ mod tests {
 
                 let matcher = shwild::CompiledMatcher::from_pattern_and_flags(pattern, flags).unwrap();
 
-                // assert_eq!(0, matcher.len());
+                assert_eq!(1, matcher.len());
 
                 assert_eq!(Ok(false), matcher.matches(""));
                 assert_eq!(Ok(false), matcher.matches(" "));
@@ -1736,8 +1743,7 @@ mod tests {
 
                 let matcher = shwild::CompiledMatcher::from_pattern_and_flags(pattern, flags).unwrap();
 
-
-                // assert_eq!(0, matcher.len());
+                assert_eq!(1, matcher.len());
 
                 assert_eq!(Ok(false), matcher.matches(""));
                 assert_eq!(Ok(true), matcher.matches(" "));
@@ -1766,7 +1772,7 @@ mod tests {
 
                 let matcher = shwild::CompiledMatcher::from_pattern_and_flags(pattern, flags).unwrap();
 
-                // assert_eq!(0, matcher.len());
+                assert_eq!(1, matcher.len());
 
                 assert_eq!(Ok(false), matcher.matches(""));
                 assert_eq!(Ok(true), matcher.matches(" "));
@@ -1800,8 +1806,7 @@ mod tests {
 
                 let matcher = shwild::CompiledMatcher::from_pattern_and_flags(pattern, flags).unwrap();
 
-
-                // assert_eq!(0, matcher.len());
+                assert_eq!(1, matcher.len());
 
                 assert_eq!(Ok(false), matcher.matches(""));
                 assert_eq!(Ok(true), matcher.matches(" "));
@@ -1835,8 +1840,7 @@ mod tests {
 
                 let matcher = shwild::CompiledMatcher::from_pattern_and_flags(pattern, flags).unwrap();
 
-
-                // assert_eq!(0, matcher.len());
+                assert_eq!(1, matcher.len());
 
                 assert_eq!(Ok(true), matcher.matches(""));
                 assert_eq!(Ok(true), matcher.matches(" "));
@@ -1870,8 +1874,7 @@ mod tests {
 
                 let matcher = shwild::CompiledMatcher::from_pattern_and_flags(pattern, flags).unwrap();
 
-
-                // assert_eq!(0, matcher.len());
+                assert_eq!(3, matcher.len());
 
                 assert_eq!(Ok(false), matcher.matches(""));
                 assert_eq!(Ok(false), matcher.matches(" "));
@@ -1911,8 +1914,7 @@ mod tests {
 
                 let matcher = shwild::CompiledMatcher::from_pattern_and_flags(pattern, flags).unwrap();
 
-
-                // assert_eq!(0, matcher.len());
+                assert_eq!(4, matcher.len());
 
                 assert_eq!(Ok(false), matcher.matches(""));
                 assert_eq!(Ok(false), matcher.matches(" "));
@@ -1964,8 +1966,7 @@ mod tests {
 
                 let matcher = shwild::CompiledMatcher::from_pattern_and_flags(pattern, flags).unwrap();
 
-
-                // assert_eq!(0, matcher.len());
+                assert_eq!(4, matcher.len());
 
                 assert_eq!(Ok(false), matcher.matches(""));
                 assert_eq!(Ok(false), matcher.matches(" "));
@@ -2019,8 +2020,7 @@ mod tests {
                     let flags = 0;
                     let matcher = shwild::CompiledMatcher::from_pattern_and_flags(pattern, flags).unwrap();
 
-
-                    // assert_eq!(0, matcher.len());
+                    assert_eq!(1, matcher.len());
 
                     assert_eq!(Ok(true), matcher.matches("abcd"));
                     assert_eq!(Ok(false), matcher.matches("ABCD"));
@@ -2030,8 +2030,7 @@ mod tests {
                     let flags = IGNORE_CASE;
                     let matcher = shwild::CompiledMatcher::from_pattern_and_flags(pattern, flags).unwrap();
 
-
-                    // assert_eq!(0, matcher.len());
+                    assert_eq!(1, matcher.len());
 
                     assert_eq!(Ok(true), matcher.matches("abcd"));
                     assert_eq!(Ok(true), matcher.matches("ABCD"));
@@ -2044,8 +2043,7 @@ mod tests {
                 let flags = 0;
                 let matcher = shwild::CompiledMatcher::from_pattern_and_flags(pattern, flags).unwrap();
 
-
-                // assert_eq!(0, matcher.len());
+                assert_eq!(4, matcher.len());
 
                 assert_eq!(Ok(true), matcher.matches("abcd"));
                 assert_eq!(Ok(true), matcher.matches("a*c?"));
@@ -2063,8 +2061,7 @@ mod tests {
                     let flags = 0;
                     let matcher = shwild::CompiledMatcher::from_pattern_and_flags(pattern, flags).unwrap();
 
-
-                    // assert_eq!(0, matcher.len());
+                    assert_eq!(1, matcher.len());
 
                     assert_eq!(Ok(false), matcher.matches("abcd"));
                     assert_eq!(Ok(true), matcher.matches("a*c?"));
@@ -2079,8 +2076,7 @@ mod tests {
                     let flags = SUPPRESS_BACKSLASH_ESCAPE;
                     let matcher = shwild::CompiledMatcher::from_pattern_and_flags(pattern, flags).unwrap();
 
-
-                    // assert_eq!(0, matcher.len());
+                    assert_eq!(1, matcher.len());
 
                     assert_eq!(Ok(false), matcher.matches("abcd"));
                     assert_eq!(Ok(true), matcher.matches("a\\*c\\?"));
@@ -2096,8 +2092,7 @@ mod tests {
                     let flags = 0;
                     let matcher = shwild::CompiledMatcher::from_pattern_and_flags(pattern, flags).unwrap();
 
-
-                    // assert_eq!(0, matcher.len());
+                    assert_eq!(4, matcher.len());
 
                     assert_eq!(Ok(true), matcher.matches("abcd"));
                     assert_eq!(Ok(false), matcher.matches("aacd"));
@@ -2111,8 +2106,7 @@ mod tests {
                     let flags = SUPPRESS_RANGE_SUPPORT;
                     let matcher = shwild::CompiledMatcher::from_pattern_and_flags(pattern, flags).unwrap();
 
-
-                    // assert_eq!(0, matcher.len());
+                    assert_eq!(1, matcher.len());
 
                     assert_eq!(Ok(false), matcher.matches("abcd"));
                     assert_eq!(Ok(false), matcher.matches("aacd"));
@@ -2131,8 +2125,7 @@ mod tests {
                     let flags = 0;
                     let matcher = shwild::CompiledMatcher::from_pattern_and_flags(pattern, flags).unwrap();
 
-
-                    // assert_eq!(0, matcher.len());
+                    assert_eq!(4, matcher.len());
 
                     assert_eq!(Ok(true), matcher.matches("abcd"));
                     assert_eq!(Ok(true), matcher.matches("abce"));
@@ -2170,8 +2163,7 @@ mod tests {
                     let flags = 0;
                     let matcher = shwild::CompiledMatcher::from_pattern_and_flags(pattern, flags).unwrap();
 
-
-                    // assert_eq!(0, matcher.len());
+                    assert_eq!(4, matcher.len());
 
                     assert_eq!(Ok(true), matcher.matches("abcd"));
                     assert_eq!(Ok(true), matcher.matches("abce"));
@@ -2209,8 +2201,7 @@ mod tests {
                     let flags = 0;
                     let matcher = shwild::CompiledMatcher::from_pattern_and_flags(pattern, flags).unwrap();
 
-
-                    // assert_eq!(0, matcher.len());
+                    assert_eq!(4, matcher.len());
 
                     assert_eq!(Ok(true), matcher.matches("abcd"));
                     assert_eq!(Ok(false), matcher.matches("aacd"));
@@ -2238,8 +2229,7 @@ mod tests {
                     let flags = 0;
                     let matcher = shwild::CompiledMatcher::from_pattern_and_flags(pattern, flags).unwrap();
 
-
-                    // assert_eq!(0, matcher.len());
+                    assert_eq!(4, matcher.len());
 
                     assert_eq!(Ok(false), matcher.matches("abcd"));
                     assert_eq!(Ok(true), matcher.matches("a*c?"));
@@ -2258,8 +2248,7 @@ mod tests {
                     let flags = 0;
                     let matcher = shwild::CompiledMatcher::from_pattern_and_flags(pattern, flags).unwrap();
 
-
-                    // assert_eq!(0, matcher.len());
+                    assert_eq!(4, matcher.len());
 
                     assert_eq!(Ok(true), matcher.matches("abcd"));
                     assert_eq!(Ok(true), matcher.matches("aacd"));
@@ -2277,8 +2266,7 @@ mod tests {
                     let flags = 0;
                     let matcher = shwild::CompiledMatcher::from_pattern_and_flags(pattern, flags).unwrap();
 
-
-                    // assert_eq!(0, matcher.len());
+                    assert_eq!(4, matcher.len());
 
                     assert_eq!(Ok(false), matcher.matches("abcd"));
                     assert_eq!(Ok(false), matcher.matches("aacd"));
