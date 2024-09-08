@@ -24,6 +24,7 @@ fn main() {
 
     match std_fs::read_dir(directory) {
         Ok(entries) => {
+            // for each file in the directory ...
             for entry in entries {
                 match entry {
                     Ok(entry) => {
@@ -31,10 +32,13 @@ fn main() {
 
                         let path_s = format!("{}", path.display());
 
+                        // ... check against ...
                         for pattern in &patterns {
+                            // ... each pattern ...
                             match shwild::matches(pattern, &path_s, 0) {
                                 Ok(is_matched) => {
                                     if is_matched {
+                                        // ... and print when it matches any one.
                                         println!("\t{path_s}");
 
                                         break;
@@ -43,17 +47,17 @@ fn main() {
                                 Err(e) => {
                                     eprintln!("failed to match against '{path_s}': {e}");
                                 },
-                            }
+                            };
                         }
                     },
                     Err(e) => {
                         eprintln!("failed to read file in '{directory}': {e}");
                     },
-                }
+                };
             }
         },
         Err(e) => {
             eprintln!("failed to read files in '{directory}': {e}");
         },
-    }
+    };
 }

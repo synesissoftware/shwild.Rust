@@ -1193,7 +1193,7 @@ impl CompiledMatcher {
                         _ => {
                             s.push(c);
                         },
-                    }
+                    };
                 },
                 '^' => {
                     match state {
@@ -1203,7 +1203,7 @@ impl CompiledMatcher {
                         _ => {
                             s.push(c);
                         },
-                    }
+                    };
                 },
                 ']' => {
                     match state {
@@ -1252,7 +1252,7 @@ impl CompiledMatcher {
                         _ => {
                             s.push(c);
                         },
-                    }
+                    };
                 },
                 '\\' => {
                     match state {
@@ -1267,7 +1267,7 @@ impl CompiledMatcher {
                                 escaped = true;
                             }
                         },
-                    }
+                    };
                 },
                 '-' => {
                     if escaped {
@@ -1324,7 +1324,7 @@ impl CompiledMatcher {
                             _ => {
                                 s.push(c);
                             },
-                        }
+                        };
                     }
                 },
                 '*' => {
@@ -1366,7 +1366,7 @@ impl CompiledMatcher {
                             _ => {
                                 s.push(c);
                             },
-                        }
+                        };
                     }
                 },
                 _ => {
@@ -1386,7 +1386,7 @@ impl CompiledMatcher {
                                 _ => {
                                     s.push(c);
                                 },
-                            }
+                            };
                         },
                         ParseState::None => {
                             s.push(c);
@@ -1396,9 +1396,9 @@ impl CompiledMatcher {
                         _ => {
                             s.push(c);
                         },
-                    }
+                    };
                 },
-            }
+            };
 
             num_bytes += c.len_utf8();
         }
@@ -1414,7 +1414,7 @@ impl CompiledMatcher {
             ParseState::InRange => {
                 matchers.prepend_Range(&String::from_iter(s.iter()), flags);
             },
-        }
+        };
 
         Ok(num_matchers)
     }
