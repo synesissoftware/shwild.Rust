@@ -225,9 +225,7 @@ mod match_structures {
             &mut self,
             _next : Option<Box<dyn Match>>,
         ) -> Option<Box<dyn Match>> {
-            assert!(false, "should never be called");
-
-            None
+            panic!("should never be called");
         }
     }
 
@@ -412,6 +410,8 @@ mod match_structures {
         }
 
         fn minimum_required(&self) -> usize {
+            #![allow(clippy::identity_op)]
+
             let next = self.next.as_ref().unwrap();
 
             0 + next.minimum_required()
@@ -1216,14 +1216,11 @@ impl CompiledMatcher {
                                 },
                             };
 
-                            match continuum_prior {
-                                Some(_c) => {
-                                    // don't care about `_c` because that will already be pushed into `s`
+                            if let Some(_c) = continuum_prior {
+                                // don't care about `_c` because that will already be pushed into `s`
 
-                                    s.push('-');
-                                },
-                                _ => (),
-                            };
+                                s.push('-');
+                            }
 
                             matchers.prepend_Range(&String::from_iter(s.iter()), flags);
 
@@ -1240,14 +1237,11 @@ impl CompiledMatcher {
                                 },
                             };
 
-                            match continuum_prior {
-                                Some(_c) => {
-                                    // don't care about `_c` because that will already be pushed into `s`
+                            if let Some(_c) = continuum_prior {
+                                // don't care about `_c` because that will already be pushed into `s`
 
-                                    s.push('-');
-                                },
-                                _ => (),
-                            };
+                                s.push('-');
+                            }
 
                             matchers.prepend_NotRange(&String::from_iter(s.iter()), flags);
 

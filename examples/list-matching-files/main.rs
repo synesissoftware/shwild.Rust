@@ -1,8 +1,6 @@
 // Example program illustrating use of shwild to filter by name files found
 // in the executing directory
 
-use shwild;
-
 use std::{
     env as std_env,
     fs as std_fs,
@@ -13,7 +11,7 @@ fn main() {
     let directory = ".";
 
     let patterns = {
-        let r = std_env::args().into_iter().skip(1).collect::<Vec<_>>();
+        let r = std_env::args().skip(1).collect::<Vec<_>>();
 
         if r.is_empty() {
             vec!["*".into()]
@@ -34,7 +32,7 @@ fn main() {
                         let path_s = format!("{}", path.display());
 
                         for pattern in &patterns {
-                            match shwild::matches(&pattern, &path_s, 0) {
+                            match shwild::matches(pattern, &path_s, 0) {
                                 Ok(is_matched) => {
                                     if is_matched {
                                         println!("\t{path_s}");
