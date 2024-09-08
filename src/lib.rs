@@ -2307,5 +2307,17 @@ mod tests {
                 },
             };
         }
+
+        #[test]
+        fn TEST_matches_WINDOWS_PROGRAM_PATH_PATTERN_1() {
+
+            let pattern = r"[A-Z]\?*\?*.[ce][ox][em]";
+
+            assert_eq!(Ok(false), shwild::matches(pattern, "", 0));
+
+            assert_eq!(Ok(true), shwild::matches(pattern, r"C:\directory\file.exe", 0));
+            assert_eq!(Ok(true), shwild::matches(pattern, r"X:\dir\filestem.exe", 0));
+            assert_eq!(Ok(true), shwild::matches(pattern, r"D:\dir\sub-dir\filestem.exe", 0));
+        }
     }
 }
