@@ -29,7 +29,6 @@ fn main() {
                 match entry {
                     Ok(entry) => {
                         let path = entry.path();
-
                         let path_s = format!("{}", path.display());
 
                         // ... check against ...

@@ -1486,10 +1486,7 @@ pub fn matches(
     input : &str,
     flags : i64,
 ) -> Result<bool> {
-    match CompiledMatcher::from_pattern_and_flags(pattern, flags) {
-        Ok(matcher) => matcher.matches(input),
-        Err(e) => Err(e),
-    }
+    CompiledMatcher::from_pattern_and_flags(pattern, flags).and_then(|matcher| matcher.matches(input))
 }
 
 
