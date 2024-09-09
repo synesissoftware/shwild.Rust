@@ -21,6 +21,13 @@ mod constants {
     pub(crate) mod patterns {
         #![allow(non_upper_case_globals)]
 
+        pub(crate) const NRANGE_CONTINUUM_SIMPLE : &str = r"[^a-z]";
+        pub(crate) const NRANGE_CONTINUUM_REVERSE : &str = r"[^z-a]";
+        pub(crate) const NRANGE_CONTINUUM_CROSSCASE : &str = r"[^a-Z]";
+        pub(crate) const RANGE_CONTINUUM_SIMPLE : &str = r"[a-z]";
+        pub(crate) const RANGE_CONTINUUM_REVERSE : &str = r"[z-a]";
+        pub(crate) const RANGE_CONTINUUM_CROSSCASE : &str = r"[a-Z]";
+
         pub(crate) const WINDOWS_PATH : &str = r"[A-Z]\?*\?*.[ce][ox][em]";
     }
 }
@@ -30,7 +37,6 @@ pub fn parse_input_empty(c : &mut Criterion) {
     let pattern = constants::EMPTY_STRING;
     let flags = 0;
 
-    // TODO criterion can benchmark between two different functions
     c.bench_function("`shwild::CompiledMatcher()` parsing - empty string", |b| {
         b.iter(|| {
             let r = shwild::CompiledMatcher::from_pattern_and_flags(black_box(pattern), black_box(flags));
@@ -44,7 +50,6 @@ pub fn parse_input_literal_small(c : &mut Criterion) {
     let pattern = constants::S_hello;
     let flags = 0;
 
-    // TODO criterion can benchmark between two different functions
     c.bench_function("`shwild::CompiledMatcher()` parsing - literal (small)", |b| {
         b.iter(|| {
             let r = shwild::CompiledMatcher::from_pattern_and_flags(black_box(pattern), black_box(flags));
@@ -58,7 +63,6 @@ pub fn parse_input_literal_medium(c : &mut Criterion) {
     let pattern = constants::S_TQBFJOTLD;
     let flags = 0;
 
-    // TODO criterion can benchmark between two different functions
     c.bench_function("`shwild::CompiledMatcher()` parsing - literal (medium)", |b| {
         b.iter(|| {
             let r = shwild::CompiledMatcher::from_pattern_and_flags(black_box(pattern), black_box(flags));
@@ -72,8 +76,85 @@ pub fn parse_input_literal_large(c : &mut Criterion) {
     let pattern = constants::S_Lorem_ipsum;
     let flags = 0;
 
-    // TODO criterion can benchmark between two different functions
     c.bench_function("`shwild::CompiledMatcher()` parsing - literal (large)", |b| {
+        b.iter(|| {
+            let r = shwild::CompiledMatcher::from_pattern_and_flags(black_box(pattern), black_box(flags));
+
+            let _ = black_box(r);
+        })
+    });
+}
+
+pub fn parse_input_nrange_continuum_simple(c : &mut Criterion) {
+    let pattern = constants::patterns::NRANGE_CONTINUUM_SIMPLE;
+    let flags = 0;
+
+    c.bench_function("`shwild::CompiledMatcher()` parsing - nrange continuum (simple)", |b| {
+        b.iter(|| {
+            let r = shwild::CompiledMatcher::from_pattern_and_flags(black_box(pattern), black_box(flags));
+
+            let _ = black_box(r);
+        })
+    });
+}
+
+pub fn parse_input_nrange_continuum_reverse(c : &mut Criterion) {
+    let pattern = constants::patterns::NRANGE_CONTINUUM_REVERSE;
+    let flags = 0;
+
+    c.bench_function("`shwild::CompiledMatcher()` parsing - nrange continuum (reverse)", |b| {
+        b.iter(|| {
+            let r = shwild::CompiledMatcher::from_pattern_and_flags(black_box(pattern), black_box(flags));
+
+            let _ = black_box(r);
+        })
+    });
+}
+
+pub fn parse_input_nrange_continuum_crosscase(c : &mut Criterion) {
+    let pattern = constants::patterns::NRANGE_CONTINUUM_CROSSCASE;
+    let flags = 0;
+
+    c.bench_function("`shwild::CompiledMatcher()` parsing - nrange continuum (crosscase)", |b| {
+        b.iter(|| {
+            let r = shwild::CompiledMatcher::from_pattern_and_flags(black_box(pattern), black_box(flags));
+
+            let _ = black_box(r);
+        })
+    });
+}
+
+pub fn parse_input_range_continuum_simple(c : &mut Criterion) {
+    let pattern = constants::patterns::RANGE_CONTINUUM_SIMPLE;
+    let flags = 0;
+
+    c.bench_function("`shwild::CompiledMatcher()` parsing - range continuum (simple)", |b| {
+        b.iter(|| {
+            let r = shwild::CompiledMatcher::from_pattern_and_flags(black_box(pattern), black_box(flags));
+
+            let _ = black_box(r);
+        })
+    });
+}
+
+pub fn parse_input_range_continuum_reverse(c : &mut Criterion) {
+    let pattern = constants::patterns::RANGE_CONTINUUM_REVERSE;
+    let flags = 0;
+
+    c.bench_function("`shwild::CompiledMatcher()` parsing - range continuum (reverse)", |b| {
+        b.iter(|| {
+            let r = shwild::CompiledMatcher::from_pattern_and_flags(black_box(pattern), black_box(flags));
+
+            let _ = black_box(r);
+        })
+    });
+}
+
+pub fn parse_input_range_continuum_crosscase(c : &mut Criterion) {
+    let pattern = constants::patterns::RANGE_CONTINUUM_CROSSCASE;
+    let flags = 0;
+
+    c.bench_function("`shwild::CompiledMatcher()` parsing - range continuum (crosscase)", |b| {
         b.iter(|| {
             let r = shwild::CompiledMatcher::from_pattern_and_flags(black_box(pattern), black_box(flags));
 
@@ -86,7 +167,6 @@ pub fn parse_input_Windows_path(c : &mut Criterion) {
     let pattern = constants::patterns::WINDOWS_PATH;
     let flags = 0;
 
-    // TODO criterion can benchmark between two different functions
     c.bench_function("`shwild::CompiledMatcher()` parsing - Windows Path", |b| {
         b.iter(|| {
             let r = shwild::CompiledMatcher::from_pattern_and_flags(black_box(pattern), black_box(flags));
@@ -112,7 +192,6 @@ pub fn test_against_pattern_input_empty(c : &mut Criterion) {
 
     let matcher = shwild::CompiledMatcher::from_pattern_and_flags(black_box(pattern), black_box(flags)).unwrap();
 
-    // TODO criterion can benchmark between two different functions
     c.bench_function("`shwild::CompiledMatcher()` matching - empty string", |b| {
         b.iter(|| {
             for input in &inputs {
@@ -140,7 +219,6 @@ pub fn test_against_pattern_WindowsPath(c : &mut Criterion) {
 
     let matcher = shwild::CompiledMatcher::from_pattern_and_flags(black_box(pattern), black_box(flags)).unwrap();
 
-    // TODO criterion can benchmark between two different functions
     c.bench_function("`shwild::CompiledMatcher()` matching - Windows Path", |b| {
         b.iter(|| {
             for input in &inputs {
@@ -159,6 +237,12 @@ criterion_group!(
     parse_input_literal_small,
     parse_input_literal_medium,
     parse_input_literal_large,
+    parse_input_range_continuum_simple,
+    parse_input_range_continuum_reverse,
+    parse_input_range_continuum_crosscase,
+    parse_input_nrange_continuum_simple,
+    parse_input_nrange_continuum_reverse,
+    parse_input_nrange_continuum_crosscase,
     parse_input_Windows_path,
     test_against_pattern_input_empty,
     test_against_pattern_WindowsPath,

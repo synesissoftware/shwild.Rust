@@ -29,7 +29,6 @@ pub fn matches_input_empty(c : &mut Criterion) {
     let input = "";
     let flags = 0;
 
-    // TODO criterion can benchmark between two different functions
     c.bench_function("`shwild::matches()` - empty string", |b| {
         b.iter(|| {
             let r = shwild::matches(black_box(pattern), black_box(input), black_box(flags));
@@ -44,7 +43,6 @@ pub fn matches_input_literal_small(c : &mut Criterion) {
     let input = "";
     let flags = 0;
 
-    // TODO criterion can benchmark between two different functions
     c.bench_function("`shwild::matches()` - literal (small)", |b| {
         b.iter(|| {
             let r = shwild::matches(black_box(pattern), black_box(input), black_box(flags));
@@ -59,7 +57,6 @@ pub fn matches_input_literal_medium(c : &mut Criterion) {
     let input = "";
     let flags = 0;
 
-    // TODO criterion can benchmark between two different functions
     c.bench_function("`shwild::matches()` - literal (medium)", |b| {
         b.iter(|| {
             let r = shwild::matches(black_box(pattern), black_box(input), black_box(flags));
@@ -74,7 +71,6 @@ pub fn matches_input_literal_large(c : &mut Criterion) {
     let input = "";
     let flags = 0;
 
-    // TODO criterion can benchmark between two different functions
     c.bench_function("`shwild::matches()` - literal (large)", |b| {
         b.iter(|| {
             let r = shwild::matches(black_box(pattern), black_box(input), black_box(flags));
