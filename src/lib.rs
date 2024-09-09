@@ -1183,15 +1183,14 @@ impl CompiledMatcher {
                                 },
                             };
 
+                            debug_assert!(!s.is_empty());
 
-                            if !s.is_empty() {
-                                minimum_required =
-                                    matchers.prepend_Literal(String::from_iter(s.iter()), flags, minimum_required);
+                            minimum_required =
+                                matchers.prepend_Literal(String::from_iter(s.iter()), flags, minimum_required);
 
-                                num_matchers += 1;
+                            num_matchers += 1;
 
-                                s.clear();
-                            }
+                            s.clear();
 
                             return Ok((minimum_required, num_matchers));
                         },
@@ -1337,14 +1336,14 @@ impl CompiledMatcher {
                                     },
                                 };
 
-                                if !s.is_empty() {
-                                    minimum_required =
-                                        matchers.prepend_Literal(String::from_iter(s.iter()), flags, minimum_required);
+                                debug_assert!(!s.is_empty());
 
-                                    num_matchers += 1;
+                                minimum_required =
+                                    matchers.prepend_Literal(String::from_iter(s.iter()), flags, minimum_required);
 
-                                    s.clear();
-                                }
+                                num_matchers += 1;
+
+                                s.clear();
 
                                 return Ok((minimum_required, num_matchers));
                             },
@@ -1389,14 +1388,14 @@ impl CompiledMatcher {
                                     },
                                 };
 
-                                if !s.is_empty() {
-                                    minimum_required =
-                                        matchers.prepend_Literal(String::from_iter(s.iter()), flags, minimum_required);
+                                debug_assert!(!s.is_empty());
 
-                                    num_matchers += 1;
+                                minimum_required =
+                                    matchers.prepend_Literal(String::from_iter(s.iter()), flags, minimum_required);
 
-                                    s.clear();
-                                }
+                                num_matchers += 1;
+
+                                s.clear();
 
                                 return Ok((minimum_required, num_matchers));
                             },
