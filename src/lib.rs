@@ -1581,14 +1581,12 @@ impl CompiledMatcher {
 
                 minimum_required = matchers.prepend_Literal(literal, flags, minimum_required);
             },
-            ParseState::InNotRange |  ParseState::InRange => {
-                let characters = crate::utils::prepare_range_string(&String::from_iter(s.iter()), flags);
-
-                minimum_required = if matches!(state, ParseState::InRange) {
-                    matchers.prepend_Range(characters, flags, minimum_required)
-                } else {
-                    matchers.prepend_NotRange(characters, flags, minimum_required)
-                };
+            ParseState::InNotRange | ParseState::InRange => {
+                return Err(Error::ParseError {
+                    line :    0,
+                    column :  usize::MAX,
+                    message : format!("incomplete range"),
+                });
             },
         };
 
@@ -2539,6 +2537,18 @@ mod tests {
                         "the character range a-9 does not define a supported (ASCII) range continuum",
                         format!("{e:?}")
                     );
+                },
+            };
+        }
+
+        #[test]
+        fn TEST_matches_INVALID_PATTERN_INCOMPLETE_RANGE_1() {
+            match shwild::matches("[a-z", "", 0) {
+                Ok(_) => {
+                    panic!("unexpected success");
+                },
+                Err(e) => {
+                    assert_eq!("incomplete range", format!("{e:?}"));
                 },
             };
         }
