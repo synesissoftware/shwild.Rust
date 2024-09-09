@@ -89,31 +89,18 @@ mod traits {
         ///
         /// # Returns:
         /// - `true` - indicates a full match; or
-        /// - `false` -
+        /// - `false` - if not a full match.
 
         fn matches(
             &self,
             slice : &str,
         ) -> bool;
-
-        /// Obtains the minimum required remaining length for the chain
-        /// beginning with the called instance, which may be called to
-        /// optimise implementations of certain `Match` instances.
-        fn minimum_required(&self) -> usize;
-
-        /// T.B.C.
-        fn set_next(
-            &mut self,
-            next : Option<Box<dyn Match>>,
-        ) -> Option<Box<dyn Match>>;
     }
 }
 
 mod match_structures {
 
     use super::traits::Match;
-
-    use std::mem as std_mem;
 
 
     #[derive(Debug)]
@@ -124,31 +111,41 @@ mod match_structures {
         next :              Option<Box<dyn Match>>,
         literal :           String,
         literal_uppercase : Option<String>,
+        #[cfg_attr(debug_assertions, allow(unused))]
+        minimum_required :  usize,
         // flags : i64,
     }
 
     #[derive(Debug)]
     pub(crate) struct MatchNotRange {
-        next :       Option<Box<dyn Match>>,
-        characters : String,
+        next :             Option<Box<dyn Match>>,
+        characters :       String,
+        #[cfg_attr(debug_assertions, allow(unused))]
+        minimum_required : usize,
         // flags : i64,
     }
 
     #[derive(Debug)]
     pub(crate) struct MatchRange {
-        next :       Option<Box<dyn Match>>,
-        characters : String,
+        next :             Option<Box<dyn Match>>,
+        characters :       String,
+        #[cfg_attr(debug_assertions, allow(unused))]
+        minimum_required : usize,
         // flags : i64,
     }
 
     #[derive(Debug)]
     pub(crate) struct MatchWild1 {
-        pub(crate) next : Option<Box<dyn Match>>,
+        pub(crate) next :  Option<Box<dyn Match>>,
+        #[cfg_attr(debug_assertions, allow(unused))]
+        minimum_required : usize,
     }
 
     #[derive(Debug)]
     pub(crate) struct MatchWildN {
-        pub(crate) next : Option<Box<dyn Match>>,
+        pub(crate) next :  Option<Box<dyn Match>>,
+        #[cfg_attr(debug_assertions, allow(unused))]
+        minimum_required : usize,
     }
 
 
@@ -166,11 +163,15 @@ mod match_structures {
                 None
             };
 
+            // NOTE: this is a not-currently-implemented feature
+            let minimum_required = usize::MAX;
+
             Self {
                 next,
                 literal,
                 literal_uppercase,
                 // flags,
+                minimum_required,
             }
         }
     }
@@ -183,10 +184,14 @@ mod match_structures {
         ) -> Self {
             let characters = super::utils::prepare_range_string(characters, flags);
 
+            // NOTE: this is a not-currently-implemented feature
+            let minimum_required = usize::MAX;
+
             Self {
                 next,
                 characters,
                 // flags,
+                minimum_required,
             }
         }
     }
@@ -199,10 +204,38 @@ mod match_structures {
         ) -> Self {
             let characters = super::utils::prepare_range_string(characters, flags);
 
+            // NOTE: this is a not-currently-implemented feature
+            let minimum_required = usize::MAX;
+
             Self {
                 next,
                 characters,
                 // flags,
+                minimum_required,
+            }
+        }
+    }
+
+    impl MatchWild1 {
+        pub(crate) fn new(next : Option<Box<dyn Match>>) -> Self {
+            // NOTE: this is a not-currently-implemented feature
+            let minimum_required = usize::MAX;
+
+            Self {
+                next,
+                minimum_required,
+            }
+        }
+    }
+
+    impl MatchWildN {
+        pub(crate) fn new(next : Option<Box<dyn Match>>) -> Self {
+            // NOTE: this is a not-currently-implemented feature
+            let minimum_required = usize::MAX;
+
+            Self {
+                next,
+                minimum_required,
             }
         }
     }
@@ -215,17 +248,6 @@ mod match_structures {
             slice : &str,
         ) -> bool {
             slice.is_empty()
-        }
-
-        fn minimum_required(&self) -> usize {
-            0
-        }
-
-        fn set_next(
-            &mut self,
-            _next : Option<Box<dyn Match>>,
-        ) -> Option<Box<dyn Match>> {
-            panic!("should never be called");
         }
     }
 
@@ -254,23 +276,6 @@ mod match_structures {
 
             next.matches(&slice[self.literal.len()..])
         }
-
-        fn minimum_required(&self) -> usize {
-            let next = self.next.as_ref().unwrap();
-
-            self.literal.len() + next.minimum_required()
-        }
-
-        fn set_next(
-            &mut self,
-            next : Option<Box<dyn Match>>,
-        ) -> Option<Box<dyn Match>> {
-            let mut next = next;
-
-            std_mem::swap(&mut self.next, &mut next);
-
-            next
-        }
     }
 
     impl Match for MatchNotRange {
@@ -291,23 +296,6 @@ mod match_structures {
             let next = self.next.as_ref().unwrap();
 
             next.matches(&slice[c0.len_utf8()..])
-        }
-
-        fn minimum_required(&self) -> usize {
-            let next = self.next.as_ref().unwrap();
-
-            1 + next.minimum_required()
-        }
-
-        fn set_next(
-            &mut self,
-            next : Option<Box<dyn Match>>,
-        ) -> Option<Box<dyn Match>> {
-            let mut next = next;
-
-            std_mem::swap(&mut self.next, &mut next);
-
-            next
         }
     }
 
@@ -330,23 +318,6 @@ mod match_structures {
 
             next.matches(&slice[c0.len_utf8()..])
         }
-
-        fn minimum_required(&self) -> usize {
-            let next = self.next.as_ref().unwrap();
-
-            1 + next.minimum_required()
-        }
-
-        fn set_next(
-            &mut self,
-            next : Option<Box<dyn Match>>,
-        ) -> Option<Box<dyn Match>> {
-            let mut next = next;
-
-            std_mem::swap(&mut self.next, &mut next);
-
-            next
-        }
     }
 
     impl Match for MatchWild1 {
@@ -363,23 +334,6 @@ mod match_structures {
             let next = self.next.as_ref().unwrap();
 
             next.matches(&slice[c0.len_utf8()..])
-        }
-
-        fn minimum_required(&self) -> usize {
-            let next = self.next.as_ref().unwrap();
-
-            1 + next.minimum_required()
-        }
-
-        fn set_next(
-            &mut self,
-            next : Option<Box<dyn Match>>,
-        ) -> Option<Box<dyn Match>> {
-            let mut next = next;
-
-            std_mem::swap(&mut self.next, &mut next);
-
-            next
         }
     }
 
@@ -408,25 +362,6 @@ mod match_structures {
 
             false
         }
-
-        fn minimum_required(&self) -> usize {
-            #![allow(clippy::identity_op)]
-
-            let next = self.next.as_ref().unwrap();
-
-            0 + next.minimum_required()
-        }
-
-        fn set_next(
-            &mut self,
-            next : Option<Box<dyn Match>>,
-        ) -> Option<Box<dyn Match>> {
-            let mut next = next;
-
-            std_mem::swap(&mut self.next, &mut next);
-
-            next
-        }
     }
 
 
@@ -451,7 +386,6 @@ mod match_structures {
 
                 assert!(matcher.matches(""));
                 assert!(!matcher.matches("a"));
-                assert_eq!(0, matcher.minimum_required());
             }
         }
 
@@ -472,7 +406,6 @@ mod match_structures {
 
                 let matcher : &dyn Match = ml.as_deref().unwrap();
 
-                assert_eq!(2, matcher.minimum_required());
                 assert!(matcher.matches("he"));
                 assert!(!matcher.matches("hen"));
                 assert!(!matcher.matches("he "));
@@ -490,7 +423,6 @@ mod match_structures {
 
                 let matcher : &dyn Match = ml1.as_deref().unwrap();
 
-                assert_eq!(4, matcher.minimum_required());
                 assert!(matcher.matches("head"));
                 assert!(!matcher.matches("heads"));
                 assert!(!matcher.matches("hea"));
@@ -513,7 +445,6 @@ mod match_structures {
 
                 let matcher : &dyn Match = mr.as_deref().unwrap();
 
-                assert_eq!(1, matcher.minimum_required());
                 assert!(!matcher.matches(""));
                 assert!(matcher.matches("0"));
                 assert!(matcher.matches("1"));
@@ -547,8 +478,6 @@ mod match_structures {
 
                 let matcher : &dyn Match = mn.as_deref().unwrap();
 
-                assert_eq!(1, matcher.minimum_required());
-
                 assert!(!matcher.matches(""));
                 assert!(!matcher.matches("0"));
                 assert!(!matcher.matches("1"));
@@ -576,13 +505,9 @@ mod match_structures {
             #[test]
             fn TEST_Wild_1() {
                 let me : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
-                let m1 : Option<Box<dyn Match>> = Some(Box::new(MatchWild1 {
-                    next : me
-                }));
+                let m1 : Option<Box<dyn Match>> = Some(Box::new(MatchWild1::new(me)));
 
                 let matcher : &dyn Match = m1.as_deref().unwrap();
-
-                assert_eq!(1, matcher.minimum_required());
 
                 assert!(!matcher.matches(""));
                 assert!(matcher.matches("0"));
@@ -603,16 +528,10 @@ mod match_structures {
             #[test]
             fn TEST_Wild_2() {
                 let me : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
-                let mw2 : Option<Box<dyn Match>> = Some(Box::new(MatchWild1 {
-                    next : me
-                }));
-                let mw1 : Option<Box<dyn Match>> = Some(Box::new(MatchWild1 {
-                    next : mw2
-                }));
+                let mw2 : Option<Box<dyn Match>> = Some(Box::new(MatchWild1::new(me)));
+                let mw1 : Option<Box<dyn Match>> = Some(Box::new(MatchWild1::new(mw2)));
 
                 let matcher : &dyn Match = mw1.as_deref().unwrap();
-
-                assert_eq!(2, matcher.minimum_required());
 
                 assert!(!matcher.matches(""));
                 assert!(!matcher.matches("0"));
@@ -642,13 +561,9 @@ mod match_structures {
             #[test]
             fn TEST_WildN_1() {
                 let me : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
-                let mw : Option<Box<dyn Match>> = Some(Box::new(MatchWildN {
-                    next : me
-                }));
+                let mw : Option<Box<dyn Match>> = Some(Box::new(MatchWildN::new(me)));
 
                 let matcher : &dyn Match = mw.as_deref().unwrap();
-
-                assert_eq!(0, matcher.minimum_required());
 
                 assert!(matcher.matches(""));
                 assert!(matcher.matches("0"));
@@ -671,14 +586,10 @@ mod match_structures {
                 let literal = "ma".into();
 
                 let me : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
-                let mw : Option<Box<dyn Match>> = Some(Box::new(MatchWildN {
-                    next : me
-                }));
+                let mw : Option<Box<dyn Match>> = Some(Box::new(MatchWildN::new(me)));
                 let ml : Option<Box<dyn Match>> = Some(Box::new(MatchLiteral::new(mw, literal, 0)));
 
                 let matcher : &dyn Match = ml.as_deref().unwrap();
-
-                assert_eq!(2, matcher.minimum_required());
 
                 assert!(!matcher.matches(""));
                 assert!(!matcher.matches("m"));
@@ -695,14 +606,10 @@ mod match_structures {
 
                 let me : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
                 let ml2 : Option<Box<dyn Match>> = Some(Box::new(MatchLiteral::new(me, literal2, 0)));
-                let mw : Option<Box<dyn Match>> = Some(Box::new(MatchWildN {
-                    next : ml2
-                }));
+                let mw : Option<Box<dyn Match>> = Some(Box::new(MatchWildN::new(ml2)));
                 let ml1 : Option<Box<dyn Match>> = Some(Box::new(MatchLiteral::new(mw, literal1, 0)));
 
                 let matcher : &dyn Match = ml1.as_deref().unwrap();
-
-                assert_eq!(2, matcher.minimum_required());
 
                 assert!(!matcher.matches(""));
                 assert!(!matcher.matches("m"));
@@ -799,11 +706,20 @@ mod utils {
         #![allow(non_snake_case)]
 
 
+        /// T.B.C.
+        ///
+        /// # Returns:
+        /// `total_minimum_required : usize` - the total minimum required of
+        /// this and all following instances.
+        #[must_use]
         pub(crate) fn prepend_Literal(
             &mut self,
             literal : String,
             flags : i64,
-        ) -> &mut Self {
+            following_minimum_required : usize,
+        ) -> usize {
+            let literal_len = literal.len();
+
             let mut next : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
 
             std_mem::swap(&mut self.matcher0, &mut next);
@@ -816,14 +732,21 @@ mod utils {
 
             self.num_matchers += 1;
 
-            self
+            literal_len + following_minimum_required
         }
 
+        /// T.B.C.
+        ///
+        /// # Returns:
+        /// `total_minimum_required : usize` - the total minimum required of
+        /// this and all following instances.
+        #[must_use]
         pub(crate) fn prepend_NotRange(
             &mut self,
             characters : &str,
             flags : i64,
-        ) -> &mut Self {
+            following_minimum_required : usize,
+        ) -> usize {
             let mut next : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
 
             std_mem::swap(&mut self.matcher0, &mut next);
@@ -836,14 +759,21 @@ mod utils {
 
             self.num_matchers += 1;
 
-            self
+            1 + following_minimum_required
         }
 
+        /// T.B.C.
+        ///
+        /// # Returns:
+        /// `total_minimum_required : usize` - the total minimum required of
+        /// this and all following instances.
+        #[must_use]
         pub(crate) fn prepend_Range(
             &mut self,
             characters : &str,
             flags : i64,
-        ) -> &mut Self {
+            following_minimum_required : usize,
+        ) -> usize {
             let mut next : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
 
             std_mem::swap(&mut self.matcher0, &mut next);
@@ -856,43 +786,59 @@ mod utils {
 
             self.num_matchers += 1;
 
-            self
+            1 + following_minimum_required
         }
 
-        pub(crate) fn prepend_Wild1(&mut self) -> &mut Self {
+        /// T.B.C.
+        ///
+        /// # Returns:
+        /// `total_minimum_required : usize` - the total minimum required of
+        /// this and all following instances.
+        #[must_use]
+        pub(crate) fn prepend_Wild1(
+            &mut self,
+            following_minimum_required : usize,
+        ) -> usize {
             let mut next : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
 
             std_mem::swap(&mut self.matcher0, &mut next);
 
             // NOW: `next` is the head of the list, and `self.matcher0` is `MatchEnd`
 
-            let mut matcher : Option<Box<dyn Match>> = Some(Box::new(MatchWild1 {
-                next,
-            }));
+            let mut matcher : Option<Box<dyn Match>> = Some(Box::new(MatchWild1::new(next)));
 
             std_mem::swap(&mut self.matcher0, &mut matcher);
 
             self.num_matchers += 1;
 
-            self
+            1 + following_minimum_required
         }
 
-        pub(crate) fn prepend_WildN(&mut self) -> &mut Self {
+        /// T.B.C.
+        ///
+        /// # Returns:
+        /// `total_minimum_required : usize` - the total minimum required of
+        /// this and all following instances.
+        #[must_use]
+        pub(crate) fn prepend_WildN(
+            &mut self,
+            following_minimum_required : usize,
+        ) -> usize {
+            #![allow(clippy::identity_op)] // for clarity of semantics of return value
+
             let mut next : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
 
             std_mem::swap(&mut self.matcher0, &mut next);
 
             // NOW: `next` is the head of the list, and `self.matcher0` is `MatchEnd`
 
-            let mut matcher : Option<Box<dyn Match>> = Some(Box::new(MatchWildN {
-                next,
-            }));
+            let mut matcher : Option<Box<dyn Match>> = Some(Box::new(MatchWildN::new(next)));
 
             std_mem::swap(&mut self.matcher0, &mut matcher);
 
             self.num_matchers += 1;
 
-            self
+            0 + following_minimum_required
         }
     }
 
@@ -960,8 +906,12 @@ mod utils {
             #[test]
             fn TEST_MatcherSequence_WITH_Literal_1() {
                 let mut matchers = MatcherSequence::new();
+                let flags = 0;
+                let mut minimum_required = 0;
 
-                matchers.prepend_Literal("ma".into(), 0);
+                minimum_required = matchers.prepend_Literal("ma".into(), flags, minimum_required);
+
+                assert_eq!(2, minimum_required);
 
                 assert_eq!(1, matchers.len());
 
@@ -975,8 +925,12 @@ mod utils {
             #[test]
             fn TEST_MatcherSequence_WITH_Range_1() {
                 let mut matchers = MatcherSequence::new();
+                let flags = 0;
+                let mut minimum_required = 0;
 
-                matchers.prepend_Range("abcdef".into(), 0);
+                minimum_required = matchers.prepend_Range("abcdef".into(), flags, minimum_required);
+
+                assert_eq!(1, minimum_required);
 
                 assert_eq!(1, matchers.len());
 
@@ -1001,8 +955,12 @@ mod utils {
             #[test]
             fn TEST_MatcherSequence_WITH_NotRange_1() {
                 let mut matchers = MatcherSequence::new();
+                let flags = 0;
+                let mut minimum_required = 0;
 
-                matchers.prepend_NotRange("abcdef".into(), 0);
+                minimum_required = matchers.prepend_NotRange("abcdef".into(), flags, minimum_required);
+
+                assert_eq!(1, minimum_required);
 
                 assert_eq!(1, matchers.len());
 
@@ -1027,8 +985,12 @@ mod utils {
             #[test]
             fn TEST_MatcherSequence_WITH_Range_HAVING__IGNORE_CASE__1() {
                 let mut matchers = MatcherSequence::new();
+                let flags = IGNORE_CASE;
+                let mut minimum_required = 0;
 
-                matchers.prepend_Range("abcdef".into(), IGNORE_CASE);
+                minimum_required = matchers.prepend_Range("abcdef".into(), flags, minimum_required);
+
+                assert_eq!(1, minimum_required);
 
                 assert_eq!(1, matchers.len());
 
@@ -1053,8 +1015,12 @@ mod utils {
             #[test]
             fn TEST_MatcherSequence_WITH_NotRange_HAVING__IGNORE_CASE__1() {
                 let mut matchers = MatcherSequence::new();
+                let flags = IGNORE_CASE;
+                let mut minimum_required = 0;
 
-                matchers.prepend_NotRange("abcdef".into(), IGNORE_CASE);
+                minimum_required = matchers.prepend_NotRange("abcdef".into(), flags, minimum_required);
+
+                assert_eq!(1, minimum_required);
 
                 assert_eq!(1, matchers.len());
 
@@ -1080,15 +1046,31 @@ mod utils {
             fn TEST_MatcherSequence_WITH_MULTIPLE_ELEMENTS_HAVING__IGNORE_CASE___1() {
                 let mut matchers = MatcherSequence::new();
                 let flags = IGNORE_CASE;
+                let mut minimum_required = 0;
 
                 // match a full Windows executable Path, albeit one that may
                 // not have a directory, or even a stem
 
-                matchers.prepend_Literal(r".exe".into(), flags);
-                matchers.prepend_WildN();
-                matchers.prepend_Range(r"\/", flags);
-                matchers.prepend_Literal(r":".into(), flags);
-                matchers.prepend_Range(r"abcdefghijklmnopqrstuvwxyz", flags);
+                minimum_required = matchers.prepend_Literal(r".exe".into(), flags, minimum_required);
+
+                assert_eq!(4, minimum_required);
+
+                minimum_required = matchers.prepend_WildN(minimum_required);
+
+                assert_eq!(4, minimum_required);
+
+                minimum_required = matchers.prepend_Range(r"\/", flags, minimum_required);
+
+                assert_eq!(5, minimum_required);
+
+                minimum_required = matchers.prepend_Literal(r":".into(), flags, minimum_required);
+
+                assert_eq!(6, minimum_required);
+
+                minimum_required = matchers.prepend_Range(r"abcdefghijklmnopqrstuvwxyz", flags, minimum_required);
+
+                assert_eq!(7, minimum_required);
+
 
                 assert!(!matchers.matches(""));
                 assert!(!matchers.matches("program.exe"));
@@ -1166,9 +1148,11 @@ impl CompiledMatcher {
         matchers : &mut utils::MatcherSequence,
         pattern : &str,
         flags : i64,
-    ) -> Result<
+    ) -> Result<(
+        usize, // minimum_required
         usize, // num_matchers
-    > {
+    )> {
+        let mut minimum_required = 0;
         let mut num_matchers = 0;
         let mut state = ParseState::None;
         let mut s = vec![];
@@ -1186,20 +1170,27 @@ impl CompiledMatcher {
                             state = ParseState::InRange;
                         },
                         ParseState::InLiteral => {
-                            num_matchers += match Self::parse_(matchers, &pattern[num_bytes..], flags) {
-                                Ok(num_matchers) => num_matchers,
+                            match Self::parse_(matchers, &pattern[num_bytes..], flags) {
+                                Ok((following_mr, following_nm)) => {
+                                    minimum_required = following_mr;
+                                    num_matchers += following_nm;
+                                },
                                 Err(e) => {
                                     return Err(e);
                                 },
                             };
 
+
                             if !s.is_empty() {
-                                matchers.prepend_Literal(String::from_iter(s.iter()), flags);
+                                minimum_required =
+                                    matchers.prepend_Literal(String::from_iter(s.iter()), flags, minimum_required);
+
+                                num_matchers += 1;
 
                                 s.clear();
                             }
 
-                            return Ok(num_matchers + 1);
+                            return Ok((minimum_required, num_matchers));
                         },
                         _ => {
                             s.push(c);
@@ -1220,8 +1211,11 @@ impl CompiledMatcher {
                     match state {
                         ParseState::InRange => {
                             num_bytes += 1;
-                            num_matchers += match Self::parse_(matchers, &pattern[num_bytes..], flags) {
-                                Ok(num_matchers) => num_matchers,
+                            match Self::parse_(matchers, &pattern[num_bytes..], flags) {
+                                Ok((following_mr, following_nm)) => {
+                                    minimum_required = following_mr;
+                                    num_matchers += following_nm;
+                                },
                                 Err(e) => {
                                     return Err(e);
                                 },
@@ -1233,16 +1227,22 @@ impl CompiledMatcher {
                                 s.push('-');
                             }
 
-                            matchers.prepend_Range(&String::from_iter(s.iter()), flags);
+                            minimum_required =
+                                matchers.prepend_Range(&String::from_iter(s.iter()), flags, minimum_required);
+
+                            num_matchers += 1;
 
                             s.clear();
 
-                            return Ok(num_matchers + 1);
+                            return Ok((minimum_required, num_matchers));
                         },
                         ParseState::InNotRange => {
                             num_bytes += 1;
-                            num_matchers += match Self::parse_(matchers, &pattern[num_bytes..], flags) {
-                                Ok(num_matchers) => num_matchers,
+                            match Self::parse_(matchers, &pattern[num_bytes..], flags) {
+                                Ok((following_mr, following_nm)) => {
+                                    minimum_required = following_mr;
+                                    num_matchers += following_nm;
+                                },
                                 Err(e) => {
                                     return Err(e);
                                 },
@@ -1254,11 +1254,14 @@ impl CompiledMatcher {
                                 s.push('-');
                             }
 
-                            matchers.prepend_NotRange(&String::from_iter(s.iter()), flags);
+                            minimum_required =
+                                matchers.prepend_NotRange(&String::from_iter(s.iter()), flags, minimum_required);
+
+                            num_matchers += 1;
 
                             s.clear();
 
-                            return Ok(num_matchers + 1);
+                            return Ok((minimum_required, num_matchers));
                         },
                         _ => {
                             s.push(c);
@@ -1304,33 +1307,43 @@ impl CompiledMatcher {
                         match state {
                             ParseState::None => {
                                 num_bytes += 1;
-                                num_matchers += match Self::parse_(matchers, &pattern[num_bytes..], flags) {
-                                    Ok(num_matchers) => num_matchers,
+                                match Self::parse_(matchers, &pattern[num_bytes..], flags) {
+                                    Ok((following_mr, following_nm)) => {
+                                        minimum_required = following_mr;
+                                        num_matchers += following_nm;
+                                    },
                                     Err(e) => {
                                         return Err(e);
                                     },
                                 };
 
+                                minimum_required = matchers.prepend_Wild1(minimum_required);
 
-                                matchers.prepend_Wild1();
+                                num_matchers += 1;
 
-                                return Ok(num_matchers + 1);
+                                return Ok((minimum_required, num_matchers));
                             },
                             ParseState::InLiteral => {
-                                num_matchers += match Self::parse_(matchers, &pattern[num_bytes..], flags) {
-                                    Ok(num_matchers) => num_matchers,
+                                match Self::parse_(matchers, &pattern[num_bytes..], flags) {
+                                    Ok((following_mr, following_nm)) => {
+                                        minimum_required = following_mr;
+                                        num_matchers += following_nm;
+                                    },
                                     Err(e) => {
                                         return Err(e);
                                     },
                                 };
 
                                 if !s.is_empty() {
-                                    matchers.prepend_Literal(String::from_iter(s.iter()), flags);
+                                    minimum_required =
+                                        matchers.prepend_Literal(String::from_iter(s.iter()), flags, minimum_required);
+
+                                    num_matchers += 1;
 
                                     s.clear();
                                 }
 
-                                return Ok(num_matchers + 1);
+                                return Ok((minimum_required, num_matchers));
                             },
                             _ => {
                                 s.push(c);
@@ -1346,33 +1359,43 @@ impl CompiledMatcher {
                         match state {
                             ParseState::None => {
                                 num_bytes += 1;
-                                num_matchers += match Self::parse_(matchers, &pattern[num_bytes..], flags) {
-                                    Ok(num_matchers) => num_matchers,
+                                match Self::parse_(matchers, &pattern[num_bytes..], flags) {
+                                    Ok((following_mr, following_nm)) => {
+                                        minimum_required = following_mr;
+                                        num_matchers += following_nm;
+                                    },
                                     Err(e) => {
                                         return Err(e);
                                     },
                                 };
 
+                                minimum_required = matchers.prepend_WildN(minimum_required);
 
-                                matchers.prepend_WildN();
+                                num_matchers += 1;
 
-                                return Ok(num_matchers + 1);
+                                return Ok((minimum_required, num_matchers));
                             },
                             ParseState::InLiteral => {
-                                num_matchers += match Self::parse_(matchers, &pattern[num_bytes..], flags) {
-                                    Ok(num_matchers) => num_matchers,
+                                match Self::parse_(matchers, &pattern[num_bytes..], flags) {
+                                    Ok((following_mr, following_nm)) => {
+                                        minimum_required = following_mr;
+                                        num_matchers += following_nm;
+                                    },
                                     Err(e) => {
                                         return Err(e);
                                     },
                                 };
 
                                 if !s.is_empty() {
-                                    matchers.prepend_Literal(String::from_iter(s.iter()), flags);
+                                    minimum_required =
+                                        matchers.prepend_Literal(String::from_iter(s.iter()), flags, minimum_required);
+
+                                    num_matchers += 1;
 
                                     s.clear();
                                 }
 
-                                return Ok(num_matchers + 1);
+                                return Ok((minimum_required, num_matchers));
                             },
                             _ => {
                                 s.push(c);
@@ -1417,17 +1440,17 @@ impl CompiledMatcher {
         match state {
             ParseState::None => {},
             ParseState::InLiteral => {
-                matchers.prepend_Literal(String::from_iter(s.iter()), flags);
+                minimum_required = matchers.prepend_Literal(String::from_iter(s.iter()), flags, minimum_required);
             },
             ParseState::InNotRange => {
-                matchers.prepend_NotRange(&String::from_iter(s.iter()), flags);
+                minimum_required = matchers.prepend_NotRange(&String::from_iter(s.iter()), flags, minimum_required);
             },
             ParseState::InRange => {
-                matchers.prepend_Range(&String::from_iter(s.iter()), flags);
+                minimum_required = matchers.prepend_Range(&String::from_iter(s.iter()), flags, minimum_required);
             },
         };
 
-        Ok(num_matchers)
+        Ok((minimum_required, num_matchers))
     }
 
     fn push_continuum_(
