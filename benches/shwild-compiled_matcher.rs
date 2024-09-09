@@ -27,14 +27,12 @@ mod constants {
 
 
 pub fn parse_input_empty(c : &mut Criterion) {
-
     let pattern = constants::EMPTY_STRING;
     let flags = 0;
 
     // TODO criterion can benchmark between two different functions
     c.bench_function("`shwild::CompiledMatcher()` parsing - empty string", |b| {
         b.iter(|| {
-
             let r = shwild::CompiledMatcher::from_pattern_and_flags(black_box(pattern), black_box(flags));
 
             let _ = black_box(r);
@@ -43,14 +41,12 @@ pub fn parse_input_empty(c : &mut Criterion) {
 }
 
 pub fn parse_input_literal_small(c : &mut Criterion) {
-
     let pattern = constants::S_hello;
     let flags = 0;
 
     // TODO criterion can benchmark between two different functions
     c.bench_function("`shwild::CompiledMatcher()` parsing - literal (small)", |b| {
         b.iter(|| {
-
             let r = shwild::CompiledMatcher::from_pattern_and_flags(black_box(pattern), black_box(flags));
 
             let _ = black_box(r);
@@ -59,14 +55,12 @@ pub fn parse_input_literal_small(c : &mut Criterion) {
 }
 
 pub fn parse_input_literal_medium(c : &mut Criterion) {
-
     let pattern = constants::S_TQBFJOTLD;
     let flags = 0;
 
     // TODO criterion can benchmark between two different functions
     c.bench_function("`shwild::CompiledMatcher()` parsing - literal (medium)", |b| {
         b.iter(|| {
-
             let r = shwild::CompiledMatcher::from_pattern_and_flags(black_box(pattern), black_box(flags));
 
             let _ = black_box(r);
@@ -75,14 +69,12 @@ pub fn parse_input_literal_medium(c : &mut Criterion) {
 }
 
 pub fn parse_input_literal_large(c : &mut Criterion) {
-
     let pattern = constants::S_Lorem_ipsum;
     let flags = 0;
 
     // TODO criterion can benchmark between two different functions
     c.bench_function("`shwild::CompiledMatcher()` parsing - literal (large)", |b| {
         b.iter(|| {
-
             let r = shwild::CompiledMatcher::from_pattern_and_flags(black_box(pattern), black_box(flags));
 
             let _ = black_box(r);
@@ -91,14 +83,12 @@ pub fn parse_input_literal_large(c : &mut Criterion) {
 }
 
 pub fn parse_input_Windows_path(c : &mut Criterion) {
-
     let pattern = constants::patterns::WINDOWS_PATH;
     let flags = 0;
 
     // TODO criterion can benchmark between two different functions
     c.bench_function("`shwild::CompiledMatcher()` parsing - Windows Path", |b| {
         b.iter(|| {
-
             let r = shwild::CompiledMatcher::from_pattern_and_flags(black_box(pattern), black_box(flags));
 
             let _ = black_box(r);
@@ -107,7 +97,6 @@ pub fn parse_input_Windows_path(c : &mut Criterion) {
 }
 
 pub fn test_against_pattern_input_empty(c : &mut Criterion) {
-
     let pattern = constants::EMPTY_STRING;
     let flags = 0;
 
@@ -126,9 +115,7 @@ pub fn test_against_pattern_input_empty(c : &mut Criterion) {
     // TODO criterion can benchmark between two different functions
     c.bench_function("`shwild::CompiledMatcher()` matching - empty string", |b| {
         b.iter(|| {
-
             for input in &inputs {
-
                 let r = black_box(&matcher).matches(input);
 
                 let _ = black_box(r);
@@ -138,7 +125,6 @@ pub fn test_against_pattern_input_empty(c : &mut Criterion) {
 }
 
 pub fn test_against_pattern_WindowsPath(c : &mut Criterion) {
-
     let pattern = constants::patterns::WINDOWS_PATH;
     let flags = 0;
 
@@ -157,9 +143,7 @@ pub fn test_against_pattern_WindowsPath(c : &mut Criterion) {
     // TODO criterion can benchmark between two different functions
     c.bench_function("`shwild::CompiledMatcher()` matching - Windows Path", |b| {
         b.iter(|| {
-
             for input in &inputs {
-
                 let r = black_box(&matcher).matches(input);
 
                 let _ = black_box(r);
@@ -167,7 +151,6 @@ pub fn test_against_pattern_WindowsPath(c : &mut Criterion) {
         })
     });
 }
-
 
 
 criterion_group!(
@@ -181,4 +164,3 @@ criterion_group!(
     test_against_pattern_WindowsPath,
 );
 criterion_main!(benches);
-
