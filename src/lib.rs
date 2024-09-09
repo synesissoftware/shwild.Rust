@@ -7,9 +7,12 @@ use std::{
 };
 
 
+/// Represents parsing result.
 #[derive(PartialEq)]
 pub enum Error {
+    /// Parsing was successful.
     Ok,
+    /// Parse error encountered.
     ParseError {
         line :    usize,
         column :  usize,

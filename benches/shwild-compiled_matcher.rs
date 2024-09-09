@@ -1,0 +1,184 @@
+#![allow(non_snake_case)]
+
+use shwild;
+
+use criterion::{
+    black_box,
+    criterion_group,
+    criterion_main,
+    Criterion,
+};
+
+
+mod constants {
+    #![allow(non_upper_case_globals)]
+
+    pub(crate) const EMPTY_STRING : &str = "";
+    pub(crate) const S_hello : &str = "hello";
+    pub(crate) const S_TQBFJOTLD : &str = "The quick brown fox jumps over the lazy dog";
+    pub(crate) const S_Lorem_ipsum : &str =  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+
+    pub(crate) mod patterns {
+        #![allow(non_upper_case_globals)]
+
+        pub(crate) const WINDOWS_PATH : &str = r"[A-Z]\?*\?*.[ce][ox][em]";
+    }
+}
+
+
+pub fn parse_input_empty(c : &mut Criterion) {
+
+    let pattern = constants::EMPTY_STRING;
+    let flags = 0;
+
+    // TODO criterion can benchmark between two different functions
+    c.bench_function("`shwild::CompiledMatcher()` parsing - empty string", |b| {
+        b.iter(|| {
+
+            let r = shwild::CompiledMatcher::from_pattern_and_flags(black_box(pattern), black_box(flags));
+
+            let _ = black_box(r);
+        })
+    });
+}
+
+pub fn parse_input_literal_small(c : &mut Criterion) {
+
+    let pattern = constants::S_hello;
+    let flags = 0;
+
+    // TODO criterion can benchmark between two different functions
+    c.bench_function("`shwild::CompiledMatcher()` parsing - literal (small)", |b| {
+        b.iter(|| {
+
+            let r = shwild::CompiledMatcher::from_pattern_and_flags(black_box(pattern), black_box(flags));
+
+            let _ = black_box(r);
+        })
+    });
+}
+
+pub fn parse_input_literal_medium(c : &mut Criterion) {
+
+    let pattern = constants::S_TQBFJOTLD;
+    let flags = 0;
+
+    // TODO criterion can benchmark between two different functions
+    c.bench_function("`shwild::CompiledMatcher()` parsing - literal (medium)", |b| {
+        b.iter(|| {
+
+            let r = shwild::CompiledMatcher::from_pattern_and_flags(black_box(pattern), black_box(flags));
+
+            let _ = black_box(r);
+        })
+    });
+}
+
+pub fn parse_input_literal_large(c : &mut Criterion) {
+
+    let pattern = constants::S_Lorem_ipsum;
+    let flags = 0;
+
+    // TODO criterion can benchmark between two different functions
+    c.bench_function("`shwild::CompiledMatcher()` parsing - literal (large)", |b| {
+        b.iter(|| {
+
+            let r = shwild::CompiledMatcher::from_pattern_and_flags(black_box(pattern), black_box(flags));
+
+            let _ = black_box(r);
+        })
+    });
+}
+
+pub fn parse_input_Windows_path(c : &mut Criterion) {
+
+    let pattern = constants::patterns::WINDOWS_PATH;
+    let flags = 0;
+
+    // TODO criterion can benchmark between two different functions
+    c.bench_function("`shwild::CompiledMatcher()` parsing - Windows Path", |b| {
+        b.iter(|| {
+
+            let r = shwild::CompiledMatcher::from_pattern_and_flags(black_box(pattern), black_box(flags));
+
+            let _ = black_box(r);
+        })
+    });
+}
+
+pub fn test_against_pattern_input_empty(c : &mut Criterion) {
+
+    let pattern = constants::EMPTY_STRING;
+    let flags = 0;
+
+    let inputs = [
+        "",
+        "C:/",
+        "C:/dir",
+        "C:/dir/stem.com",
+        "C:/dir/stem.exe",
+        "C:/directory-with-a-veeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrryyyyyyyyyyyyyyyyyyyyyyyyyyyyyy-long-name",
+        "C:/directory-with-a-veeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrryyyyyyyyyyyyyyyyyyyyyyyyyyyyyy-long-name/stem.com",
+    ];
+
+    let matcher = shwild::CompiledMatcher::from_pattern_and_flags(black_box(pattern), black_box(flags)).unwrap();
+
+    // TODO criterion can benchmark between two different functions
+    c.bench_function("`shwild::CompiledMatcher()` matching - empty string", |b| {
+        b.iter(|| {
+
+            for input in &inputs {
+
+                let r = black_box(&matcher).matches(input);
+
+                let _ = black_box(r);
+            }
+        })
+    });
+}
+
+pub fn test_against_pattern_WindowsPath(c : &mut Criterion) {
+
+    let pattern = constants::patterns::WINDOWS_PATH;
+    let flags = 0;
+
+    let inputs = [
+        "",
+        "C:/",
+        "C:/dir",
+        "C:/dir/stem.com",
+        "C:/dir/stem.exe",
+        "C:/directory-with-a-veeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrryyyyyyyyyyyyyyyyyyyyyyyyyyyyyy-long-name",
+        "C:/directory-with-a-veeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrryyyyyyyyyyyyyyyyyyyyyyyyyyyyyy-long-name/stem.com",
+    ];
+
+    let matcher = shwild::CompiledMatcher::from_pattern_and_flags(black_box(pattern), black_box(flags)).unwrap();
+
+    // TODO criterion can benchmark between two different functions
+    c.bench_function("`shwild::CompiledMatcher()` matching - Windows Path", |b| {
+        b.iter(|| {
+
+            for input in &inputs {
+
+                let r = black_box(&matcher).matches(input);
+
+                let _ = black_box(r);
+            }
+        })
+    });
+}
+
+
+
+criterion_group!(
+    benches,
+    parse_input_empty,
+    parse_input_literal_small,
+    parse_input_literal_medium,
+    parse_input_literal_large,
+    parse_input_Windows_path,
+    test_against_pattern_input_empty,
+    test_against_pattern_WindowsPath,
+);
+criterion_main!(benches);
+

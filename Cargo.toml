@@ -23,6 +23,14 @@ version = "0.0.0"
 name = "shwild"
 path = "src/lib.rs"
 
+[[bench]]
+name = "shwild-compiled_matcher"
+harness = false
+
+[[bench]]
+name = "shwild-matches"
+harness = false
+
 [[bin]]
 name = "list-matching-files"
 path = "examples/list-matching-files/main.rs"
@@ -42,6 +50,7 @@ path = "examples/list-matching-files/main.rs"
 
 [dev-dependencies]
 
+criterion = "*"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
