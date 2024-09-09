@@ -371,14 +371,16 @@ mod match_structures {
         #![allow(non_snake_case)]
 
         use super::{
+            super::{
+                traits::Match,
+                utils::prepare_range_string,
+            },
             MatchEnd,
             MatchLiteral,
             MatchNotRange,
             MatchRange,
             MatchWild1,
             MatchWildN,
-            super::traits::Match,
-            super::utils::prepare_range_string,
         };
 
 
@@ -893,9 +895,9 @@ mod utils {
         #![allow(non_snake_case)]
 
         use super::{
-            MatcherSequence,
-            prepare_range_string,
             super::constants,
+            prepare_range_string,
+            MatcherSequence,
         };
 
 
@@ -1585,7 +1587,7 @@ impl CompiledMatcher {
                 return Err(Error::ParseError {
                     line :    0,
                     column :  usize::MAX,
-                    message : format!("incomplete range"),
+                    message : "incomplete range".into(),
                 });
             },
         };
@@ -1679,13 +1681,13 @@ impl CompiledMatcher {
 /// - `Ok(false)` - `pattern` represents a valid wildcard specification that
 ///   does not match `input`;
 /// - `Err(Error)` - `pattern` does not represent a valid wildcard
-/// specification;
+///   specification;
 pub fn matches(
     pattern : &str,
     input : &str,
     flags : i64,
 ) -> Result<bool> {
-    CompiledMatcher::from_pattern_and_flags(pattern, flags).and_then(|matcher| Ok(matcher.matches(input)))
+    CompiledMatcher::from_pattern_and_flags(pattern, flags).map(|matcher| matcher.matches(input))
 }
 
 
