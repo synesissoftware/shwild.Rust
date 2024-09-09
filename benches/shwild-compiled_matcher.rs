@@ -102,26 +102,32 @@ pub fn parse_input_nrange_continuum_reverse(c : &mut Criterion) {
     let pattern = constants::patterns::NRANGE_CONTINUUM_REVERSE;
     let flags = 0;
 
-    c.bench_function("`shwild::CompiledMatcher()` parsing - nrange continuum (reverse)", |b| {
-        b.iter(|| {
-            let r = shwild::CompiledMatcher::from_pattern_and_flags(black_box(pattern), black_box(flags));
+    c.bench_function(
+        "`shwild::CompiledMatcher()` parsing - nrange continuum (reverse)",
+        |b| {
+            b.iter(|| {
+                let r = shwild::CompiledMatcher::from_pattern_and_flags(black_box(pattern), black_box(flags));
 
-            let _ = black_box(r);
-        })
-    });
+                let _ = black_box(r);
+            })
+        },
+    );
 }
 
 pub fn parse_input_nrange_continuum_crosscase(c : &mut Criterion) {
     let pattern = constants::patterns::NRANGE_CONTINUUM_CROSSCASE;
     let flags = 0;
 
-    c.bench_function("`shwild::CompiledMatcher()` parsing - nrange continuum (crosscase)", |b| {
-        b.iter(|| {
-            let r = shwild::CompiledMatcher::from_pattern_and_flags(black_box(pattern), black_box(flags));
+    c.bench_function(
+        "`shwild::CompiledMatcher()` parsing - nrange continuum (crosscase)",
+        |b| {
+            b.iter(|| {
+                let r = shwild::CompiledMatcher::from_pattern_and_flags(black_box(pattern), black_box(flags));
 
-            let _ = black_box(r);
-        })
-    });
+                let _ = black_box(r);
+            })
+        },
+    );
 }
 
 pub fn parse_input_range_continuum_simple(c : &mut Criterion) {
@@ -154,13 +160,16 @@ pub fn parse_input_range_continuum_crosscase(c : &mut Criterion) {
     let pattern = constants::patterns::RANGE_CONTINUUM_CROSSCASE;
     let flags = 0;
 
-    c.bench_function("`shwild::CompiledMatcher()` parsing - range continuum (crosscase)", |b| {
-        b.iter(|| {
-            let r = shwild::CompiledMatcher::from_pattern_and_flags(black_box(pattern), black_box(flags));
+    c.bench_function(
+        "`shwild::CompiledMatcher()` parsing - range continuum (crosscase)",
+        |b| {
+            b.iter(|| {
+                let r = shwild::CompiledMatcher::from_pattern_and_flags(black_box(pattern), black_box(flags));
 
-            let _ = black_box(r);
-        })
-    });
+                let _ = black_box(r);
+            })
+        },
+    );
 }
 
 pub fn parse_input_Windows_path(c : &mut Criterion) {
