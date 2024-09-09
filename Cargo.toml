@@ -31,7 +31,7 @@ harness = false
 name = "shwild-matches"
 harness = false
 
-[[bin]]
+[[example]]
 name = "list-matching-files"
 path = "examples/list-matching-files/main.rs"
 
