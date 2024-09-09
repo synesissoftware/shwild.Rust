@@ -652,24 +652,21 @@ mod utils {
             // 1. If we only care about ASCII, just double letter chars; or
             // 2. Convert string to upper and lower case and form from them
 
-
             let mut ci_chars = Vec::with_capacity(s.len() * 2);
 
-            // for c in s.chars() {
+            if true {
+                // 1.
 
-            //     if c.is_alphabetic() {
+                for c in s.chars() {
+                    ci_chars.push(c.to_ascii_lowercase());
+                    ci_chars.push(c.to_ascii_uppercase());
+                }
+            } else {
+                // 2.
 
-            //         ci_chars.append(other)
-            //         ci_chars.push(c.to_lowercase());
-            //         ci_chars.push(c.to_uppercase());
-            //     } else {
-
-            //         ci_chars.push(c);
-            //     }
-            // }
-
-            ci_chars.append(&mut s.to_lowercase().chars().collect());
-            ci_chars.append(&mut s.to_uppercase().chars().collect());
+                ci_chars.append(&mut s.to_lowercase().chars().collect());
+                ci_chars.append(&mut s.to_uppercase().chars().collect());
+            }
 
             ci_chars
         } else {
@@ -1455,6 +1452,31 @@ impl CompiledMatcher {
         Ok((minimum_required, num_matchers))
     }
 
+    fn push_character_range_(
+        s : &mut Vec<char>,
+        c_from : char,
+        c_to : char,
+    ) {
+        if c_to < c_from {
+            Self::push_character_range_(s, c_to, c_from);
+        } else {
+            // Doing it long-hand as follows, as an observed faster
+            // alternative to
+            //
+            //   s.append((c_from..=c_to).into_iter().collect::<Vec<_>>().as_mut());
+            //
+            // although there doesn't seem to be much in it.
+
+            let n = 1 + (c_to as usize - c_from as usize);
+
+            s.reserve(s.len() + n);
+
+            for c in c_from..=c_to {
+                s.push(c);
+            }
+        }
+    }
+
     fn push_continuum_(
         s : &mut Vec<char>,
         prior_character : char,
@@ -1474,36 +1496,20 @@ impl CompiledMatcher {
         }
 
         if prior_character.is_ascii_lowercase() == posterior_character.is_ascii_lowercase() {
-            let r = if prior_character > posterior_character {
-                posterior_character..=prior_character
-            } else {
-                prior_character..=posterior_character
-            };
-
-            s.append(r.into_iter().collect::<Vec<_>>().as_mut());
+            Self::push_character_range_(s, prior_character, posterior_character);
         } else {
             {
                 let prior_lower = prior_character.to_ascii_lowercase();
                 let posterior_lower = posterior_character.to_ascii_lowercase();
-                let r_lower = if prior_lower > posterior_lower {
-                    posterior_lower..=prior_lower
-                } else {
-                    prior_lower..=posterior_lower
-                };
 
-                s.append(r_lower.into_iter().collect::<Vec<_>>().as_mut());
+                Self::push_character_range_(s, prior_lower, posterior_lower);
             }
 
             {
                 let prior_upper = prior_character.to_ascii_uppercase();
                 let posterior_upper = posterior_character.to_ascii_uppercase();
-                let r_upper = if prior_upper > posterior_upper {
-                    posterior_upper..=prior_upper
-                } else {
-                    prior_upper..=posterior_upper
-                };
 
-                s.append(r_upper.into_iter().collect::<Vec<_>>().as_mut());
+                Self::push_character_range_(s, prior_upper, posterior_upper);
             }
         }
 
