@@ -1161,7 +1161,7 @@ impl CompiledMatcher {
         let mut num_bytes = 0;
 
         for c in pattern.chars() {
-            debug_assert!(continuum_prior.is_none() || matches!(state, ParseState::InRange | ParseState::InNotRange));
+            debug_assert!(continuum_prior.is_none() || matches!(state, ParseState::InNotRange | ParseState::InRange));
 
             match c {
                 '[' => {
@@ -1208,7 +1208,7 @@ impl CompiledMatcher {
                 },
                 ']' => {
                     match state {
-                        ParseState::InRange => {
+                        ParseState::InNotRange | ParseState::InRange => {
                             num_bytes += 1;
                             match Self::parse_(matchers, &pattern[num_bytes..], flags) {
                                 Ok((following_mr, following_nm)) => {
@@ -1226,35 +1226,13 @@ impl CompiledMatcher {
                                 s.push('-');
                             }
 
-                            minimum_required =
-                                matchers.prepend_Range(&String::from_iter(s.iter()), flags, minimum_required);
+                            minimum_required = if matches!(state, ParseState::InRange) {
 
-                            num_matchers += 1;
+                                matchers.prepend_Range(&String::from_iter(s.iter()), flags, minimum_required)
+                            } else {
 
-                            s.clear();
-
-                            return Ok((minimum_required, num_matchers));
-                        },
-                        ParseState::InNotRange => {
-                            num_bytes += 1;
-                            match Self::parse_(matchers, &pattern[num_bytes..], flags) {
-                                Ok((following_mr, following_nm)) => {
-                                    minimum_required = following_mr;
-                                    num_matchers += following_nm;
-                                },
-                                Err(e) => {
-                                    return Err(e);
-                                },
+                                matchers.prepend_NotRange(&String::from_iter(s.iter()), flags, minimum_required)
                             };
-
-                            if let Some(_c) = continuum_prior {
-                                // don't care about `_c` because that will already be pushed into `s`
-
-                                s.push('-');
-                            }
-
-                            minimum_required =
-                                matchers.prepend_NotRange(&String::from_iter(s.iter()), flags, minimum_required);
 
                             num_matchers += 1;
 
@@ -1269,7 +1247,7 @@ impl CompiledMatcher {
                 },
                 '\\' => {
                     match state {
-                        ParseState::InRange | ParseState::InNotRange => {
+                        ParseState::InNotRange | ParseState::InRange => {
                             s.push(c);
                         },
                         _ => {
@@ -1289,7 +1267,7 @@ impl CompiledMatcher {
                         escaped = false;
                     } else {
                         match state {
-                            ParseState::InRange | ParseState::InNotRange if !s.is_empty() => {
+                            ParseState::InNotRange | ParseState::InRange if !s.is_empty() => {
                                 continuum_prior = Some(*s.last().unwrap());
                             },
                             _ => {
@@ -1404,7 +1382,7 @@ impl CompiledMatcher {
                 },
                 _ => {
                     match state {
-                        ParseState::InRange | ParseState::InNotRange if !s.is_empty() => {
+                        ParseState::InNotRange | ParseState::InRange if !s.is_empty() => {
                             match continuum_prior {
                                 Some(prior_character) => {
                                     match Self::push_continuum_(&mut s, prior_character, c, flags) {
