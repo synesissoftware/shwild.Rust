@@ -75,8 +75,10 @@ impl std_error::Error for Error {
 
 mod constants {
 
-    pub(crate) const IGNORE_CASE : i64 = 0x0200;
+    pub const IGNORE_CASE : i64 = 0x0200;
 }
+
+pub use constants::IGNORE_CASE;
 
 
 mod traits {
@@ -182,11 +184,9 @@ mod match_structures {
     impl MatchNotRange {
         pub(crate) fn new(
             next : Option<Box<dyn Match>>,
-            characters : &str,
-            flags : i64,
+            characters : String,
+            _flags : i64,
         ) -> Self {
-            let characters = super::utils::prepare_range_string(characters, flags);
-
             // NOTE: this is a not-currently-implemented feature
             let minimum_required = usize::MAX;
 
@@ -202,11 +202,9 @@ mod match_structures {
     impl MatchRange {
         pub(crate) fn new(
             next : Option<Box<dyn Match>>,
-            characters : &str,
-            flags : i64,
+            characters : String,
+            _flags : i64,
         ) -> Self {
-            let characters = super::utils::prepare_range_string(characters, flags);
-
             // NOTE: this is a not-currently-implemented feature
             let minimum_required = usize::MAX;
 
@@ -372,7 +370,16 @@ mod match_structures {
     mod tests {
         #![allow(non_snake_case)]
 
-        use super::*;
+        use super::{
+            MatchEnd,
+            MatchLiteral,
+            MatchNotRange,
+            MatchRange,
+            MatchWild1,
+            MatchWildN,
+            super::traits::Match,
+            super::utils::prepare_range_string,
+        };
 
 
         mod TESTING_MatchEnd {
@@ -442,6 +449,8 @@ mod match_structures {
             #[test]
             fn TEST_Range_1() {
                 let characters = "0123456789";
+                let flags = 0;
+                let characters = prepare_range_string(characters, flags);
 
                 let me : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
                 let mr : Option<Box<dyn Match>> = Some(Box::new(MatchRange::new(me, characters, 0)));
@@ -475,6 +484,8 @@ mod match_structures {
             #[test]
             fn TEST_NotRange_1() {
                 let characters = "0123456789";
+                let flags = 0;
+                let characters = prepare_range_string(characters, flags);
 
                 let me : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
                 let mn : Option<Box<dyn Match>> = Some(Box::new(MatchNotRange::new(me, characters, 0)));
@@ -743,7 +754,7 @@ mod utils {
         #[must_use]
         pub(crate) fn prepend_NotRange(
             &mut self,
-            characters : &str,
+            characters : String,
             flags : i64,
             following_minimum_required : usize,
         ) -> usize {
@@ -770,7 +781,7 @@ mod utils {
         #[must_use]
         pub(crate) fn prepend_Range(
             &mut self,
-            characters : &str,
+            characters : String,
             flags : i64,
             following_minimum_required : usize,
         ) -> usize {
@@ -881,15 +892,17 @@ mod utils {
     mod tests {
         #![allow(non_snake_case)]
 
-        use super::*;
+        use super::{
+            MatcherSequence,
+            prepare_range_string,
+            super::constants,
+        };
 
 
         mod TEST_MatcherSequence {
             #![allow(non_snake_case)]
 
             use super::*;
-
-            use crate::constants::IGNORE_CASE;
 
 
             #[test]
@@ -928,7 +941,12 @@ mod utils {
                 let flags = 0;
                 let mut minimum_required = 0;
 
-                minimum_required = matchers.prepend_Range("abcdef".into(), flags, minimum_required);
+                {
+                    let characters = r"abcdef";
+                    let characters = prepare_range_string(characters, flags);
+
+                    minimum_required = matchers.prepend_Range(characters, flags, minimum_required);
+                }
 
                 assert_eq!(1, minimum_required);
 
@@ -958,7 +976,12 @@ mod utils {
                 let flags = 0;
                 let mut minimum_required = 0;
 
-                minimum_required = matchers.prepend_NotRange("abcdef".into(), flags, minimum_required);
+                {
+                    let characters = r"abcdef";
+                    let characters = prepare_range_string(characters, flags);
+
+                    minimum_required = matchers.prepend_NotRange(characters, flags, minimum_required);
+                }
 
                 assert_eq!(1, minimum_required);
 
@@ -985,10 +1008,15 @@ mod utils {
             #[test]
             fn TEST_MatcherSequence_WITH_Range_HAVING__IGNORE_CASE__1() {
                 let mut matchers = MatcherSequence::new();
-                let flags = IGNORE_CASE;
+                let flags = constants::IGNORE_CASE;
                 let mut minimum_required = 0;
 
-                minimum_required = matchers.prepend_Range("abcdef".into(), flags, minimum_required);
+                {
+                    let characters = r"abcdef";
+                    let characters = prepare_range_string(characters, flags);
+
+                    minimum_required = matchers.prepend_Range(characters, flags, minimum_required);
+                }
 
                 assert_eq!(1, minimum_required);
 
@@ -1015,10 +1043,15 @@ mod utils {
             #[test]
             fn TEST_MatcherSequence_WITH_NotRange_HAVING__IGNORE_CASE__1() {
                 let mut matchers = MatcherSequence::new();
-                let flags = IGNORE_CASE;
+                let flags = constants::IGNORE_CASE;
                 let mut minimum_required = 0;
 
-                minimum_required = matchers.prepend_NotRange("abcdef".into(), flags, minimum_required);
+                {
+                    let characters = r"abcdef";
+                    let characters = prepare_range_string(characters, flags);
+
+                    minimum_required = matchers.prepend_NotRange(characters, flags, minimum_required);
+                }
 
                 assert_eq!(1, minimum_required);
 
@@ -1045,29 +1078,51 @@ mod utils {
             #[test]
             fn TEST_MatcherSequence_WITH_MULTIPLE_ELEMENTS_HAVING__IGNORE_CASE___1() {
                 let mut matchers = MatcherSequence::new();
-                let flags = IGNORE_CASE;
+                let flags = constants::IGNORE_CASE;
                 let mut minimum_required = 0;
 
                 // match a full Windows executable Path, albeit one that may
                 // not have a directory, or even a stem
 
-                minimum_required = matchers.prepend_Literal(r".exe".into(), flags, minimum_required);
+                {
+                    let characters = r".exe";
+                    let literal = characters.into();
+
+                    minimum_required = matchers.prepend_Literal(literal, flags, minimum_required);
+                }
 
                 assert_eq!(4, minimum_required);
 
-                minimum_required = matchers.prepend_WildN(minimum_required);
+                {
+                    minimum_required = matchers.prepend_WildN(minimum_required);
+                }
 
                 assert_eq!(4, minimum_required);
 
-                minimum_required = matchers.prepend_Range(r"\/", flags, minimum_required);
+                {
+                    let characters = r"\/";
+                    let characters = prepare_range_string(characters, flags);
+
+                    minimum_required = matchers.prepend_Range(characters, flags, minimum_required);
+                }
 
                 assert_eq!(5, minimum_required);
 
-                minimum_required = matchers.prepend_Literal(r":".into(), flags, minimum_required);
+                {
+                    let characters = r":";
+                    let characters = prepare_range_string(characters, flags);
+
+                    minimum_required = matchers.prepend_Literal(characters, flags, minimum_required);
+                }
 
                 assert_eq!(6, minimum_required);
 
-                minimum_required = matchers.prepend_Range(r"abcdefghijklmnopqrstuvwxyz", flags, minimum_required);
+                {
+                    let characters = r"abcdefghijklmnopqrstuvwxyz";
+                    let characters = prepare_range_string(characters, flags);
+
+                    minimum_required = matchers.prepend_Range(characters, flags, minimum_required);
+                }
 
                 assert_eq!(7, minimum_required);
 
@@ -1082,15 +1137,116 @@ mod utils {
                 assert!(matchers.matches(r"C:\program.exe"));
             }
         }
+
+
+        mod TEST_prepare_range_string {
+            #![allow(non_snake_case)]
+
+            use super::*;
+
+
+            #[test]
+            fn TEST_prepare_range_string_EMPTY() {
+                let input = "";
+                let flags = 0;
+                let expected = "";
+                let actual = prepare_range_string(input, flags);
+
+                assert_eq!(expected, actual);
+            }
+
+            #[test]
+            fn TEST_prepare_range_string_NUMBERS() {
+                let input = "7890123456";
+
+                {
+                    let flags = 0;
+                    let expected = "0123456789";
+                    let actual = prepare_range_string(input, flags);
+
+                    assert_eq!(expected, actual);
+                }
+
+                {
+                    let flags = constants::IGNORE_CASE;
+                    let expected = "0123456789";
+                    let actual = prepare_range_string(input, flags);
+
+                    assert_eq!(expected, actual);
+                }
+            }
+
+            #[test]
+            fn TEST_prepare_range_string_NUMBERS_WITH_DUPLICATES() {
+                let input = "7890123456789";
+
+                {
+                    let flags = 0;
+                    let expected = "0123456789";
+                    let actual = prepare_range_string(input, flags);
+
+                    assert_eq!(expected, actual);
+                }
+
+                {
+                    let flags = constants::IGNORE_CASE;
+                    let expected = "0123456789";
+                    let actual = prepare_range_string(input, flags);
+
+                    assert_eq!(expected, actual);
+                }
+            }
+
+            #[test]
+            fn TEST_prepare_range_string_CHARACTERS() {
+                let input = "mnopabcd";
+
+                {
+                    let flags = 0;
+                    let expected = "abcdmnop";
+                    let actual = prepare_range_string(input, flags);
+
+                    assert_eq!(expected, actual);
+                }
+
+                {
+                    let flags = constants::IGNORE_CASE;
+                    let expected = "ABCDMNOPabcdmnop";
+                    let actual = prepare_range_string(input, flags);
+
+                    assert_eq!(expected, actual);
+                }
+            }
+        }
     }
 }
 
+
+// /////////////////////////////////////////////////////////
+// types
 
 /// A specialized [`Result`] type for **shwild**.
 pub type Result<T> = std_result::Result<T, Error>;
 
 
-/// T.B.C.
+/// Type that holds a compiled match pattern, against which multiple strings
+/// may be evaluated.
+///
+/// # Examples:
+///
+/// ```
+/// let matcher = shwild::CompiledMatcher::from_pattern_and_flags("a[bc]c?", shwild::IGNORE_CASE).unwrap();
+///
+/// assert!(matcher.matches("abcd"));
+/// assert!(matcher.matches("accd"));
+/// assert!(matcher.matches("accx"));
+/// assert!(!matcher.matches("accxyx"));
+/// assert!(matcher.matches("ABCD"));
+/// assert!(matcher.matches("AbCd"));
+/// assert!(!matcher.matches("aacd"));
+/// assert!(matcher.matches("accm"));
+/// assert!(!matcher.matches("abc"));
+/// ```
 #[derive(Debug)]
 pub struct CompiledMatcher {
     matchers : utils::MatcherSequence,
@@ -1125,7 +1281,11 @@ impl CompiledMatcher {
         self.matchers.len()
     }
 
-    /// T.B.C.
+    /// Determines whether the given `input` matches the instance's compiled
+    /// pattern.
+    ///
+    /// # Parameters:
+    /// - `input` - the string to be evaluated;
     pub fn matches(
         &self,
         input : &str,
@@ -1226,12 +1386,12 @@ impl CompiledMatcher {
                                 s.push('-');
                             }
 
+                            let characters = crate::utils::prepare_range_string(&String::from_iter(s.iter()), flags);
+
                             minimum_required = if matches!(state, ParseState::InRange) {
-
-                                matchers.prepend_Range(&String::from_iter(s.iter()), flags, minimum_required)
+                                matchers.prepend_Range(characters, flags, minimum_required)
                             } else {
-
-                                matchers.prepend_NotRange(&String::from_iter(s.iter()), flags, minimum_required)
+                                matchers.prepend_NotRange(characters, flags, minimum_required)
                             };
 
                             num_matchers += 1;
@@ -1417,13 +1577,18 @@ impl CompiledMatcher {
         match state {
             ParseState::None => {},
             ParseState::InLiteral => {
-                minimum_required = matchers.prepend_Literal(String::from_iter(s.iter()), flags, minimum_required);
+                let literal = String::from_iter(s.iter());
+
+                minimum_required = matchers.prepend_Literal(literal, flags, minimum_required);
             },
-            ParseState::InNotRange => {
-                minimum_required = matchers.prepend_NotRange(&String::from_iter(s.iter()), flags, minimum_required);
-            },
-            ParseState::InRange => {
-                minimum_required = matchers.prepend_Range(&String::from_iter(s.iter()), flags, minimum_required);
+            ParseState::InNotRange |  ParseState::InRange => {
+                let characters = crate::utils::prepare_range_string(&String::from_iter(s.iter()), flags);
+
+                minimum_required = if matches!(state, ParseState::InRange) {
+                    matchers.prepend_Range(characters, flags, minimum_required)
+                } else {
+                    matchers.prepend_NotRange(characters, flags, minimum_required)
+                };
             },
         };
 
@@ -1497,10 +1662,26 @@ impl CompiledMatcher {
 
 // Trait implementations
 
+// NONE DEFINED AT THIS TIME
 
+// /////////////////////////////////////////////////////////
 // API functions
 
-/// T.B.C.
+/// Determines whether the given `input` matches the given `pattern`,
+/// according to the given `flags`.
+///
+/// # Parameters:
+/// - `pattern` - the pattern to be used to evaluate `input`;
+/// - `input` - the string to be evaluated;
+/// - `flags` - flags that moderate the evaluation;
+///
+/// # Returns:
+/// - `Ok(true)` - `pattern` represents a valid wildcard specification that
+///   matches `input`;
+/// - `Ok(false)` - `pattern` represents a valid wildcard specification that
+///   does not match `input`;
+/// - `Err(Error)` - `pattern` does not represent a valid wildcard
+/// specification;
 pub fn matches(
     pattern : &str,
     input : &str,
@@ -1511,7 +1692,6 @@ pub fn matches(
 
 
 #[cfg(test)]
-
 mod tests {
     #![allow(non_snake_case)]
 
@@ -1915,6 +2095,48 @@ mod tests {
                 assert!(matcher.matches("mad"));
                 assert!(matcher.matches("made"));
                 assert!(matcher.matches("madder"));
+            }
+        }
+
+        #[test]
+        fn TEST_CompiledMatcher_parse_RANGE_THEN_WILD1_1() {
+            let pattern = "[abc]?";
+
+            {
+                let flags = 0;
+
+                let matcher = shwild::CompiledMatcher::from_pattern_and_flags(pattern, flags).unwrap();
+
+                assert_eq!(2, matcher.len());
+
+                assert!(!matcher.matches(""));
+                assert!(!matcher.matches(" "));
+                assert!(!matcher.matches("["));
+                assert!(!matcher.matches("]"));
+                assert!(!matcher.matches("^"));
+                assert!(!matcher.matches("a"));
+                assert!(!matcher.matches("b"));
+                assert!(!matcher.matches("c"));
+                assert!(!matcher.matches("d"));
+                assert!(!matcher.matches("e"));
+
+                assert!(matcher.matches("aa"));
+                assert!(matcher.matches("ax"));
+                assert!(matcher.matches("bb"));
+                assert!(matcher.matches("by"));
+                assert!(matcher.matches("cc"));
+                assert!(matcher.matches("cz"));
+                assert!(!matcher.matches("da"));
+                assert!(!matcher.matches("ee"));
+
+                assert!(!matcher.matches("aa "));
+                assert!(!matcher.matches("ax "));
+                assert!(!matcher.matches("bb "));
+                assert!(!matcher.matches("by "));
+                assert!(!matcher.matches("cc "));
+                assert!(!matcher.matches("cz "));
+                assert!(!matcher.matches("da "));
+                assert!(!matcher.matches("ee "));
             }
         }
 
