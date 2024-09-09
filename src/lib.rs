@@ -1,5 +1,12 @@
 // Definition of the shwild Rust package
 
+// ///////////////////////////////////////////////
+// crate-level feature definitions
+
+
+// ///////////////////////////////////////////////
+// crate-level imports
+
 use std::{
     error as std_error,
     fmt as std_fmt,
@@ -1664,6 +1671,7 @@ impl CompiledMatcher {
 
 // NONE DEFINED AT THIS TIME
 
+
 // /////////////////////////////////////////////////////////
 // API functions
 
@@ -1691,11 +1699,32 @@ pub fn matches(
 }
 
 
+// /////////////////////////////////////////////////////////
+// macros
+
+/// Defines the macro `shwild_matches!()`.
+///
+/// # Parameters:
+/// - `$pattern` - the pattern to be used to evaluate `$input`;
+/// - `$input` - the string to be evaluated;
+/// - `$flags` - flags that moderate the evaluation;
+#[macro_export]
+macro_rules! shwild_matches {
+    ($pattern:expr, $input:expr $(,)?) => {
+        crate::matches($pattern, $input, 0)
+    };
+    ($pattern:expr, $input:expr, $flags:expr $(,)?) => {
+        crate::matches($pattern, $input, $flags)
+    };
+}
+
+
 #[cfg(test)]
 mod tests {
     #![allow(non_snake_case)]
 
     use crate as shwild;
+    use crate::shwild_matches;
 
 
     mod TEST_CompiledMatcher_PARSING {
@@ -2526,6 +2555,15 @@ mod tests {
             assert_eq!(Ok(false), shwild::matches("", "_", 0));
             assert_eq!(Ok(false), shwild::matches("", "a", 0));
             assert_eq!(Ok(false), shwild::matches("", "abc", 0));
+        }
+
+        #[test]
+        fn TEST_shwild_matches_EMPTY_PATTERN_1() {
+            assert_eq!(Ok(true), shwild_matches!("", ""));
+            assert_eq!(Ok(false), shwild_matches!("", " "));
+            assert_eq!(Ok(false), shwild_matches!("", "_"));
+            assert_eq!(Ok(false), shwild_matches!("", "a"));
+            assert_eq!(Ok(false), shwild_matches!("", "abc"));
         }
 
         #[test]
