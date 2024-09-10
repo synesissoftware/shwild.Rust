@@ -120,42 +120,52 @@ mod match_structures {
 
     #[derive(Debug)]
     pub(crate) struct MatchLiteral {
-        next :              Option<Box<dyn Match>>,
+        /// The next matcher.
+        next :              Box<dyn Match>,
+        /// The literal string against which to evaluate.
         literal :           String,
         literal_uppercase : Option<String>,
+        /// The minimum_required size of this and all subsequent instances.
         #[cfg_attr(debug_assertions, allow(unused))]
         minimum_required :  usize,
-        // flags : i64,
     }
 
     #[derive(Debug)]
     pub(crate) struct MatchNotRange {
-        next :             Option<Box<dyn Match>>,
+        /// The next matcher.
+        next :             Box<dyn Match>,
+        /// The range characters against which to evaluate.
         characters :       String,
+        /// The minimum_required size of this and all subsequent instances.
         #[cfg_attr(debug_assertions, allow(unused))]
         minimum_required : usize,
-        // flags : i64,
     }
 
     #[derive(Debug)]
     pub(crate) struct MatchRange {
-        next :             Option<Box<dyn Match>>,
+        /// The next matcher.
+        next :             Box<dyn Match>,
+        /// The range characters against which to evaluate.
         characters :       String,
+        /// The minimum_required size of this and all subsequent instances.
         #[cfg_attr(debug_assertions, allow(unused))]
         minimum_required : usize,
-        // flags : i64,
     }
 
     #[derive(Debug)]
     pub(crate) struct MatchWild1 {
-        pub(crate) next :  Option<Box<dyn Match>>,
+        /// The next matcher.
+        pub(crate) next :  Box<dyn Match>,
+        /// The minimum_required size of this and all subsequent instances.
         #[cfg_attr(debug_assertions, allow(unused))]
         minimum_required : usize,
     }
 
     #[derive(Debug)]
     pub(crate) struct MatchWildN {
-        pub(crate) next :  Option<Box<dyn Match>>,
+        /// The next matcher.
+        pub(crate) next :  Box<dyn Match>,
+        /// The minimum_required size of this and all subsequent instances.
         #[cfg_attr(debug_assertions, allow(unused))]
         minimum_required : usize,
     }
@@ -165,7 +175,7 @@ mod match_structures {
 
     impl MatchLiteral {
         pub(crate) fn new(
-            next : Option<Box<dyn Match>>,
+            next : Box<dyn Match>,
             literal : String,
             flags : i64,
         ) -> Self {
@@ -190,7 +200,7 @@ mod match_structures {
 
     impl MatchNotRange {
         pub(crate) fn new(
-            next : Option<Box<dyn Match>>,
+            next : Box<dyn Match>,
             characters : String,
             _flags : i64,
         ) -> Self {
@@ -208,7 +218,7 @@ mod match_structures {
 
     impl MatchRange {
         pub(crate) fn new(
-            next : Option<Box<dyn Match>>,
+            next : Box<dyn Match>,
             characters : String,
             _flags : i64,
         ) -> Self {
@@ -225,7 +235,7 @@ mod match_structures {
     }
 
     impl MatchWild1 {
-        pub(crate) fn new(next : Option<Box<dyn Match>>) -> Self {
+        pub(crate) fn new(next : Box<dyn Match>) -> Self {
             // NOTE: this is a not-currently-implemented feature
             let minimum_required = usize::MAX;
 
@@ -237,7 +247,7 @@ mod match_structures {
     }
 
     impl MatchWildN {
-        pub(crate) fn new(next : Option<Box<dyn Match>>) -> Self {
+        pub(crate) fn new(next : Box<dyn Match>) -> Self {
             // NOTE: this is a not-currently-implemented feature
             let minimum_required = usize::MAX;
 
@@ -280,7 +290,7 @@ mod match_structures {
                 return false;
             }
 
-            let next = self.next.as_ref().unwrap();
+            let next = self.next.as_ref();
 
             next.matches(&slice[self.literal.len()..])
         }
@@ -301,7 +311,7 @@ mod match_structures {
                 return false;
             }
 
-            let next = self.next.as_ref().unwrap();
+            let next = self.next.as_ref();
 
             next.matches(&slice[c0.len_utf8()..])
         }
@@ -322,7 +332,7 @@ mod match_structures {
                 return false;
             }
 
-            let next = self.next.as_ref().unwrap();
+            let next = self.next.as_ref();
 
             next.matches(&slice[c0.len_utf8()..])
         }
@@ -339,7 +349,7 @@ mod match_structures {
 
             let c0 = slice.chars().next().unwrap();
 
-            let next = self.next.as_ref().unwrap();
+            let next = self.next.as_ref();
 
             next.matches(&slice[c0.len_utf8()..])
         }
@@ -354,7 +364,7 @@ mod match_structures {
 
             // TODO: consider using `#char_indices()`
 
-            let next = self.next.as_ref().unwrap();
+            let next = self.next.as_ref();
 
             for c in slice.chars() {
                 if next.matches(&slice[offset..]) {
@@ -399,9 +409,9 @@ mod match_structures {
 
             #[test]
             fn TEST_End_1() {
-                let me : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
+                let me : Box<dyn Match> = Box::new(MatchEnd {});
 
-                let matcher : &dyn Match = me.as_deref().unwrap();
+                let matcher : &dyn Match = &*me;
 
                 assert!(matcher.matches(""));
                 assert!(!matcher.matches("a"));
@@ -419,11 +429,11 @@ mod match_structures {
             fn TEST_Literal_1() {
                 let literal = "he".into();
 
-                let me : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
+                let me : Box<dyn Match> = Box::new(MatchEnd {});
 
-                let ml : Option<Box<dyn Match>> = Some(Box::new(MatchLiteral::new(me, literal, 0)));
+                let ml : Box<dyn Match> = Box::new(MatchLiteral::new(me, literal, 0));
 
-                let matcher : &dyn Match = ml.as_deref().unwrap();
+                let matcher : &dyn Match = &*ml;
 
                 assert!(matcher.matches("he"));
                 assert!(!matcher.matches("hen"));
@@ -436,11 +446,11 @@ mod match_structures {
 
                 let literal1 = "he".into();
 
-                let me : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
-                let ml2 : Option<Box<dyn Match>> = Some(Box::new(MatchLiteral::new(me, literal2, 0)));
-                let ml1 : Option<Box<dyn Match>> = Some(Box::new(MatchLiteral::new(ml2, literal1, 0)));
+                let me : Box<dyn Match> = Box::new(MatchEnd {});
+                let ml2 : Box<dyn Match> = Box::new(MatchLiteral::new(me, literal2, 0));
+                let ml1 : Box<dyn Match> = Box::new(MatchLiteral::new(ml2, literal1, 0));
 
-                let matcher : &dyn Match = ml1.as_deref().unwrap();
+                let matcher : &dyn Match = &*ml1;
 
                 assert!(matcher.matches("head"));
                 assert!(!matcher.matches("heads"));
@@ -461,10 +471,10 @@ mod match_structures {
                 let flags = 0;
                 let characters = prepare_range_string(characters, flags);
 
-                let me : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
-                let mr : Option<Box<dyn Match>> = Some(Box::new(MatchRange::new(me, characters, 0)));
+                let me : Box<dyn Match> = Box::new(MatchEnd {});
+                let mr : Box<dyn Match> = Box::new(MatchRange::new(me, characters, 0));
 
-                let matcher : &dyn Match = mr.as_deref().unwrap();
+                let matcher : &dyn Match = &*mr;
 
                 assert!(!matcher.matches(""));
                 assert!(matcher.matches("0"));
@@ -496,10 +506,10 @@ mod match_structures {
                 let flags = 0;
                 let characters = prepare_range_string(characters, flags);
 
-                let me : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
-                let mn : Option<Box<dyn Match>> = Some(Box::new(MatchNotRange::new(me, characters, 0)));
+                let me : Box<dyn Match> = Box::new(MatchEnd {});
+                let mn : Box<dyn Match> = Box::new(MatchNotRange::new(me, characters, 0));
 
-                let matcher : &dyn Match = mn.as_deref().unwrap();
+                let matcher : &dyn Match = &*mn;
 
                 assert!(!matcher.matches(""));
                 assert!(!matcher.matches("0"));
@@ -527,10 +537,10 @@ mod match_structures {
 
             #[test]
             fn TEST_Wild_1() {
-                let me : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
-                let m1 : Option<Box<dyn Match>> = Some(Box::new(MatchWild1::new(me)));
+                let me : Box<dyn Match> = Box::new(MatchEnd {});
+                let m1 : Box<dyn Match> = Box::new(MatchWild1::new(me));
 
-                let matcher : &dyn Match = m1.as_deref().unwrap();
+                let matcher : &dyn Match = &*m1;
 
                 assert!(!matcher.matches(""));
                 assert!(matcher.matches("0"));
@@ -550,11 +560,11 @@ mod match_structures {
 
             #[test]
             fn TEST_Wild_2() {
-                let me : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
-                let mw2 : Option<Box<dyn Match>> = Some(Box::new(MatchWild1::new(me)));
-                let mw1 : Option<Box<dyn Match>> = Some(Box::new(MatchWild1::new(mw2)));
+                let me : Box<dyn Match> = Box::new(MatchEnd {});
+                let mw2 : Box<dyn Match> = Box::new(MatchWild1::new(me));
+                let mw1 : Box<dyn Match> = Box::new(MatchWild1::new(mw2));
 
-                let matcher : &dyn Match = mw1.as_deref().unwrap();
+                let matcher : &dyn Match = &*mw1;
 
                 assert!(!matcher.matches(""));
                 assert!(!matcher.matches("0"));
@@ -583,10 +593,10 @@ mod match_structures {
 
             #[test]
             fn TEST_WildN_1() {
-                let me : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
-                let mw : Option<Box<dyn Match>> = Some(Box::new(MatchWildN::new(me)));
+                let me : Box<dyn Match> = Box::new(MatchEnd {});
+                let mw : Box<dyn Match> = Box::new(MatchWildN::new(me));
 
-                let matcher : &dyn Match = mw.as_deref().unwrap();
+                let matcher : &dyn Match = &*mw;
 
                 assert!(matcher.matches(""));
                 assert!(matcher.matches("0"));
@@ -608,11 +618,11 @@ mod match_structures {
             fn TEST_Literal_WildN() {
                 let literal = "ma".into();
 
-                let me : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
-                let mw : Option<Box<dyn Match>> = Some(Box::new(MatchWildN::new(me)));
-                let ml : Option<Box<dyn Match>> = Some(Box::new(MatchLiteral::new(mw, literal, 0)));
+                let me : Box<dyn Match> = Box::new(MatchEnd {});
+                let mw : Box<dyn Match> = Box::new(MatchWildN::new(me));
+                let ml : Box<dyn Match> = Box::new(MatchLiteral::new(mw, literal, 0));
 
-                let matcher : &dyn Match = ml.as_deref().unwrap();
+                let matcher : &dyn Match = &*ml;
 
                 assert!(!matcher.matches(""));
                 assert!(!matcher.matches("m"));
@@ -627,12 +637,12 @@ mod match_structures {
                 let literal2 = "d".into();
                 let literal1 = "m".into();
 
-                let me : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
-                let ml2 : Option<Box<dyn Match>> = Some(Box::new(MatchLiteral::new(me, literal2, 0)));
-                let mw : Option<Box<dyn Match>> = Some(Box::new(MatchWildN::new(ml2)));
-                let ml1 : Option<Box<dyn Match>> = Some(Box::new(MatchLiteral::new(mw, literal1, 0)));
+                let me : Box<dyn Match> = Box::new(MatchEnd {});
+                let ml2 : Box<dyn Match> = Box::new(MatchLiteral::new(me, literal2, 0));
+                let mw : Box<dyn Match> = Box::new(MatchWildN::new(ml2));
+                let ml1 : Box<dyn Match> = Box::new(MatchLiteral::new(mw, literal1, 0));
 
-                let matcher : &dyn Match = ml1.as_deref().unwrap();
+                let matcher : &dyn Match = &*ml1;
 
                 assert!(!matcher.matches(""));
                 assert!(!matcher.matches("m"));
@@ -703,7 +713,7 @@ mod utils {
 
     pub(crate) struct MatcherSequence {
         /// The head of the chain.
-        matcher0 :     Option<Box<dyn Match>>,
+        matcher0 :     Box<dyn Match>,
         /// The number of matchers (excluding the end-element).
         num_matchers : usize,
     }
@@ -711,7 +721,7 @@ mod utils {
     // API functions
     impl MatcherSequence {
         pub(crate) fn new() -> Self {
-            let matcher0 : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
+            let matcher0 : Box<dyn Match> = Box::new(MatchEnd {});
             let num_matchers = 0;
 
             Self {
@@ -740,13 +750,13 @@ mod utils {
         ) -> usize {
             let literal_len = literal.len();
 
-            let mut next : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
+            let mut next : Box<dyn Match> = Box::new(MatchEnd {});
 
             std_mem::swap(&mut self.matcher0, &mut next);
 
             // NOW: `next` is the head of the list, and `self.matcher0` is `MatchEnd`
 
-            let mut matcher : Option<Box<dyn Match>> = Some(Box::new(MatchLiteral::new(next, literal, flags)));
+            let mut matcher : Box<dyn Match> = Box::new(MatchLiteral::new(next, literal, flags));
 
             std_mem::swap(&mut self.matcher0, &mut matcher);
 
@@ -767,13 +777,13 @@ mod utils {
             flags : i64,
             following_minimum_required : usize,
         ) -> usize {
-            let mut next : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
+            let mut next : Box<dyn Match> = Box::new(MatchEnd {});
 
             std_mem::swap(&mut self.matcher0, &mut next);
 
             // NOW: `next` is the head of the list, and `self.matcher0` is `MatchEnd`
 
-            let mut matcher : Option<Box<dyn Match>> = Some(Box::new(MatchNotRange::new(next, characters, flags)));
+            let mut matcher : Box<dyn Match> = Box::new(MatchNotRange::new(next, characters, flags));
 
             std_mem::swap(&mut self.matcher0, &mut matcher);
 
@@ -794,13 +804,13 @@ mod utils {
             flags : i64,
             following_minimum_required : usize,
         ) -> usize {
-            let mut next : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
+            let mut next : Box<dyn Match> = Box::new(MatchEnd {});
 
             std_mem::swap(&mut self.matcher0, &mut next);
 
             // NOW: `next` is the head of the list, and `self.matcher0` is `MatchEnd`
 
-            let mut matcher : Option<Box<dyn Match>> = Some(Box::new(MatchRange::new(next, characters, flags)));
+            let mut matcher : Box<dyn Match> = Box::new(MatchRange::new(next, characters, flags));
 
             std_mem::swap(&mut self.matcher0, &mut matcher);
 
@@ -819,13 +829,13 @@ mod utils {
             &mut self,
             following_minimum_required : usize,
         ) -> usize {
-            let mut next : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
+            let mut next : Box<dyn Match> = Box::new(MatchEnd {});
 
             std_mem::swap(&mut self.matcher0, &mut next);
 
             // NOW: `next` is the head of the list, and `self.matcher0` is `MatchEnd`
 
-            let mut matcher : Option<Box<dyn Match>> = Some(Box::new(MatchWild1::new(next)));
+            let mut matcher : Box<dyn Match> = Box::new(MatchWild1::new(next));
 
             std_mem::swap(&mut self.matcher0, &mut matcher);
 
@@ -846,13 +856,13 @@ mod utils {
         ) -> usize {
             #![allow(clippy::identity_op)] // for clarity of semantics of return value
 
-            let mut next : Option<Box<dyn Match>> = Some(Box::new(MatchEnd {}));
+            let mut next : Box<dyn Match> = Box::new(MatchEnd {});
 
             std_mem::swap(&mut self.matcher0, &mut next);
 
             // NOW: `next` is the head of the list, and `self.matcher0` is `MatchEnd`
 
-            let mut matcher : Option<Box<dyn Match>> = Some(Box::new(MatchWildN::new(next)));
+            let mut matcher : Box<dyn Match> = Box::new(MatchWildN::new(next));
 
             std_mem::swap(&mut self.matcher0, &mut matcher);
 
@@ -875,7 +885,7 @@ mod utils {
             &self,
             input : &str,
         ) -> bool {
-            let matcher : &dyn Match = self.matcher0.as_deref().unwrap();
+            let matcher = &self.matcher0;
 
             matcher.matches(input)
         }
