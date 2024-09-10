@@ -1,3 +1,5 @@
+#![allow(non_snake_case)]
+
 use shwild;
 
 use criterion::{
@@ -80,11 +82,39 @@ pub fn matches_input_literal_large(c : &mut Criterion) {
     });
 }
 
+pub fn matches_test_against_pattern_WindowsPath(c : &mut Criterion) {
+    let pattern = constants::patterns::WINDOWS_PATH;
+    let flags = 0;
+
+    let inputs = [
+        "",
+        "C:/",
+        "C:/dir",
+        "C:/dir/stem.com",
+        "C:/dir/stem.exe",
+        "C:/directory-with-a-veeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrryyyyyyyyyyyyyyyyyyyyyyyyyyyyyy-long-name",
+        "C:/directory-with-a-veeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrryyyyyyyyyyyyyyyyyyyyyyyyyyyyyy-long-name/stem.com",
+    ];
+
+    c.bench_function("`shwild::matches()` - Windows Path", |b| {
+        b.iter(|| {
+
+            for input in &inputs {
+                let r = shwild::matches(black_box(pattern), black_box(input), black_box(flags));
+
+                let _ = black_box(r);
+            }
+        })
+    });
+}
+
+
 criterion_group!(
     benches,
     matches_input_empty,
     matches_input_literal_small,
     matches_input_literal_medium,
     matches_input_literal_large,
+    matches_test_against_pattern_WindowsPath,
 );
 criterion_main!(benches);
