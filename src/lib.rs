@@ -15,6 +15,7 @@ use std::{
 
 
 /// Represents parsing result.
+#[derive(Debug)]
 #[derive(PartialEq)]
 pub enum Error {
     /// Parsing was successful.
@@ -48,24 +49,21 @@ impl Error {
         match self {
             Self::Ok => write!(f, "the operating completed successfully"),
             Self::ParseError {
-                message, ..
+                line,
+                column,
+                message,
             } => {
-                write!(f, "{message}")
+                if *column != usize::MAX {
+                    write!(f, "pattern syntax error (at {line}:{column}): {message}")
+                } else {
+                    write!(f, "{message}")
+                }
             },
         }
     }
 }
 
 // Trait implementations
-
-impl std_fmt::Debug for Error {
-    fn fmt(
-        &self,
-        f : &mut std_fmt::Formatter<'_>,
-    ) -> std_fmt::Result {
-        self.fmt_for_Debug_or_Display(f)
-    }
-}
 
 impl std_fmt::Display for Error {
     fn fmt(
@@ -1281,7 +1279,10 @@ impl CompiledMatcher {
     ) -> Result<Self> {
         let mut matchers = utils::MatcherSequence::new();
 
-        Self::parse_(&mut matchers, pattern, flags).map(|_| {
+        let mut line = 0;
+        let mut column = 0;
+
+        Self::parse_(&mut matchers, pattern, flags, &mut line, &mut column).map(|_| {
             Self {
                 matchers,
             }
@@ -1329,6 +1330,8 @@ impl CompiledMatcher {
         matchers : &mut utils::MatcherSequence,
         pattern : &str,
         flags : i64,
+        line : &mut usize,
+        column : &mut usize,
     ) -> Result<(
         usize, // minimum_required
         usize, // num_matchers
@@ -1351,7 +1354,7 @@ impl CompiledMatcher {
                             state = ParseState::InRange;
                         },
                         ParseState::InLiteral => {
-                            match Self::parse_(matchers, &pattern[num_bytes..], flags) {
+                            match Self::parse_(matchers, &pattern[num_bytes..], flags, line, column) {
                                 Ok((following_mr, following_nm)) => {
                                     minimum_required = following_mr;
                                     num_matchers += following_nm;
@@ -1391,7 +1394,7 @@ impl CompiledMatcher {
                     match state {
                         ParseState::InNotRange | ParseState::InRange => {
                             num_bytes += 1;
-                            match Self::parse_(matchers, &pattern[num_bytes..], flags) {
+                            match Self::parse_(matchers, &pattern[num_bytes..], flags, line, column) {
                                 Ok((following_mr, following_nm)) => {
                                     minimum_required = following_mr;
                                     num_matchers += following_nm;
@@ -1465,7 +1468,7 @@ impl CompiledMatcher {
                         match state {
                             ParseState::None => {
                                 num_bytes += 1;
-                                match Self::parse_(matchers, &pattern[num_bytes..], flags) {
+                                match Self::parse_(matchers, &pattern[num_bytes..], flags, line, column) {
                                     Ok((following_mr, following_nm)) => {
                                         minimum_required = following_mr;
                                         num_matchers += following_nm;
@@ -1482,7 +1485,7 @@ impl CompiledMatcher {
                                 return Ok((minimum_required, num_matchers));
                             },
                             ParseState::InLiteral => {
-                                match Self::parse_(matchers, &pattern[num_bytes..], flags) {
+                                match Self::parse_(matchers, &pattern[num_bytes..], flags, line, column) {
                                     Ok((following_mr, following_nm)) => {
                                         minimum_required = following_mr;
                                         num_matchers += following_nm;
@@ -1517,7 +1520,7 @@ impl CompiledMatcher {
                         match state {
                             ParseState::None => {
                                 num_bytes += 1;
-                                match Self::parse_(matchers, &pattern[num_bytes..], flags) {
+                                match Self::parse_(matchers, &pattern[num_bytes..], flags, line, column) {
                                     Ok((following_mr, following_nm)) => {
                                         minimum_required = following_mr;
                                         num_matchers += following_nm;
@@ -1534,7 +1537,7 @@ impl CompiledMatcher {
                                 return Ok((minimum_required, num_matchers));
                             },
                             ParseState::InLiteral => {
-                                match Self::parse_(matchers, &pattern[num_bytes..], flags) {
+                                match Self::parse_(matchers, &pattern[num_bytes..], flags, line, column) {
                                     Ok((following_mr, following_nm)) => {
                                         minimum_required = following_mr;
                                         num_matchers += following_nm;
@@ -1566,7 +1569,7 @@ impl CompiledMatcher {
                         ParseState::InNotRange | ParseState::InRange if !s.is_empty() => {
                             match continuum_prior {
                                 Some(prior_character) => {
-                                    match Self::push_continuum_(&mut s, prior_character, c, flags) {
+                                    match Self::push_continuum_(&mut s, prior_character, c, flags, *line, *column) {
                                         Ok(_) => (),
                                         Err(e) => {
                                             return Err(e);
@@ -1592,6 +1595,13 @@ impl CompiledMatcher {
                 },
             };
 
+            if c == '\n' {
+                *line += 1;
+                *column = 0;
+            } else {
+                *column += 1;
+            }
+
             num_bytes += c.len_utf8();
         }
 
@@ -1604,8 +1614,8 @@ impl CompiledMatcher {
             },
             ParseState::InNotRange | ParseState::InRange => {
                 return Err(Error::ParseError {
-                    line :    0,
-                    column :  usize::MAX,
+                    line :    *line,
+                    column :  *column,
                     message : "incomplete range".into(),
                 });
             },
@@ -1644,6 +1654,8 @@ impl CompiledMatcher {
         prior_character : char,
         posterior_character : char,
         flags : i64,
+        line : usize,
+        column : usize,
     ) -> Result<()> {
         {
             let _ = flags;
@@ -1651,8 +1663,8 @@ impl CompiledMatcher {
 
         if !prior_character.is_ascii_alphabetic() || !posterior_character.is_ascii_alphabetic() {
             return Err(Error::ParseError {
-                line : 0,
-                column : usize::MAX,
+                line,
+                column,
                 message : format!("the character range {prior_character}-{posterior_character} does not define a supported (ASCII) range continuum"),
             });
         }
@@ -2580,28 +2592,91 @@ mod tests {
         }
 
         #[test]
-        fn TEST_matches_INVALID_PATTERN_1() {
+        fn TEST_matches_INVALID_PATTERN_1_AS_Display() {
             match shwild::matches("[a-9]", "", 0) {
                 Ok(_) => {
                     panic!("unexpected success");
                 },
                 Err(e) => {
-                    assert_eq!(
-                        "the character range a-9 does not define a supported (ASCII) range continuum",
-                        format!("{e:?}")
-                    );
+                    let expected = r#"pattern syntax error (at 0:3): the character range a-9 does not define a supported (ASCII) range continuum"#;
+                    let actual = format!("{e}");
+
+                    assert_eq!(expected, actual);
                 },
             };
         }
 
         #[test]
-        fn TEST_matches_INVALID_PATTERN_INCOMPLETE_RANGE_1() {
+        fn TEST_matches_INVALID_PATTERN_1_AS_Debug() {
+            match shwild::matches("[a-9]", "", 0) {
+                Ok(_) => {
+                    panic!("unexpected success");
+                },
+                Err(e) => {
+                    let expected = r#"ParseError { line: 0, column: 3, message: "the character range a-9 does not define a supported (ASCII) range continuum" }"#;
+                    let actual = format!("{e:?}");
+
+                    assert_eq!(expected, actual);
+                },
+            };
+        }
+
+        #[test]
+        fn TEST_matches_INVALID_PATTERN_INCOMPLETE_RANGE_1_AS_Display() {
             match shwild::matches("[a-z", "", 0) {
                 Ok(_) => {
                     panic!("unexpected success");
                 },
                 Err(e) => {
-                    assert_eq!("incomplete range", format!("{e:?}"));
+                    let expected = "pattern syntax error (at 0:4): incomplete range";
+                    let actual = format!("{e}");
+
+                    assert_eq!(expected, actual);
+                },
+            };
+        }
+
+        #[test]
+        fn TEST_matches_INVALID_PATTERN_INCOMPLETE_RANGE_1_AS_Debug() {
+            match shwild::matches("[a-z", "", 0) {
+                Ok(_) => {
+                    panic!("unexpected success");
+                },
+                Err(e) => {
+                    let expected = r#"ParseError { line: 0, column: 4, message: "incomplete range" }"#;
+                    let actual = format!("{e:?}");
+
+                    assert_eq!(expected, actual);
+                },
+            };
+        }
+
+        #[test]
+        fn TEST_matches_INVALID_PATTERN_INCOMPLETE_RANGE_2_AS_Display() {
+            match shwild::matches("the cat in\nthe ha[mt", "", 0) {
+                Ok(_) => {
+                    panic!("unexpected success");
+                },
+                Err(e) => {
+                    let expected = "pattern syntax error (at 1:9): incomplete range";
+                    let actual = format!("{e}");
+
+                    assert_eq!(expected, actual);
+                },
+            };
+        }
+
+        #[test]
+        fn TEST_matches_INVALID_PATTERN_INCOMPLETE_RANGE_2_AS_Debug() {
+            match shwild::matches("the cat in\nthe ha[mt", "", 0) {
+                Ok(_) => {
+                    panic!("unexpected success");
+                },
+                Err(e) => {
+                    let expected = r#"ParseError { line: 1, column: 9, message: "incomplete range" }"#;
+                    let actual = format!("{e:?}");
+
+                    assert_eq!(expected, actual);
                 },
             };
         }
