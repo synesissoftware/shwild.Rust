@@ -11,25 +11,27 @@ use std::{
 fn main() {
     let directory = ".";
 
-    let matchers = {
+    let patterns = {
         let r = std_env::args().skip(1).collect::<Vec<_>>();
 
-        let r = if r.is_empty() { vec!["*".into()] } else { r };
-
-        r.into_iter()
-            .map(|pattern| {
-                let m = shwild::CompiledMatcher::from_pattern_and_flags(&pattern, 0).unwrap_or_else(|e| {
-                    eprintln!("failed to parse pattern '{pattern}': {e}");
-
-                    std_process::exit(1);
-                });
-
-                m
-            })
-            .collect::<Vec<_>>()
+        if r.is_empty() {
+            vec!["*".into()]
+        } else {
+            r
+        }
     };
+    let matchers = patterns
+        .iter()
+        .map(|pattern| {
+            shwild::CompiledMatcher::from_pattern_and_flags(&pattern, 0).unwrap_or_else(|e| {
+                eprintln!("failed to parse pattern '{pattern}': {e}");
 
-    // println!("searching in '{directory}' with pattern(s) {patterns:?}");
+                std_process::exit(1);
+            })
+        })
+        .collect::<Vec<_>>();
+
+    println!("searching in '{directory}' with pattern(s) {:?}", patterns);
 
     match std_fs::read_dir(directory) {
         Ok(entries) => {
