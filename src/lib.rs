@@ -2616,5 +2616,20 @@ mod tests {
             assert_eq!(Ok(true), shwild::matches(pattern, r"X:\dir\filestem.exe", 0));
             assert_eq!(Ok(true), shwild::matches(pattern, r"D:\dir\sub-dir\filestem.exe", 0));
         }
+
+        #[test]
+        fn TEST_matches_WILDN_BEAR_WILD1_1() {
+            let pattern = r"*🐻?";
+
+            assert_eq!(Ok(false), shwild::matches(pattern, "", 0));
+            assert_eq!(Ok(false), shwild::matches(pattern, "🐻", 0));
+            assert_eq!(Ok(false), shwild::matches(pattern, "bears", 0));
+            assert_eq!(Ok(true), shwild::matches(pattern, "🐻s", 0));
+            assert_eq!(Ok(false), shwild::matches(pattern, "🐼s", 0));
+            assert_eq!(Ok(true), shwild::matches(pattern, "teddy-🐻s", 0));
+            assert_eq!(Ok(false), shwild::matches(pattern, "teddy-🐼s", 0));
+            assert_eq!(Ok(false), shwild::matches(pattern, "teddy-🐻", 0));
+            assert_eq!(Ok(false), shwild::matches(pattern, "teddy-🐼", 0));
+        }
     }
 }
