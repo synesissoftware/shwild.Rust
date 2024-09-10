@@ -35,6 +35,10 @@ harness = false
 name = "list-matching-files"
 path = "examples/list-matching-files/main.rs"
 
+[[example]]
+name = "list-matching-files-compiled"
+path = "examples/list-matching-files-compiled/main.rs"
+
 
 # ##########################################################
 # Features
