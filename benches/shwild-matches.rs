@@ -12,6 +12,7 @@ use criterion::{
 
 mod constants {
     #![allow(non_upper_case_globals)]
+    #![allow(unused)]
 
     pub(crate) const EMPTY_STRING : &str = "";
     pub(crate) const S_hello : &str = "hello";
@@ -20,6 +21,14 @@ mod constants {
 
     pub(crate) mod patterns {
         #![allow(non_upper_case_globals)]
+        #![allow(unused)]
+
+        pub(crate) const NRANGE_CONTINUUM_SIMPLE : &str = r"[^a-z]";
+        pub(crate) const NRANGE_CONTINUUM_REVERSE : &str = r"[^z-a]";
+        pub(crate) const NRANGE_CONTINUUM_CROSSCASE : &str = r"[^a-Z]";
+        pub(crate) const RANGE_CONTINUUM_SIMPLE : &str = r"[a-z]";
+        pub(crate) const RANGE_CONTINUUM_REVERSE : &str = r"[z-a]";
+        pub(crate) const RANGE_CONTINUUM_CROSSCASE : &str = r"[a-Z]";
 
         pub(crate) const WINDOWS_PATH : &str = r"[A-Z]\?*\?*.[ce][ox][em]";
     }
@@ -82,6 +91,162 @@ pub fn matches_input_literal_large(c : &mut Criterion) {
     });
 }
 
+pub fn matches_against_nrange_continuum_simple(c : &mut Criterion) {
+    let pattern = constants::patterns::NRANGE_CONTINUUM_SIMPLE;
+    let flags = 0;
+
+    let inputs = [
+        "",
+        " ",
+        "a",
+        "b",
+        "c",
+        "d",
+        "aa",
+        "_",
+    ];
+
+    c.bench_function("`shwild::matches()` - nrange continuum (simple)", |b| {
+        b.iter(|| {
+            for input in &inputs {
+                let r = shwild::matches(black_box(pattern), black_box(input), black_box(flags));
+
+                let _ = black_box(r);
+            }
+        })
+    });
+}
+
+pub fn matches_against_nrange_continuum_reverse(c : &mut Criterion) {
+    let pattern = constants::patterns::NRANGE_CONTINUUM_REVERSE;
+    let flags = 0;
+
+    let inputs = [
+        "",
+        " ",
+        "a",
+        "b",
+        "c",
+        "d",
+        "aa",
+        "_",
+    ];
+
+    c.bench_function("`shwild::matches()` - nrange continuum (reverse)", |b| {
+        b.iter(|| {
+            for input in &inputs {
+                let r = shwild::matches(black_box(pattern), black_box(input), black_box(flags));
+
+                let _ = black_box(r);
+            }
+        })
+    });
+}
+
+pub fn matches_against_nrange_continuum_crosscase(c : &mut Criterion) {
+    let pattern = constants::patterns::NRANGE_CONTINUUM_CROSSCASE;
+    let flags = 0;
+
+    let inputs = [
+        "",
+        " ",
+        "a",
+        "b",
+        "c",
+        "d",
+        "aa",
+        "_",
+    ];
+
+    c.bench_function("`shwild::matches()` - nrange continuum (crosscase)", |b| {
+        b.iter(|| {
+            for input in &inputs {
+                let r = shwild::matches(black_box(pattern), black_box(input), black_box(flags));
+
+                let _ = black_box(r);
+            }
+        })
+    });
+}
+
+pub fn matches_against_range_continuum_simple(c : &mut Criterion) {
+    let pattern = constants::patterns::RANGE_CONTINUUM_SIMPLE;
+    let flags = 0;
+
+    let inputs = [
+        "",
+        " ",
+        "a",
+        "b",
+        "c",
+        "d",
+        "aa",
+        "_",
+    ];
+
+    c.bench_function("`shwild::matches()` - range continuum (simple)", |b| {
+        b.iter(|| {
+            for input in &inputs {
+                let r = shwild::matches(black_box(pattern), black_box(input), black_box(flags));
+
+                let _ = black_box(r);
+            }
+        })
+    });
+}
+
+pub fn matches_against_range_continuum_reverse(c : &mut Criterion) {
+    let pattern = constants::patterns::RANGE_CONTINUUM_REVERSE;
+    let flags = 0;
+
+    let inputs = [
+        "",
+        " ",
+        "a",
+        "b",
+        "c",
+        "d",
+        "aa",
+        "_",
+    ];
+
+    c.bench_function("`shwild::matches()` - range continuum (reverse)", |b| {
+        b.iter(|| {
+            for input in &inputs {
+                let r = shwild::matches(black_box(pattern), black_box(input), black_box(flags));
+
+                let _ = black_box(r);
+            }
+        })
+    });
+}
+
+pub fn matches_against_range_continuum_crosscase(c : &mut Criterion) {
+    let pattern = constants::patterns::RANGE_CONTINUUM_CROSSCASE;
+    let flags = 0;
+
+    let inputs = [
+        "",
+        " ",
+        "a",
+        "b",
+        "c",
+        "d",
+        "aa",
+        "_",
+    ];
+
+    c.bench_function("`shwild::matches()` - range continuum (crosscase)", |b| {
+        b.iter(|| {
+            for input in &inputs {
+                let r = shwild::matches(black_box(pattern), black_box(input), black_box(flags));
+
+                let _ = black_box(r);
+            }
+        })
+    });
+}
+
 pub fn matches_test_against_pattern_WindowsPath(c : &mut Criterion) {
     let pattern = constants::patterns::WINDOWS_PATH;
     let flags = 0;
@@ -98,7 +263,6 @@ pub fn matches_test_against_pattern_WindowsPath(c : &mut Criterion) {
 
     c.bench_function("`shwild::matches()` - Windows Path", |b| {
         b.iter(|| {
-
             for input in &inputs {
                 let r = shwild::matches(black_box(pattern), black_box(input), black_box(flags));
 
@@ -116,5 +280,11 @@ criterion_group!(
     matches_input_literal_medium,
     matches_input_literal_large,
     matches_test_against_pattern_WindowsPath,
+    matches_against_nrange_continuum_simple,
+    matches_against_nrange_continuum_reverse,
+    matches_against_nrange_continuum_crosscase,
+    matches_against_range_continuum_simple,
+    matches_against_range_continuum_reverse,
+    matches_against_range_continuum_crosscase,
 );
 criterion_main!(benches);
