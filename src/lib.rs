@@ -870,6 +870,7 @@ mod utils {
             self.num_matchers
         }
 
+        #[inline]
         pub(crate) fn matches(
             &self,
             input : &str,
@@ -1295,6 +1296,7 @@ impl CompiledMatcher {
     ///
     /// # Parameters:
     /// - `input` - the string to be evaluated;
+    #[inline]
     pub fn matches(
         &self,
         input : &str,
@@ -1690,6 +1692,7 @@ impl CompiledMatcher {
 ///   does not match `input`;
 /// - `Err(Error)` - `pattern` does not represent a valid wildcard
 ///   specification;
+#[inline]
 pub fn matches(
     pattern : &str,
     input : &str,
