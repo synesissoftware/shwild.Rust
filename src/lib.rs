@@ -1371,6 +1371,11 @@ impl CompiledMatcher {
                 };
 
                 escaped = false;
+
+                if matches!(state, ParseState::None) {
+
+                    state = ParseState::InLiteral;
+                }
             } else {
                 match c {
                     '[' => {
@@ -1505,7 +1510,6 @@ impl CompiledMatcher {
                                 minimum_required = matchers.prepend_Literal(literal, flags, minimum_required);
 
                                 num_matchers += 1;
-
 
                                 return Ok((minimum_required, num_matchers));
                             },
@@ -2389,7 +2393,7 @@ mod tests {
 
             /* Using escaped characters. */
             {
-                let pattern = "a\\*c\\?";
+                let pattern = r"a\*c\?";
 
                 {
                     let flags = 0;
@@ -2413,7 +2417,7 @@ mod tests {
                     assert_eq!(1, matcher.len());
 
                     assert!(!matcher.matches("abcd"));
-                    assert!(matcher.matches("a\\*c\\?"));
+                    assert!(matcher.matches(r"a\*c\?"));
                 }
                  */
             }
@@ -2672,7 +2676,7 @@ mod tests {
         fn TEST_CompiledMatcher_parse_RANGES_WITH_UNESCAPED_SPECIAL_CHARACTERS_1() {
             // Range
             {
-                let pattern = r"[[^\]\\\-*?]";
+                let pattern = r"[[^\]\-*?]";
 
                 {
                     let flags = 0;
@@ -2683,7 +2687,7 @@ mod tests {
                     assert!(!matcher.matches(r""));
                     assert!(!matcher.matches(r"a"));
                     assert!(!matcher.matches(r"&"));
-                    assert!(matcher.matches(r"\"));
+                    assert!(!matcher.matches(r"\"));
                     assert!(!matcher.matches(r"/"));
                     assert!(matcher.matches(r"["));
                     assert!(matcher.matches(r"]"));
@@ -2699,7 +2703,7 @@ mod tests {
 
             // NotRange
             {
-                let pattern = r"[^[^\]\\\-*?]";
+                let pattern = r"[^[^\]\-*?]";
 
                 {
                     let flags = 0;
@@ -2710,7 +2714,7 @@ mod tests {
                     assert!(!matcher.matches(r""));
                     assert!(matcher.matches(r"a"));
                     assert!(matcher.matches(r"&"));
-                    assert!(!matcher.matches(r"\"));
+                    assert!(matcher.matches(r"\"));
                     assert!(matcher.matches(r"/"));
                     assert!(!matcher.matches(r"["));
                     assert!(!matcher.matches(r"]"));
@@ -2878,7 +2882,7 @@ mod tests {
 
         #[test]
         fn TEST_matches_WINDOWS_PROGRAM_PATH_PATTERN_1() {
-            let pattern = r"[A-Z]\?*\?*.[ce][ox][em]";
+            let pattern = r"[A-Z]:\\?*\\?*.[ce][ox][em]";
 
             assert_eq!(Ok(false), shwild::matches(pattern, "", 0));
 
