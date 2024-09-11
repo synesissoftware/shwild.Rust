@@ -1350,12 +1350,27 @@ impl CompiledMatcher {
         for c in pattern.chars() {
             debug_assert!(continuum_prior.is_none() || matches!(state, ParseState::InNotRange | ParseState::InRange));
 
-            match c {
-                '[' => {
-                    if escaped {
+            if escaped {
+                match c {
+                    // TODO: do a lookup table
+                    'n' => {
+                        s.push('\n');
+                    },
+                    'r' => {
+                        s.push('\r');
+                    },
+                    't' => {
+                        s.push('\t');
+                    },
+                    _ => {
                         s.push(c);
-                        escaped = false;
-                    } else {
+                    },
+                };
+
+                escaped = false;
+            } else {
+                match c {
+                    '[' => {
                         match state {
                             ParseState::None => {
                                 state = ParseState::InRange;
@@ -1386,13 +1401,8 @@ impl CompiledMatcher {
                                 s.push(c);
                             },
                         };
-                    }
-                },
-                '^' => {
-                    if escaped {
-                        s.push(c);
-                        escaped = false;
-                    } else {
+                    },
+                    '^' => {
                         match state {
                             ParseState::InRange if s.is_empty() => {
                                 state = ParseState::InNotRange;
@@ -1401,13 +1411,8 @@ impl CompiledMatcher {
                                 s.push(c);
                             },
                         };
-                    }
-                },
-                ']' => {
-                    if escaped {
-                        s.push(c);
-                        escaped = false;
-                    } else {
+                    },
+                    ']' => {
                         match state {
                             ParseState::InNotRange | ParseState::InRange => {
                                 num_bytes += 1;
@@ -1446,21 +1451,11 @@ impl CompiledMatcher {
                                 s.push(c);
                             },
                         };
-                    }
-                },
-                '\\' => {
-                    if escaped {
-                        s.push(c);
-                    } else {
+                    },
+                    '\\' => {
                         escaped = true;
-                    }
-                },
-                '-' => {
-                    if escaped {
-                        escaped = false;
-
-                        s.push(c);
-                    } else {
+                    },
+                    '-' => {
                         match state {
                             ParseState::InNotRange | ParseState::InRange if !s.is_empty() => {
                                 continuum_prior = Some(*s.last().unwrap());
@@ -1469,13 +1464,8 @@ impl CompiledMatcher {
                                 s.push(c);
                             },
                         };
-                    }
-                },
-                '?' => {
-                    if escaped {
-                        s.push(c);
-                        escaped = false;
-                    } else {
+                    },
+                    '?' => {
                         match state {
                             ParseState::None => {
                                 num_bytes += 1;
@@ -1521,13 +1511,8 @@ impl CompiledMatcher {
                                 s.push(c);
                             },
                         };
-                    }
-                },
-                '*' => {
-                    if escaped {
-                        s.push(c);
-                        escaped = false;
-                    } else {
+                    },
+                    '*' => {
                         match state {
                             ParseState::None => {
                                 num_bytes += 1;
@@ -1573,28 +1558,8 @@ impl CompiledMatcher {
                                 s.push(c);
                             },
                         };
-                    }
-                },
-                _ => {
-                    if escaped {
-                        match c {
-                            // TODO: do a lookup table
-                            'n' => {
-                                s.push('\n');
-                            },
-                            'r' => {
-                                s.push('\r');
-                            },
-                            't' => {
-                                s.push('\t');
-                            },
-                            _ => {
-                                s.push(c);
-                            },
-                        };
-
-                        escaped = false;
-                    } else {
+                    },
+                    _ => {
                         match state {
                             ParseState::InNotRange | ParseState::InRange if !s.is_empty() => {
                                 match continuum_prior {
@@ -1622,8 +1587,8 @@ impl CompiledMatcher {
                                 s.push(c);
                             },
                         };
-                    }
-                },
+                    },
+                }
             };
 
             if c == '\n' {
@@ -1635,6 +1600,14 @@ impl CompiledMatcher {
 
             num_bytes += c.len_utf8();
         }
+
+        if escaped {
+            return Err(Error::ParseError {
+                line :    *line,
+                column :  *column,
+                message : "trailing slash".into(),
+            });
+    }
 
         match state {
             ParseState::None => {},
@@ -2747,6 +2720,26 @@ mod tests {
                     assert!(!matcher.matches(r"-"));
                     assert!(matcher.matches(r"+"));
                 }
+            }
+        }
+
+        #[test]
+        fn TEST_CompiledMatcher_parse_TRAILING_SLASH_1() {
+            /* Matching literal strings. */
+            {
+                let pattern = r"abcd\";
+
+                match shwild::CompiledMatcher::from_pattern_and_flags(pattern, 0) {
+                    Ok(_) => {
+                        panic!("unexpected success");
+                    },
+                    Err(e) => {
+                        let expected = r#"pattern syntax error (at 0:5): trailing slash"#;
+                        let actual = format!("{e}");
+
+                        assert_eq!(expected, actual);
+                    },
+                };
             }
         }
     }
