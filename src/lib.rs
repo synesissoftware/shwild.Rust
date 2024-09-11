@@ -42,6 +42,9 @@ impl Error {
 
     /// Until we determine a need to separate them, `Debug` and `Display`
     /// implementations produce same representation.
+    ///
+    /// NOTE: this separation was done, but leaving here for reasons of
+    /// revisibility.
     fn fmt_for_Debug_or_Display(
         &self,
         f : &mut std_fmt::Formatter<'_>,
@@ -1349,106 +1352,114 @@ impl CompiledMatcher {
 
             match c {
                 '[' => {
-                    match state {
-                        ParseState::None => {
-                            state = ParseState::InRange;
-                        },
-                        ParseState::InLiteral => {
-                            match Self::parse_(matchers, &pattern[num_bytes..], flags, line, column) {
-                                Ok((following_mr, following_nm)) => {
-                                    minimum_required = following_mr;
-                                    num_matchers += following_nm;
-                                },
-                                Err(e) => {
-                                    return Err(e);
-                                },
-                            };
+                    if escaped {
+                        s.push(c);
+                        escaped = false;
+                    } else {
+                        match state {
+                            ParseState::None => {
+                                state = ParseState::InRange;
+                            },
+                            ParseState::InLiteral => {
+                                match Self::parse_(matchers, &pattern[num_bytes..], flags, line, column) {
+                                    Ok((following_mr, following_nm)) => {
+                                        minimum_required = following_mr;
+                                        num_matchers += following_nm;
+                                    },
+                                    Err(e) => {
+                                        return Err(e);
+                                    },
+                                };
 
-                            debug_assert!(!s.is_empty());
+                                debug_assert!(!s.is_empty());
 
-                            minimum_required =
-                                matchers.prepend_Literal(String::from_iter(s.iter()), flags, minimum_required);
+                                minimum_required =
+                                    matchers.prepend_Literal(String::from_iter(s.iter()), flags, minimum_required);
 
-                            num_matchers += 1;
+                                num_matchers += 1;
 
-                            s.clear();
+                                s.clear();
 
-                            return Ok((minimum_required, num_matchers));
-                        },
-                        _ => {
-                            s.push(c);
-                        },
-                    };
+                                return Ok((minimum_required, num_matchers));
+                            },
+                            _ => {
+                                s.push(c);
+                            },
+                        };
+                    }
                 },
                 '^' => {
-                    match state {
-                        ParseState::InRange if s.is_empty() => {
-                            state = ParseState::InNotRange;
-                        },
-                        _ => {
-                            s.push(c);
-                        },
-                    };
+                    if escaped {
+                        s.push(c);
+                        escaped = false;
+                    } else {
+                        match state {
+                            ParseState::InRange if s.is_empty() => {
+                                state = ParseState::InNotRange;
+                            },
+                            _ => {
+                                s.push(c);
+                            },
+                        };
+                    }
                 },
                 ']' => {
-                    match state {
-                        ParseState::InNotRange | ParseState::InRange => {
-                            num_bytes += 1;
-                            match Self::parse_(matchers, &pattern[num_bytes..], flags, line, column) {
-                                Ok((following_mr, following_nm)) => {
-                                    minimum_required = following_mr;
-                                    num_matchers += following_nm;
-                                },
-                                Err(e) => {
-                                    return Err(e);
-                                },
-                            };
+                    if escaped {
+                        s.push(c);
+                        escaped = false;
+                    } else {
+                        match state {
+                            ParseState::InNotRange | ParseState::InRange => {
+                                num_bytes += 1;
+                                match Self::parse_(matchers, &pattern[num_bytes..], flags, line, column) {
+                                    Ok((following_mr, following_nm)) => {
+                                        minimum_required = following_mr;
+                                        num_matchers += following_nm;
+                                    },
+                                    Err(e) => {
+                                        return Err(e);
+                                    },
+                                };
 
-                            if let Some(_c) = continuum_prior {
-                                // don't care about `_c` because that will already be pushed into `s`
+                                if let Some(_c) = continuum_prior {
+                                    // don't care about `_c` because that will already be pushed into `s`
 
-                                s.push('-');
-                            }
+                                    s.push('-');
+                                }
 
-                            let characters = crate::utils::prepare_range_string(&String::from_iter(s.iter()), flags);
+                                let characters =
+                                    crate::utils::prepare_range_string(&String::from_iter(s.iter()), flags);
 
-                            minimum_required = if matches!(state, ParseState::InRange) {
-                                matchers.prepend_Range(characters, flags, minimum_required)
-                            } else {
-                                matchers.prepend_NotRange(characters, flags, minimum_required)
-                            };
+                                minimum_required = if matches!(state, ParseState::InRange) {
+                                    matchers.prepend_Range(characters, flags, minimum_required)
+                                } else {
+                                    matchers.prepend_NotRange(characters, flags, minimum_required)
+                                };
 
-                            num_matchers += 1;
+                                num_matchers += 1;
 
-                            s.clear();
+                                s.clear();
 
-                            return Ok((minimum_required, num_matchers));
-                        },
-                        _ => {
-                            s.push(c);
-                        },
-                    };
+                                return Ok((minimum_required, num_matchers));
+                            },
+                            _ => {
+                                s.push(c);
+                            },
+                        };
+                    }
                 },
                 '\\' => {
-                    match state {
-                        ParseState::InNotRange | ParseState::InRange => {
-                            s.push(c);
-                        },
-                        _ => {
-                            if escaped {
-                                s.push('\\');
-                                escaped = false;
-                            } else {
-                                escaped = true;
-                            }
-                        },
-                    };
+                    if escaped {
+                        s.push(c);
+                    } else {
+                        escaped = true;
+                    }
                 },
                 '-' => {
                     if escaped {
-                        s.push(c);
-
                         escaped = false;
+
+                        s.push(c);
                     } else {
                         match state {
                             ParseState::InNotRange | ParseState::InRange if !s.is_empty() => {
@@ -1565,33 +1576,53 @@ impl CompiledMatcher {
                     }
                 },
                 _ => {
-                    match state {
-                        ParseState::InNotRange | ParseState::InRange if !s.is_empty() => {
-                            match continuum_prior {
-                                Some(prior_character) => {
-                                    match Self::push_continuum_(&mut s, prior_character, c, flags, *line, *column) {
-                                        Ok(_) => (),
-                                        Err(e) => {
-                                            return Err(e);
-                                        },
-                                    };
+                    if escaped {
+                        match c {
+                            // TODO: do a lookup table
+                            'n' => {
+                                s.push('\n');
+                            },
+                            'r' => {
+                                s.push('\r');
+                            },
+                            't' => {
+                                s.push('\t');
+                            },
+                            _ => {
+                                s.push(c);
+                            },
+                        };
 
-                                    continuum_prior = None;
-                                },
-                                _ => {
-                                    s.push(c);
-                                },
-                            };
-                        },
-                        ParseState::None => {
-                            s.push(c);
+                        escaped = false;
+                    } else {
+                        match state {
+                            ParseState::InNotRange | ParseState::InRange if !s.is_empty() => {
+                                match continuum_prior {
+                                    Some(prior_character) => {
+                                        match Self::push_continuum_(&mut s, prior_character, c, flags, *line, *column) {
+                                            Ok(_) => (),
+                                            Err(e) => {
+                                                return Err(e);
+                                            },
+                                        };
 
-                            state = ParseState::InLiteral;
-                        },
-                        _ => {
-                            s.push(c);
-                        },
-                    };
+                                        continuum_prior = None;
+                                    },
+                                    _ => {
+                                        s.push(c);
+                                    },
+                                };
+                            },
+                            ParseState::None => {
+                                s.push(c);
+
+                                state = ParseState::InLiteral;
+                            },
+                            _ => {
+                                s.push(c);
+                            },
+                        };
+                    }
                 },
             };
 
@@ -1914,6 +1945,46 @@ mod tests {
                 assert!(matcher.matches("ab-d"));
                 assert!(matcher.matches("AB-D"));
                 assert!(!matcher.matches("ab-de"));
+            }
+        }
+
+        #[test]
+        fn TEST_CompiledMatcher_parse_LITERAL_4() {
+            let pattern = r"ab\\d";
+
+            {
+                let flags = 0;
+
+                let matcher = shwild::CompiledMatcher::from_pattern_and_flags(pattern, flags).unwrap();
+
+
+                assert_eq!(1, matcher.len());
+
+                assert!(!matcher.matches(""));
+                assert!(!matcher.matches(" "));
+                assert!(!matcher.matches("a"));
+                assert!(!matcher.matches("ab"));
+                assert!(!matcher.matches("abc"));
+                assert!(matcher.matches(r"ab\d"));
+                assert!(!matcher.matches("AB-D"));
+                assert!(!matcher.matches("ab-de"));
+            }
+
+            {
+                let flags = IGNORE_CASE;
+
+                let matcher = shwild::CompiledMatcher::from_pattern_and_flags(pattern, flags).unwrap();
+
+                assert_eq!(1, matcher.len());
+
+                assert!(!matcher.matches(""));
+                assert!(!matcher.matches(" "));
+                assert!(!matcher.matches("a"));
+                assert!(!matcher.matches("ab"));
+                assert!(!matcher.matches("abc"));
+                assert!(matcher.matches(r"ab\d"));
+                assert!(matcher.matches(r"AB\D"));
+                assert!(!matcher.matches(r"ab\de"));
             }
         }
 
@@ -2564,8 +2635,121 @@ mod tests {
                 }
             }
         }
-    }
 
+        #[test]
+        fn TEST_CompiledMatcher_parse_RANGES_WITH_ESCAPED_CHARACTERS_1() {
+            // Range
+            {
+                let pattern = r"[\[\^\]\\\-\*\?]";
+
+                {
+                    let flags = 0;
+                    let matcher = shwild::CompiledMatcher::from_pattern_and_flags(pattern, flags).unwrap();
+
+                    assert_eq!(1, matcher.len());
+
+                    assert!(!matcher.matches(r""));
+                    assert!(!matcher.matches(r"a"));
+                    assert!(!matcher.matches(r"&"));
+                    assert!(matcher.matches(r"\"));
+                    assert!(!matcher.matches(r"/"));
+                    assert!(matcher.matches(r"["));
+                    assert!(matcher.matches(r"]"));
+                    assert!(!matcher.matches(r"{"));
+                    assert!(!matcher.matches(r"}"));
+                    assert!(matcher.matches(r"*"));
+                    assert!(!matcher.matches(r"!"));
+                    assert!(!matcher.matches(r"|"));
+                    assert!(matcher.matches(r"-"));
+                    assert!(!matcher.matches(r"+"));
+                }
+            }
+
+            // NotRange
+            {
+                let pattern = r"[^\[\^\]\\\-\*\?]";
+
+                {
+                    let flags = 0;
+                    let matcher = shwild::CompiledMatcher::from_pattern_and_flags(pattern, flags).unwrap();
+
+                    assert_eq!(1, matcher.len());
+
+                    assert!(!matcher.matches(r""));
+                    assert!(matcher.matches(r"a"));
+                    assert!(matcher.matches(r"&"));
+                    assert!(!matcher.matches(r"\"));
+                    assert!(matcher.matches(r"/"));
+                    assert!(!matcher.matches(r"["));
+                    assert!(!matcher.matches(r"]"));
+                    assert!(matcher.matches(r"{"));
+                    assert!(matcher.matches(r"}"));
+                    assert!(!matcher.matches(r"*"));
+                    assert!(matcher.matches(r"!"));
+                    assert!(matcher.matches(r"|"));
+                    assert!(!matcher.matches(r"-"));
+                    assert!(matcher.matches(r"+"));
+                }
+            }
+        }
+
+        #[test]
+        fn TEST_CompiledMatcher_parse_RANGES_WITH_UNESCAPED_SPECIAL_CHARACTERS_1() {
+            // Range
+            {
+                let pattern = r"[[^\]\\\-*?]";
+
+                {
+                    let flags = 0;
+                    let matcher = shwild::CompiledMatcher::from_pattern_and_flags(pattern, flags).unwrap();
+
+                    assert_eq!(1, matcher.len());
+
+                    assert!(!matcher.matches(r""));
+                    assert!(!matcher.matches(r"a"));
+                    assert!(!matcher.matches(r"&"));
+                    assert!(matcher.matches(r"\"));
+                    assert!(!matcher.matches(r"/"));
+                    assert!(matcher.matches(r"["));
+                    assert!(matcher.matches(r"]"));
+                    assert!(!matcher.matches(r"{"));
+                    assert!(!matcher.matches(r"}"));
+                    assert!(matcher.matches(r"*"));
+                    assert!(!matcher.matches(r"!"));
+                    assert!(!matcher.matches(r"|"));
+                    assert!(matcher.matches(r"-"));
+                    assert!(!matcher.matches(r"+"));
+                }
+            }
+
+            // NotRange
+            {
+                let pattern = r"[^[^\]\\\-*?]";
+
+                {
+                    let flags = 0;
+                    let matcher = shwild::CompiledMatcher::from_pattern_and_flags(pattern, flags).unwrap();
+
+                    assert_eq!(1, matcher.len());
+
+                    assert!(!matcher.matches(r""));
+                    assert!(matcher.matches(r"a"));
+                    assert!(matcher.matches(r"&"));
+                    assert!(!matcher.matches(r"\"));
+                    assert!(matcher.matches(r"/"));
+                    assert!(!matcher.matches(r"["));
+                    assert!(!matcher.matches(r"]"));
+                    assert!(matcher.matches(r"{"));
+                    assert!(matcher.matches(r"}"));
+                    assert!(!matcher.matches(r"*"));
+                    assert!(matcher.matches(r"!"));
+                    assert!(matcher.matches(r"|"));
+                    assert!(!matcher.matches(r"-"));
+                    assert!(matcher.matches(r"+"));
+                }
+            }
+        }
+    }
 
     mod TEST_API {
         #![allow(non_snake_case)]
@@ -2679,6 +2863,24 @@ mod tests {
                     assert_eq!(expected, actual);
                 },
             };
+        }
+
+        #[test]
+        fn TEST_matches_PATTERNS_CONTAINING_LINEBREAKS_1() {
+            let pattern = r"The ?* sat[ \t\n]on the ?*";
+            let flags = shwild::IGNORE_CASE;
+
+            assert_eq!(Ok(false), shwild::matches(pattern, "", flags));
+
+            assert_eq!(Ok(true), shwild::matches(pattern, "The cat sat on the mat", flags));
+            assert_eq!(Ok(true), shwild::matches(pattern, "The dog sat on the mat", flags));
+            assert_eq!(Ok(true), shwild::matches(pattern, "The owl sat on the mat", flags));
+            assert_eq!(Ok(true), shwild::matches(pattern, "The owl sat on the branch", flags));
+            assert_eq!(Ok(false), shwild::matches(pattern, "The owl stood on the mat", flags));
+
+            assert_eq!(Ok(true), shwild::matches(pattern, "The cat sat\non the mat", flags));
+            assert_eq!(Ok(true), shwild::matches(pattern, "The cat sat\ton the mat", flags));
+            assert_eq!(Ok(false), shwild::matches(pattern, "The cat sat\ron the mat", flags));
         }
 
         #[test]
