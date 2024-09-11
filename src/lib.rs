@@ -1393,11 +1393,9 @@ impl CompiledMatcher {
 
                                 debug_assert!(!s.is_empty(), "`s` expected to be not empty, but is found to be so");
 
-                                minimum_required =
-                                    matchers.prepend_Literal(literal, flags, minimum_required);
+                                minimum_required = matchers.prepend_Literal(literal, flags, minimum_required);
 
                                 num_matchers += 1;
-
 
                                 return Ok((minimum_required, num_matchers));
                             },
@@ -1425,7 +1423,8 @@ impl CompiledMatcher {
                                     s.push('-');
                                 }
 
-                                let characters = crate::utils::prepare_range_string(&String::from_iter(s.iter()), flags);
+                                let characters =
+                                    crate::utils::prepare_range_string(&String::from_iter(s.iter()), flags);
 
                                 num_bytes += 1;
                                 match Self::parse_(matchers, &pattern[num_bytes..], flags, line, column) {
@@ -1445,7 +1444,6 @@ impl CompiledMatcher {
                                 };
 
                                 num_matchers += 1;
-
 
                                 return Ok((minimum_required, num_matchers));
                             },
@@ -1502,8 +1500,7 @@ impl CompiledMatcher {
 
                                 debug_assert!(!s.is_empty(), "`s` expected to be not empty, but is found to be so");
 
-                                minimum_required =
-                                    matchers.prepend_Literal(literal, flags, minimum_required);
+                                minimum_required = matchers.prepend_Literal(literal, flags, minimum_required);
 
                                 num_matchers += 1;
 
@@ -1550,11 +1547,9 @@ impl CompiledMatcher {
 
                                 debug_assert!(!s.is_empty(), "`s` expected to be not empty, but is found to be so");
 
-                                minimum_required =
-                                    matchers.prepend_Literal(literal, flags, minimum_required);
+                                minimum_required = matchers.prepend_Literal(literal, flags, minimum_required);
 
                                 num_matchers += 1;
-
 
                                 return Ok((minimum_required, num_matchers));
                             },
@@ -1607,8 +1602,8 @@ impl CompiledMatcher {
 
         if escaped {
             return Err(Error::ParseError {
-                line :    line,
-                column :  column,
+                line,
+                column,
                 message : "trailing slash".into(),
             });
         }
@@ -1622,8 +1617,8 @@ impl CompiledMatcher {
             },
             ParseState::InNotRange | ParseState::InRange => {
                 return Err(Error::ParseError {
-                    line :    line,
-                    column :  column,
+                    line,
+                    column,
                     message : "incomplete range".into(),
                 });
             },
@@ -1744,10 +1739,10 @@ pub fn matches(
 #[macro_export]
 macro_rules! shwild_matches {
     ($pattern:expr, $input:expr $(,)?) => {
-        crate::matches($pattern, $input, 0)
+        $crate::matches($pattern, $input, 0)
     };
     ($pattern:expr, $input:expr, $flags:expr $(,)?) => {
-        crate::matches($pattern, $input, $flags)
+        $crate::matches($pattern, $input, $flags)
     };
 }
 
