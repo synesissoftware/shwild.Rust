@@ -1282,10 +1282,10 @@ impl CompiledMatcher {
     ) -> Result<Self> {
         let mut matchers = utils::MatcherSequence::new();
 
-        let mut line = 0;
-        let mut column = 0;
+        let line = 0;
+        let column = 0;
 
-        Self::parse_(&mut matchers, pattern, flags, &mut line, &mut column).map(|_| {
+        Self::parse_(&mut matchers, pattern, flags, line, column).map(|_| {
             Self {
                 matchers,
             }
@@ -1333,12 +1333,15 @@ impl CompiledMatcher {
         matchers : &mut utils::MatcherSequence,
         pattern : &str,
         flags : i64,
-        line : &mut usize,
-        column : &mut usize,
+        line : usize,
+        column : usize,
     ) -> Result<(
         usize, // minimum_required
         usize, // num_matchers
     )> {
+        let mut line = line;
+        let mut column = column;
+
         let mut minimum_required = 0;
         let mut num_matchers = 0;
         let mut state = ParseState::None;
@@ -1564,7 +1567,7 @@ impl CompiledMatcher {
                             ParseState::InNotRange | ParseState::InRange if !s.is_empty() => {
                                 match continuum_prior {
                                     Some(prior_character) => {
-                                        match Self::push_continuum_(&mut s, prior_character, c, flags, *line, *column) {
+                                        match Self::push_continuum_(&mut s, prior_character, c, flags, line, column) {
                                             Ok(_) => (),
                                             Err(e) => {
                                                 return Err(e);
@@ -1592,10 +1595,10 @@ impl CompiledMatcher {
             };
 
             if c == '\n' {
-                *line += 1;
-                *column = 0;
+                line += 1;
+                column = 0;
             } else {
-                *column += 1;
+                column += 1;
             }
 
             num_bytes += c.len_utf8();
@@ -1603,8 +1606,8 @@ impl CompiledMatcher {
 
         if escaped {
             return Err(Error::ParseError {
-                line :    *line,
-                column :  *column,
+                line :    line,
+                column :  column,
                 message : "trailing slash".into(),
             });
         }
@@ -1618,8 +1621,8 @@ impl CompiledMatcher {
             },
             ParseState::InNotRange | ParseState::InRange => {
                 return Err(Error::ParseError {
-                    line :    *line,
-                    column :  *column,
+                    line :    line,
+                    column :  column,
                     message : "incomplete range".into(),
                 });
             },
