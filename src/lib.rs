@@ -1607,7 +1607,7 @@ impl CompiledMatcher {
                 column :  *column,
                 message : "trailing slash".into(),
             });
-    }
+        }
 
         match state {
             ParseState::None => {},
@@ -2725,24 +2725,22 @@ mod tests {
 
         #[test]
         fn TEST_CompiledMatcher_parse_TRAILING_SLASH_1() {
-            /* Matching literal strings. */
-            {
-                let pattern = r"abcd\";
+            let pattern = r"abcd\";
 
-                match shwild::CompiledMatcher::from_pattern_and_flags(pattern, 0) {
-                    Ok(_) => {
-                        panic!("unexpected success");
-                    },
-                    Err(e) => {
-                        let expected = r#"pattern syntax error (at 0:5): trailing slash"#;
-                        let actual = format!("{e}");
+            match shwild::CompiledMatcher::from_pattern_and_flags(pattern, 0) {
+                Ok(_) => {
+                    panic!("unexpected success");
+                },
+                Err(e) => {
+                    let expected = r#"pattern syntax error (at 0:5): trailing slash"#;
+                    let actual = format!("{e}");
 
-                        assert_eq!(expected, actual);
-                    },
-                };
-            }
+                    assert_eq!(expected, actual);
+                },
+            };
         }
     }
+
 
     mod TEST_API {
         #![allow(non_snake_case)]

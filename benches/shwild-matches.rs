@@ -96,6 +96,7 @@ pub fn matches_against_nrange_continuum_simple(c : &mut Criterion) {
     let flags = 0;
 
     let inputs = [
+        // insert list:
         "",
         " ",
         "a",
@@ -122,6 +123,7 @@ pub fn matches_against_nrange_continuum_reverse(c : &mut Criterion) {
     let flags = 0;
 
     let inputs = [
+        // insert list:
         "",
         " ",
         "a",
@@ -148,6 +150,7 @@ pub fn matches_against_nrange_continuum_crosscase(c : &mut Criterion) {
     let flags = 0;
 
     let inputs = [
+        // insert list:
         "",
         " ",
         "a",
@@ -174,6 +177,7 @@ pub fn matches_against_range_continuum_simple(c : &mut Criterion) {
     let flags = 0;
 
     let inputs = [
+        // insert list:
         "",
         " ",
         "a",
@@ -200,6 +204,7 @@ pub fn matches_against_range_continuum_reverse(c : &mut Criterion) {
     let flags = 0;
 
     let inputs = [
+        // insert list:
         "",
         " ",
         "a",
@@ -226,6 +231,7 @@ pub fn matches_against_range_continuum_crosscase(c : &mut Criterion) {
     let flags = 0;
 
     let inputs = [
+        // insert list:
         "",
         " ",
         "a",
@@ -252,6 +258,7 @@ pub fn matches_test_against_pattern_WindowsPath(c : &mut Criterion) {
     let flags = 0;
 
     let inputs = [
+        // insert list:
         "",
         "C:/",
         "C:/dir",

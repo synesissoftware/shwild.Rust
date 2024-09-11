@@ -192,6 +192,7 @@ pub fn matches_against_input_empty(c : &mut Criterion) {
     let flags = 0;
 
     let inputs = [
+        // insert list:
         "",
         "C:/",
         "C:/dir",
@@ -219,6 +220,7 @@ pub fn matches_against_nrange_continuum_simple(c : &mut Criterion) {
     let flags = 0;
 
     let inputs = [
+        // insert list:
         "",
         " ",
         "a",
@@ -231,15 +233,18 @@ pub fn matches_against_nrange_continuum_simple(c : &mut Criterion) {
 
     let matcher = shwild::CompiledMatcher::from_pattern_and_flags(black_box(pattern), black_box(flags)).unwrap();
 
-    c.bench_function("`shwild::CompiledMatcher()` matching - nrange continuum (simple)", |b| {
-        b.iter(|| {
-            for input in &inputs {
-                let r = black_box(&matcher).matches(input);
+    c.bench_function(
+        "`shwild::CompiledMatcher()` matching - nrange continuum (simple)",
+        |b| {
+            b.iter(|| {
+                for input in &inputs {
+                    let r = black_box(&matcher).matches(input);
 
-                let _ = black_box(r);
-            }
-        })
-    });
+                    let _ = black_box(r);
+                }
+            })
+        },
+    );
 }
 
 pub fn matches_against_nrange_continuum_reverse(c : &mut Criterion) {
@@ -247,6 +252,7 @@ pub fn matches_against_nrange_continuum_reverse(c : &mut Criterion) {
     let flags = 0;
 
     let inputs = [
+        // insert list:
         "",
         " ",
         "a",
@@ -259,15 +265,18 @@ pub fn matches_against_nrange_continuum_reverse(c : &mut Criterion) {
 
     let matcher = shwild::CompiledMatcher::from_pattern_and_flags(black_box(pattern), black_box(flags)).unwrap();
 
-    c.bench_function("`shwild::CompiledMatcher()` matching - range continuum (reverse)", |b| {
-        b.iter(|| {
-            for input in &inputs {
-                let r = black_box(&matcher).matches(input);
+    c.bench_function(
+        "`shwild::CompiledMatcher()` matching - range continuum (reverse)",
+        |b| {
+            b.iter(|| {
+                for input in &inputs {
+                    let r = black_box(&matcher).matches(input);
 
-                let _ = black_box(r);
-            }
-        })
-    });
+                    let _ = black_box(r);
+                }
+            })
+        },
+    );
 }
 
 pub fn matches_against_nrange_continuum_crosscase(c : &mut Criterion) {
@@ -275,6 +284,7 @@ pub fn matches_against_nrange_continuum_crosscase(c : &mut Criterion) {
     let flags = 0;
 
     let inputs = [
+        // insert list:
         "",
         " ",
         "a",
@@ -287,15 +297,18 @@ pub fn matches_against_nrange_continuum_crosscase(c : &mut Criterion) {
 
     let matcher = shwild::CompiledMatcher::from_pattern_and_flags(black_box(pattern), black_box(flags)).unwrap();
 
-    c.bench_function("`shwild::CompiledMatcher()` matching - nrange continuum (crosscase)", |b| {
-        b.iter(|| {
-            for input in &inputs {
-                let r = black_box(&matcher).matches(input);
+    c.bench_function(
+        "`shwild::CompiledMatcher()` matching - nrange continuum (crosscase)",
+        |b| {
+            b.iter(|| {
+                for input in &inputs {
+                    let r = black_box(&matcher).matches(input);
 
-                let _ = black_box(r);
-            }
-        })
-    });
+                    let _ = black_box(r);
+                }
+            })
+        },
+    );
 }
 
 pub fn matches_against_range_continuum_simple(c : &mut Criterion) {
@@ -303,6 +316,7 @@ pub fn matches_against_range_continuum_simple(c : &mut Criterion) {
     let flags = 0;
 
     let inputs = [
+        // insert list:
         "",
         " ",
         "a",
@@ -331,6 +345,7 @@ pub fn matches_against_range_continuum_reverse(c : &mut Criterion) {
     let flags = 0;
 
     let inputs = [
+        // insert list:
         "",
         " ",
         "a",
@@ -343,15 +358,18 @@ pub fn matches_against_range_continuum_reverse(c : &mut Criterion) {
 
     let matcher = shwild::CompiledMatcher::from_pattern_and_flags(black_box(pattern), black_box(flags)).unwrap();
 
-    c.bench_function("`shwild::CompiledMatcher()` matching - range continuum (reverse)", |b| {
-        b.iter(|| {
-            for input in &inputs {
-                let r = black_box(&matcher).matches(input);
+    c.bench_function(
+        "`shwild::CompiledMatcher()` matching - range continuum (reverse)",
+        |b| {
+            b.iter(|| {
+                for input in &inputs {
+                    let r = black_box(&matcher).matches(input);
 
-                let _ = black_box(r);
-            }
-        })
-    });
+                    let _ = black_box(r);
+                }
+            })
+        },
+    );
 }
 
 pub fn matches_against_range_continuum_crosscase(c : &mut Criterion) {
@@ -359,6 +377,7 @@ pub fn matches_against_range_continuum_crosscase(c : &mut Criterion) {
     let flags = 0;
 
     let inputs = [
+        // insert list:
         "",
         " ",
         "a",
@@ -371,15 +390,18 @@ pub fn matches_against_range_continuum_crosscase(c : &mut Criterion) {
 
     let matcher = shwild::CompiledMatcher::from_pattern_and_flags(black_box(pattern), black_box(flags)).unwrap();
 
-    c.bench_function("`shwild::CompiledMatcher()` matching - range continuum (crosscase)", |b| {
-        b.iter(|| {
-            for input in &inputs {
-                let r = black_box(&matcher).matches(input);
+    c.bench_function(
+        "`shwild::CompiledMatcher()` matching - range continuum (crosscase)",
+        |b| {
+            b.iter(|| {
+                for input in &inputs {
+                    let r = black_box(&matcher).matches(input);
 
-                let _ = black_box(r);
-            }
-        })
-    });
+                    let _ = black_box(r);
+                }
+            })
+        },
+    );
 }
 
 pub fn matches_against_WindowsPath(c : &mut Criterion) {
@@ -387,6 +409,7 @@ pub fn matches_against_WindowsPath(c : &mut Criterion) {
     let flags = 0;
 
     let inputs = [
+        // insert list:
         "",
         "C:/",
         "C:/dir",
