@@ -1379,6 +1379,8 @@ impl CompiledMatcher {
                                 state = ParseState::InRange;
                             },
                             ParseState::InLiteral => {
+                                let literal = String::from_iter(s.iter());
+
                                 match Self::parse_(matchers, &pattern[num_bytes..], flags, line, column) {
                                     Ok((following_mr, following_nm)) => {
                                         minimum_required = following_mr;
@@ -1389,14 +1391,13 @@ impl CompiledMatcher {
                                     },
                                 };
 
-                                debug_assert!(!s.is_empty());
+                                debug_assert!(!s.is_empty(), "`s` expected to be not empty, but is found to be so");
 
                                 minimum_required =
-                                    matchers.prepend_Literal(String::from_iter(s.iter()), flags, minimum_required);
+                                    matchers.prepend_Literal(literal, flags, minimum_required);
 
                                 num_matchers += 1;
 
-                                s.clear();
 
                                 return Ok((minimum_required, num_matchers));
                             },
@@ -1418,6 +1419,14 @@ impl CompiledMatcher {
                     ']' => {
                         match state {
                             ParseState::InNotRange | ParseState::InRange => {
+                                if let Some(_c) = continuum_prior {
+                                    // don't care about `_c` because that will already be pushed into `s`
+
+                                    s.push('-');
+                                }
+
+                                let characters = crate::utils::prepare_range_string(&String::from_iter(s.iter()), flags);
+
                                 num_bytes += 1;
                                 match Self::parse_(matchers, &pattern[num_bytes..], flags, line, column) {
                                     Ok((following_mr, following_nm)) => {
@@ -1429,15 +1438,6 @@ impl CompiledMatcher {
                                     },
                                 };
 
-                                if let Some(_c) = continuum_prior {
-                                    // don't care about `_c` because that will already be pushed into `s`
-
-                                    s.push('-');
-                                }
-
-                                let characters =
-                                    crate::utils::prepare_range_string(&String::from_iter(s.iter()), flags);
-
                                 minimum_required = if matches!(state, ParseState::InRange) {
                                     matchers.prepend_Range(characters, flags, minimum_required)
                                 } else {
@@ -1446,7 +1446,6 @@ impl CompiledMatcher {
 
                                 num_matchers += 1;
 
-                                s.clear();
 
                                 return Ok((minimum_required, num_matchers));
                             },
@@ -1489,6 +1488,8 @@ impl CompiledMatcher {
                                 return Ok((minimum_required, num_matchers));
                             },
                             ParseState::InLiteral => {
+                                let literal = String::from_iter(s.iter());
+
                                 match Self::parse_(matchers, &pattern[num_bytes..], flags, line, column) {
                                     Ok((following_mr, following_nm)) => {
                                         minimum_required = following_mr;
@@ -1499,14 +1500,13 @@ impl CompiledMatcher {
                                     },
                                 };
 
-                                debug_assert!(!s.is_empty());
+                                debug_assert!(!s.is_empty(), "`s` expected to be not empty, but is found to be so");
 
                                 minimum_required =
-                                    matchers.prepend_Literal(String::from_iter(s.iter()), flags, minimum_required);
+                                    matchers.prepend_Literal(literal, flags, minimum_required);
 
                                 num_matchers += 1;
 
-                                s.clear();
 
                                 return Ok((minimum_required, num_matchers));
                             },
@@ -1536,6 +1536,8 @@ impl CompiledMatcher {
                                 return Ok((minimum_required, num_matchers));
                             },
                             ParseState::InLiteral => {
+                                let literal = String::from_iter(s.iter());
+
                                 match Self::parse_(matchers, &pattern[num_bytes..], flags, line, column) {
                                     Ok((following_mr, following_nm)) => {
                                         minimum_required = following_mr;
@@ -1546,14 +1548,13 @@ impl CompiledMatcher {
                                     },
                                 };
 
-                                debug_assert!(!s.is_empty());
+                                debug_assert!(!s.is_empty(), "`s` expected to be not empty, but is found to be so");
 
                                 minimum_required =
-                                    matchers.prepend_Literal(String::from_iter(s.iter()), flags, minimum_required);
+                                    matchers.prepend_Literal(literal, flags, minimum_required);
 
                                 num_matchers += 1;
 
-                                s.clear();
 
                                 return Ok((minimum_required, num_matchers));
                             },
@@ -2587,6 +2588,7 @@ mod tests {
 
                     assert!(matcher.matches("abcd"));
                     assert!(matcher.matches("aacd"));
+                    assert!(matcher.matches("a-cd"));
                     assert!(matcher.matches("acc-"));
                     assert!(matcher.matches("a-c-"));
                     assert!(!matcher.matches("abce"));
