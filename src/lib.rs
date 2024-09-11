@@ -1379,6 +1379,8 @@ impl CompiledMatcher {
                                 state = ParseState::InRange;
                             },
                             ParseState::InLiteral => {
+                                debug_assert!(!s.is_empty(), "`s` expected to be not empty, but is found to be so");
+
                                 let literal = String::from_iter(s.iter());
 
                                 match Self::parse_(matchers, &pattern[num_bytes..], flags, line, column) {
@@ -1390,8 +1392,6 @@ impl CompiledMatcher {
                                         return Err(e);
                                     },
                                 };
-
-                                debug_assert!(!s.is_empty(), "`s` expected to be not empty, but is found to be so");
 
                                 minimum_required = matchers.prepend_Literal(literal, flags, minimum_required);
 
@@ -1417,6 +1417,8 @@ impl CompiledMatcher {
                     ']' => {
                         match state {
                             ParseState::InNotRange | ParseState::InRange => {
+                                debug_assert!(!s.is_empty(), "`s` expected to be not empty, but is found to be so");
+
                                 if let Some(_c) = continuum_prior {
                                     // don't care about `_c` because that will already be pushed into `s`
 
@@ -1486,6 +1488,8 @@ impl CompiledMatcher {
                                 return Ok((minimum_required, num_matchers));
                             },
                             ParseState::InLiteral => {
+                                debug_assert!(!s.is_empty(), "`s` expected to be not empty, but is found to be so");
+
                                 let literal = String::from_iter(s.iter());
 
                                 match Self::parse_(matchers, &pattern[num_bytes..], flags, line, column) {
@@ -1497,8 +1501,6 @@ impl CompiledMatcher {
                                         return Err(e);
                                     },
                                 };
-
-                                debug_assert!(!s.is_empty(), "`s` expected to be not empty, but is found to be so");
 
                                 minimum_required = matchers.prepend_Literal(literal, flags, minimum_required);
 
@@ -1533,6 +1535,8 @@ impl CompiledMatcher {
                                 return Ok((minimum_required, num_matchers));
                             },
                             ParseState::InLiteral => {
+                                debug_assert!(!s.is_empty(), "`s` expected to be not empty, but is found to be so");
+
                                 let literal = String::from_iter(s.iter());
 
                                 match Self::parse_(matchers, &pattern[num_bytes..], flags, line, column) {
@@ -1544,8 +1548,6 @@ impl CompiledMatcher {
                                         return Err(e);
                                     },
                                 };
-
-                                debug_assert!(!s.is_empty(), "`s` expected to be not empty, but is found to be so");
 
                                 minimum_required = matchers.prepend_Literal(literal, flags, minimum_required);
 
