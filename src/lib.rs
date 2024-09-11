@@ -1588,7 +1588,7 @@ impl CompiledMatcher {
                             },
                         };
                     },
-                }
+                };
             };
 
             if c == '\n' {
