@@ -677,7 +677,7 @@ mod utils {
         s : &str,
         flags : i64,
     ) -> String {
-        let mut chars : Vec<char> = if 0 != (super::constants::IGNORE_CASE & flags) {
+        let mut chars = if 0 != (super::constants::IGNORE_CASE & flags) {
             // Two ways to do this:
             //
             // 1. If we only care about ASCII, just double letter chars; or
