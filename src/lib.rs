@@ -711,6 +711,30 @@ mod utils {
         chars.into_iter().collect()
     }
 
+    pub(crate) fn prepare_range_string_from_slice(
+        chars : &[char],
+        flags : i64,
+    ) -> String {
+        let mut chars = if 0 != (super::constants::IGNORE_CASE & flags) {
+            let mut ci_chars = Vec::with_capacity(chars.len() * 2);
+
+            for c in chars {
+                ci_chars.push(c.to_ascii_lowercase());
+                ci_chars.push(c.to_ascii_uppercase());
+            }
+
+            ci_chars
+        } else {
+            chars.to_vec()
+        };
+
+        chars.sort_unstable();
+
+        chars.dedup();
+
+        chars.into_iter().collect()
+    }
+
 
     pub(crate) struct MatcherSequence {
         /// The head of the chain.
@@ -1431,7 +1455,7 @@ impl CompiledMatcher {
                                 }
 
                                 let characters =
-                                    crate::utils::prepare_range_string(&String::from_iter(s.iter()), flags);
+                                    crate::utils::prepare_range_string_from_slice(s.as_slice(), flags);
 
                                 num_bytes += 1;
                                 match Self::parse_(matchers, &pattern[num_bytes..], flags, line, column) {
