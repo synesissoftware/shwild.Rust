@@ -1981,6 +1981,7 @@ mod tests {
                 assert!(!matcher.matches("ab"));
                 assert!(!matcher.matches("abc"));
                 assert!(matcher.matches(r"ab\d"));
+                assert!(!matcher.matches(r"a🐻\d"));
                 assert!(!matcher.matches("AB-D"));
                 assert!(!matcher.matches("ab-de"));
             }
@@ -1998,8 +1999,55 @@ mod tests {
                 assert!(!matcher.matches("ab"));
                 assert!(!matcher.matches("abc"));
                 assert!(matcher.matches(r"ab\d"));
+                assert!(!matcher.matches(r"a🐻\d"));
                 assert!(matcher.matches(r"AB\D"));
+                assert!(!matcher.matches(r"A🐻\D"));
                 assert!(!matcher.matches(r"ab\de"));
+                assert!(!matcher.matches(r"a🐻\de"));
+            }
+        }
+
+        #[test]
+        fn TEST_CompiledMatcher_parse_LITERAL_5() {
+            let pattern = r"a🐻\\d";
+
+            {
+                let flags = 0;
+
+                let matcher = shwild::CompiledMatcher::from_pattern_and_flags(pattern, flags).unwrap();
+
+
+                assert_eq!(1, matcher.len());
+
+                assert!(!matcher.matches(""));
+                assert!(!matcher.matches(" "));
+                assert!(!matcher.matches("a"));
+                assert!(!matcher.matches("ab"));
+                assert!(!matcher.matches("abc"));
+                assert!(!matcher.matches(r"ab\d"));
+                assert!(matcher.matches(r"a🐻\d"));
+                assert!(!matcher.matches("AB-D"));
+                assert!(!matcher.matches("ab-de"));
+            }
+
+            {
+                let flags = IGNORE_CASE;
+
+                let matcher = shwild::CompiledMatcher::from_pattern_and_flags(pattern, flags).unwrap();
+
+                assert_eq!(1, matcher.len());
+
+                assert!(!matcher.matches(""));
+                assert!(!matcher.matches(" "));
+                assert!(!matcher.matches("a"));
+                assert!(!matcher.matches("ab"));
+                assert!(!matcher.matches("abc"));
+                assert!(!matcher.matches(r"ab\d"));
+                assert!(matcher.matches(r"a🐻\d"));
+                assert!(!matcher.matches(r"AB\D"));
+                assert!(matcher.matches(r"A🐻\D"));
+                assert!(!matcher.matches(r"ab\de"));
+                assert!(!matcher.matches(r"a🐻\de"));
             }
         }
 
@@ -2281,6 +2329,48 @@ mod tests {
         }
 
         #[test]
+        fn TEST_CompiledMatcher_parse_RANGE_THEN_WILD1_2() {
+            let pattern = "[a🐻c]?";
+
+            {
+                let flags = 0;
+
+                let matcher = shwild::CompiledMatcher::from_pattern_and_flags(pattern, flags).unwrap();
+
+                assert_eq!(2, matcher.len());
+
+                assert!(!matcher.matches(""));
+                assert!(!matcher.matches(" "));
+                assert!(!matcher.matches("["));
+                assert!(!matcher.matches("]"));
+                assert!(!matcher.matches("^"));
+                assert!(!matcher.matches("a"));
+                assert!(!matcher.matches("🐻"));
+                assert!(!matcher.matches("c"));
+                assert!(!matcher.matches("d"));
+                assert!(!matcher.matches("e"));
+
+                assert!(matcher.matches("aa"));
+                assert!(matcher.matches("ax"));
+                assert!(matcher.matches("🐻🐻"));
+                assert!(matcher.matches("🐻y"));
+                assert!(matcher.matches("cc"));
+                assert!(matcher.matches("cz"));
+                assert!(!matcher.matches("da"));
+                assert!(!matcher.matches("ee"));
+
+                assert!(!matcher.matches("aa "));
+                assert!(!matcher.matches("ax "));
+                assert!(!matcher.matches("🐻b "));
+                assert!(!matcher.matches("🐻y "));
+                assert!(!matcher.matches("cc "));
+                assert!(!matcher.matches("cz "));
+                assert!(!matcher.matches("da "));
+                assert!(!matcher.matches("ee "));
+            }
+        }
+
+        #[test]
         fn TEST_CompiledMatcher_parse_RANGE_THEN_LITERAL_THEN_WILDN_THEN_RANGE_1() {
             let pattern = "[mb]a*[der]";
 
@@ -2298,11 +2388,13 @@ mod tests {
                 assert!(!matcher.matches("^"));
                 assert!(!matcher.matches("a"));
                 assert!(!matcher.matches("b"));
+                assert!(!matcher.matches("🐻"));
                 assert!(!matcher.matches("c"));
                 assert!(!matcher.matches("d"));
                 assert!(!matcher.matches("e"));
                 assert!(!matcher.matches("A"));
                 assert!(!matcher.matches("B"));
+                assert!(!matcher.matches("🐻"));
                 assert!(!matcher.matches("C"));
                 assert!(!matcher.matches("D"));
                 assert!(!matcher.matches("E"));
@@ -2316,17 +2408,83 @@ mod tests {
 
                 assert!(!matcher.matches("ma"));
                 assert!(matcher.matches("bad"));
+                assert!(!matcher.matches("🐻ad"));
                 assert!(matcher.matches("bar"));
+                assert!(!matcher.matches("🐻ar"));
                 assert!(matcher.matches("bald"));
+                assert!(!matcher.matches("🐻ald"));
                 assert!(matcher.matches("bard"));
+                assert!(!matcher.matches("🐻ard"));
                 assert!(!matcher.matches("cad"));
                 assert!(!matcher.matches("car"));
                 assert!(matcher.matches("mad"));
                 assert!(matcher.matches("mar"));
                 assert!(matcher.matches("bade"));
+                assert!(!matcher.matches("🐻ade"));
                 assert!(!matcher.matches("lade"));
                 assert!(matcher.matches("made"));
                 assert!(matcher.matches("badder"));
+                assert!(!matcher.matches("🐻adder"));
+                assert!(!matcher.matches("ladder"));
+                assert!(matcher.matches("madder"));
+            }
+        }
+
+        #[test]
+        fn TEST_CompiledMatcher_parse_RANGE_THEN_LITERAL_THEN_WILDN_THEN_RANGE_2() {
+            let pattern = "[m🐻]a*[der]";
+
+            {
+                let flags = 0;
+
+                let matcher = shwild::CompiledMatcher::from_pattern_and_flags(pattern, flags).unwrap();
+
+                assert_eq!(4, matcher.len());
+
+                assert!(!matcher.matches(""));
+                assert!(!matcher.matches(" "));
+                assert!(!matcher.matches("["));
+                assert!(!matcher.matches("]"));
+                assert!(!matcher.matches("^"));
+                assert!(!matcher.matches("a"));
+                assert!(!matcher.matches("b"));
+                assert!(!matcher.matches("🐻"));
+                assert!(!matcher.matches("c"));
+                assert!(!matcher.matches("d"));
+                assert!(!matcher.matches("e"));
+                assert!(!matcher.matches("A"));
+                assert!(!matcher.matches("B"));
+                assert!(!matcher.matches("🐻"));
+                assert!(!matcher.matches("C"));
+                assert!(!matcher.matches("D"));
+                assert!(!matcher.matches("E"));
+                assert!(!matcher.matches("ab"));
+                assert!(!matcher.matches("ae"));
+                assert!(!matcher.matches("abc"));
+                assert!(!matcher.matches("abcd"));
+                assert!(!matcher.matches("ABCD"));
+                assert!(!matcher.matches("abcde"));
+
+
+                assert!(!matcher.matches("ma"));
+                assert!(!matcher.matches("bad"));
+                assert!(matcher.matches("🐻ad"));
+                assert!(!matcher.matches("bar"));
+                assert!(matcher.matches("🐻ar"));
+                assert!(!matcher.matches("bald"));
+                assert!(matcher.matches("🐻ald"));
+                assert!(!matcher.matches("bard"));
+                assert!(matcher.matches("🐻ard"));
+                assert!(!matcher.matches("cad"));
+                assert!(!matcher.matches("car"));
+                assert!(matcher.matches("mad"));
+                assert!(matcher.matches("mar"));
+                assert!(!matcher.matches("bade"));
+                assert!(matcher.matches("🐻ade"));
+                assert!(!matcher.matches("lade"));
+                assert!(matcher.matches("made"));
+                assert!(!matcher.matches("badder"));
+                assert!(matcher.matches("🐻adder"));
                 assert!(!matcher.matches("ladder"));
                 assert!(matcher.matches("madder"));
             }
@@ -2381,6 +2539,65 @@ mod tests {
                 assert!(!matcher.matches("badder"));
                 assert!(!matcher.matches("ladder"));
                 assert!(!matcher.matches("madder"));
+            }
+        }
+
+        #[test]
+        fn TEST_CompiledMatcher_parse_RANGE_THEN_LITERAL_THEN_WILD1_THEN_RANGE_2() {
+            let pattern = "[mb]a?[x👀🛑👁]";
+
+            {
+                let flags = 0;
+
+                let matcher = shwild::CompiledMatcher::from_pattern_and_flags(pattern, flags).unwrap();
+
+
+                assert_eq!(4, matcher.len());
+
+                assert!(!matcher.matches(""));
+                assert!(!matcher.matches(" "));
+                assert!(!matcher.matches("["));
+                assert!(!matcher.matches("]"));
+                assert!(!matcher.matches("^"));
+                assert!(!matcher.matches("a"));
+                assert!(!matcher.matches("b"));
+                assert!(!matcher.matches("c"));
+                assert!(!matcher.matches("👁"));
+                assert!(!matcher.matches("e"));
+                assert!(!matcher.matches("A"));
+                assert!(!matcher.matches("B"));
+                assert!(!matcher.matches("C"));
+                assert!(!matcher.matches("D"));
+                assert!(!matcher.matches("E"));
+                assert!(!matcher.matches("ab"));
+                assert!(!matcher.matches("ae"));
+                assert!(!matcher.matches("abc"));
+                assert!(!matcher.matches("abc👁"));
+                assert!(!matcher.matches("ABC👁"));
+                assert!(!matcher.matches("abc👁🛑"));
+
+                assert!(matcher.matches("ba x"));
+                assert!(matcher.matches("ba 👀"));
+                assert!(matcher.matches("ba 🛑"));
+                assert!(matcher.matches("ba👁x"));
+                assert!(matcher.matches("ba 👁"));
+                assert!(matcher.matches("ba 🛑"));
+
+                assert!(!matcher.matches("ma"));
+                assert!(!matcher.matches("bad"));
+                assert!(!matcher.matches("ba👀"));
+                assert!(matcher.matches("bal👀"));
+                assert!(matcher.matches("bar👁"));
+                assert!(!matcher.matches("ca👁"));
+                assert!(!matcher.matches("ca👀"));
+                assert!(!matcher.matches("ma👁"));
+                assert!(!matcher.matches("ma👀"));
+                assert!(matcher.matches("ba👁🛑"));
+                assert!(!matcher.matches("lad🛑"));
+                assert!(matcher.matches("ma👁🛑"));
+                assert!(!matcher.matches("bad👁🛑r"));
+                assert!(!matcher.matches("lad👁🛑r"));
+                assert!(!matcher.matches("mad👁🛑r"));
             }
         }
 
