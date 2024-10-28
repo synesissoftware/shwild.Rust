@@ -1,3 +1,5 @@
+// benches/shwild-matches.rs : evaluates performance of `matches`
+
 #![allow(non_snake_case)]
 
 use shwild;

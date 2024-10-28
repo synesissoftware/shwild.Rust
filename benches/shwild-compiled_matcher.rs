@@ -1,3 +1,5 @@
+// benches/shwild-compiled_matcher.rs : evaluates performance of `CompiledMatcher`
+
 #![allow(non_snake_case)]
 
 use shwild;

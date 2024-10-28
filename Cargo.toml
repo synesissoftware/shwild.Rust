@@ -9,7 +9,7 @@ authors = [
 ]
 description = "shwild (for Rust)"
 edition = "2021"
-homepage = "https://github.com/synesissoftware/shwild.Rust"
+repository = "https://github.com/synesissoftware/shwild.Rust"
 license = "BSD-3-Clause"
 name = "shwild"
 readme = "README.md"
@@ -67,6 +67,8 @@ null-feature = []
 [dev-dependencies]
 
 criterion = "*"
+test_help-rs = { version = "0.1" }
+
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
