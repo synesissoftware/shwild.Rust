@@ -24,6 +24,10 @@ name = "shwild"
 path = "src/lib.rs"
 
 [[bench]]
+name = "range_string-creation_functions"
+harness = false
+
+[[bench]]
 name = "shwild-compiled_matcher"
 harness = false
 
