@@ -1,4 +1,4 @@
-// Definition of the shwild Rust package
+// src/lib.rs : Definition of the shwild Rust package
 
 // ///////////////////////////////////////////////
 // crate-level feature definitions
@@ -111,14 +111,18 @@ mod traits {
     }
 }
 
+
 mod match_structures {
 
     use super::traits::Match;
 
 
+    /// Marks the end of the string, and the root of the reverse match
+    /// chain
     #[derive(Debug)]
     pub(crate) struct MatchEnd {}
 
+    /// Matches a literal, which is a non-empty, variable-length string.
     #[derive(Debug)]
     pub(crate) struct MatchLiteral {
         /// The next matcher.
@@ -131,6 +135,8 @@ mod match_structures {
         minimum_required :  usize,
     }
 
+    /// Matches a not-range, e.g. `"[^abcd]"` will match any single
+    /// character except `'a'`, `'b'`, `'c'`, `'d'`.
     #[derive(Debug)]
     pub(crate) struct MatchNotRange {
         /// The next matcher.
@@ -142,6 +148,8 @@ mod match_structures {
         minimum_required : usize,
     }
 
+    /// Matches a range, e.g. `"[abcd]"` will match any of the characters
+    /// `'a'`, `'b'`, `'c'`, `'d'`.
     #[derive(Debug)]
     pub(crate) struct MatchRange {
         /// The next matcher.
@@ -153,6 +161,7 @@ mod match_structures {
         minimum_required : usize,
     }
 
+    /// `?` matches any single character.
     #[derive(Debug)]
     pub(crate) struct MatchWild1 {
         /// The next matcher.
@@ -162,6 +171,7 @@ mod match_structures {
         minimum_required : usize,
     }
 
+    /// `*` matches any number (0 or more) of characters.
     #[derive(Debug)]
     pub(crate) struct MatchWildN {
         /// The next matcher.
@@ -170,7 +180,6 @@ mod match_structures {
         #[cfg_attr(debug_assertions, allow(unused))]
         minimum_required : usize,
     }
-
 
     // API functions
 
@@ -660,6 +669,7 @@ mod match_structures {
     }
 }
 
+
 mod utils {
 
     use super::{
@@ -673,6 +683,8 @@ mod utils {
     };
 
 
+    // #TODO: remove this once in beta
+    #[allow(dead_code)]
     pub(crate) fn prepare_range_string(
         s : &str,
         flags : i64,
@@ -1342,6 +1354,7 @@ impl CompiledMatcher {
         self.matchers.matches(input)
     }
 }
+
 
 #[derive(Debug)]
 enum ParseState {
@@ -2934,3 +2947,7 @@ mod tests {
         }
     }
 }
+
+
+/* ///////////////////////////// end of file //////////////////////////// */
+
