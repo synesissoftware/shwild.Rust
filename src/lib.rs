@@ -2912,7 +2912,10 @@ mod tests {
 
             assert_eq!(Ok(true), shwild::matches(pattern, r"C:\directory\file.exe", 0));
             assert_eq!(Ok(true), shwild::matches(pattern, r"X:\dir\filestem.exe", 0));
+            assert_eq!(Ok(false), shwild::matches(pattern, r"X:\filestem.exe", 0));
+            assert_eq!(Ok(false), shwild::matches(pattern, r"_:\dir\filestem.exe", 0));
             assert_eq!(Ok(true), shwild::matches(pattern, r"D:\dir\sub-dir\filestem.exe", 0));
+            assert_eq!(Ok(false), shwild::matches(pattern, r"D:\dir\sub-dir\filestem.bat", 0));
         }
 
         #[test]

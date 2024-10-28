@@ -32,7 +32,7 @@ mod constants {
         pub(crate) const RANGE_CONTINUUM_REVERSE : &str = r"[z-a]";
         pub(crate) const RANGE_CONTINUUM_CROSSCASE : &str = r"[a-Z]";
 
-        pub(crate) const WINDOWS_PATH : &str = r"[A-Z]\?*\?*.[ce][ox][em]";
+        pub(crate) const WINDOWS_PATH : &str = r"[A-Z]:\\?*\\?*.[ce][ox][em]";
     }
 }
 
