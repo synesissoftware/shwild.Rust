@@ -35,6 +35,10 @@ harness = false
 name = "shwild-matches"
 harness = false
 
+[[bin]]
+name = "character-play"
+path = "test/scratch/character-play/main.rs"
+
 [[example]]
 name = "list-matching-files"
 path = "examples/list-matching-files/main.rs"
@@ -66,6 +70,8 @@ null-feature = []
 # Dependencies
 
 [dependencies]
+
+regex = "*"
 
 
 [dev-dependencies]
