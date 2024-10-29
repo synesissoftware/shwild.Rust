@@ -129,10 +129,10 @@ The `shwild::CompiledMatcher` structure is the data structure that is used to pa
 
 	assert!(!matcher.matches(""));
 	assert!(!matcher.matches("Where are the bears?"));
-	assert_eq!(true, matcher.matches("Where are the 🐻s?"));
-	assert_eq!(true, matcher.matches("Where are the 🐼s?"));
-	assert_eq!(true, matcher.matches("Where are their 🐻s?"));
-	assert_eq!(true, matcher.matches("Where are the big brown 🐻s?"));
+	assert!( matcher.matches("Where are the 🐻s?"));
+	assert!( matcher.matches("Where are the 🐼s?"));
+	assert!( matcher.matches("Where are their 🐻s?"));
+	assert!( matcher.matches("Where are the big brown 🐻s?"));
 	assert!(!matcher.matches("Where are the teddy-🐻s?"));
 ```
 
