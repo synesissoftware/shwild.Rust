@@ -83,6 +83,7 @@ impl std_error::Error for Error {
 
 mod constants {
 
+    /// Causes matching to ignore case.
     pub const IGNORE_CASE : i64 = 0x0200;
 }
 
@@ -2999,6 +3000,26 @@ mod tests {
                 },
             };
         }
+
+        #[test]
+        fn TEST_matches_WILDN_BEAR_WILD1_1() {
+            let pattern = r"Where are the* [🐼🐻]s\?";
+
+            {
+                let flags = 0;
+                let matcher = shwild::CompiledMatcher::from_pattern_and_flags(pattern, flags).unwrap();
+
+                assert_eq!(5, matcher.len());
+
+                assert!(!matcher.matches(""));
+                assert!(!matcher.matches("Where are the bears?"));
+                assert_eq!(true, matcher.matches("Where are the 🐻s?"));
+                assert_eq!(true, matcher.matches("Where are the 🐼s?"));
+                assert_eq!(true, matcher.matches("Where are their 🐻s?"));
+                assert_eq!(true, matcher.matches("Where are the big brown 🐻s?"));
+                assert!(!matcher.matches("Where are the teddy-🐻s?"));
+            }
+        }
     }
 
 
@@ -3150,17 +3171,47 @@ mod tests {
 
         #[test]
         fn TEST_matches_WILDN_BEAR_WILD1_1() {
-            let pattern = r"*🐻?";
+            {
+                let pattern = r"*🐻?";
 
-            assert_eq!(Ok(false), shwild::matches(pattern, "", 0));
-            assert_eq!(Ok(false), shwild::matches(pattern, "🐻", 0));
-            assert_eq!(Ok(false), shwild::matches(pattern, "bears", 0));
-            assert_eq!(Ok(true), shwild::matches(pattern, "🐻s", 0));
-            assert_eq!(Ok(false), shwild::matches(pattern, "🐼s", 0));
-            assert_eq!(Ok(true), shwild::matches(pattern, "teddy-🐻s", 0));
-            assert_eq!(Ok(false), shwild::matches(pattern, "teddy-🐼s", 0));
-            assert_eq!(Ok(false), shwild::matches(pattern, "teddy-🐻", 0));
-            assert_eq!(Ok(false), shwild::matches(pattern, "teddy-🐼", 0));
+                assert_eq!(Ok(false), shwild::matches(pattern, "", 0));
+                assert_eq!(Ok(false), shwild::matches(pattern, "🐻", 0));
+                assert_eq!(Ok(false), shwild::matches(pattern, "bears", 0));
+                assert_eq!(Ok(true), shwild::matches(pattern, "🐻s", 0));
+                assert_eq!(Ok(false), shwild::matches(pattern, "🐼s", 0));
+                assert_eq!(Ok(true), shwild::matches(pattern, "teddy-🐻s", 0));
+                assert_eq!(Ok(false), shwild::matches(pattern, "teddy-🐼s", 0));
+                assert_eq!(Ok(false), shwild::matches(pattern, "teddy-🐻", 0));
+                assert_eq!(Ok(false), shwild::matches(pattern, "teddy-🐼", 0));
+            }
+
+            {
+                let pattern = r"*🐻[!?]";
+
+                assert_eq!(Ok(false), shwild::matches(pattern, "", 0));
+
+                assert_eq!(Ok(false), shwild::matches(pattern, "🐻", 0));
+                assert_eq!(Ok(false), shwild::matches(pattern, "bear!", 0));
+                assert_eq!(Ok(true), shwild::matches(pattern, "🐻?", 0));
+                assert_eq!(Ok(false), shwild::matches(pattern, "🐼?", 0));
+
+                assert_eq!(Ok(false), shwild::matches(pattern, "teddy-🐻", 0));
+                assert_eq!(Ok(false), shwild::matches(pattern, "teddy-🐼", 0));
+                assert_eq!(Ok(true), shwild::matches(pattern, "teddy-🐻!", 0));
+                assert_eq!(Ok(false), shwild::matches(pattern, "teddy-🐼!", 0));
+            }
+
+            {
+                let pattern = r"Where are the* [🐼🐻]s\?";
+
+                assert_eq!(Ok(false), shwild_matches!(pattern, ""));
+                assert_eq!(Ok(false), shwild_matches!(pattern, "Where are the bears?"));
+                assert_eq!(Ok(true), shwild_matches!(pattern, "Where are the 🐻s?"));
+                assert_eq!(Ok(true), shwild_matches!(pattern, "Where are the 🐼s?"));
+                assert_eq!(Ok(true), shwild_matches!(pattern, "Where are their 🐻s?"));
+                assert_eq!(Ok(true), shwild_matches!(pattern, "Where are the big brown 🐻s?"));
+                assert_eq!(Ok(false), shwild_matches!(pattern, "Where are the teddy-🐻s?"));
+            }
         }
     }
 }
