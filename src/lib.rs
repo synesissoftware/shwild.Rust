@@ -113,9 +113,24 @@ mod traits {
 }
 
 
+mod types {
+
+    #[cfg(feature = "lookup-ranges")]
+    use collect_rs::containers::UnicodePointMap;
+
+    #[cfg(feature = "lookup-ranges")]
+    pub(super) type CharacterRangeType = UnicodePointMap;
+    #[cfg(not(feature = "lookup-ranges"))]
+    pub(super) type CharacterRangeType = String;
+}
+
+
 mod match_structures {
 
-    use super::traits::Match;
+    use super::{
+        traits::Match,
+        types::CharacterRangeType,
+    };
 
 
     /// Marks the end of the string, and the root of the reverse match
@@ -143,7 +158,7 @@ mod match_structures {
         /// The next matcher.
         next :             Box<dyn Match>,
         /// The range characters against which to evaluate.
-        character_range :       String,
+        character_range :  CharacterRangeType,
         /// The minimum_required size of this and all subsequent instances.
         #[cfg_attr(debug_assertions, allow(unused))]
         minimum_required : usize,
@@ -156,7 +171,7 @@ mod match_structures {
         /// The next matcher.
         next :             Box<dyn Match>,
         /// The range characters against which to evaluate.
-        character_range :       String,
+        character_range :  CharacterRangeType,
         /// The minimum_required size of this and all subsequent instances.
         #[cfg_attr(debug_assertions, allow(unused))]
         minimum_required : usize,
@@ -212,7 +227,7 @@ mod match_structures {
     impl MatchNotRange {
         pub(crate) fn new(
             next : Box<dyn Match>,
-            character_range : String,
+            character_range : CharacterRangeType,
             _flags : i64,
         ) -> Self {
             // NOTE: this is a not-currently-implemented feature
@@ -230,7 +245,7 @@ mod match_structures {
     impl MatchRange {
         pub(crate) fn new(
             next : Box<dyn Match>,
-            character_range : String,
+            character_range : CharacterRangeType,
             _flags : i64,
         ) -> Self {
             // NOTE: this is a not-currently-implemented feature
@@ -318,6 +333,11 @@ mod match_structures {
 
             let c0 = slice.chars().next().unwrap();
 
+            #[cfg(feature = "lookup-ranges")]
+            if self.character_range.contains_key(&c0) {
+                return false;
+            }
+            #[cfg(not(feature = "lookup-ranges"))]
             if self.character_range.contains(c0) {
                 return false;
             }
@@ -339,6 +359,11 @@ mod match_structures {
 
             let c0 = slice.chars().next().unwrap();
 
+            #[cfg(feature = "lookup-ranges")]
+            if !self.character_range.contains_key(&c0) {
+                return false;
+            }
+            #[cfg(not(feature = "lookup-ranges"))]
             if !self.character_range.contains(c0) {
                 return false;
             }
@@ -398,6 +423,8 @@ mod match_structures {
     mod tests {
         #![allow(non_snake_case)]
 
+        #[cfg(feature = "lookup-ranges")]
+        use super::super::utils::prepare_range_upm_from_slice;
         use super::{
             super::{
                 traits::Match,
@@ -410,6 +437,9 @@ mod match_structures {
             MatchWild1,
             MatchWildN,
         };
+
+        #[cfg(feature = "lookup-ranges")]
+        use collect_rs::containers::UnicodePointMap;
 
 
         mod TESTING_MatchEnd {
@@ -478,9 +508,12 @@ mod match_structures {
 
             #[test]
             fn TEST_Range_1() {
-                let character_range = "0123456789";
+                let characters = "0123456789";
                 let flags = 0;
-                let character_range = prepare_range_string(character_range, flags);
+                #[cfg(feature = "lookup-ranges")]
+                let character_range = prepare_range_upm_from_slice(&characters.chars().collect::<Vec<char>>(), flags);
+                #[cfg(not(feature = "lookup-ranges"))]
+                let character_range = prepare_range_string(characters, flags);
 
                 let me : Box<dyn Match> = Box::new(MatchEnd {});
                 let mr : Box<dyn Match> = Box::new(MatchRange::new(me, character_range, 0));
@@ -513,9 +546,12 @@ mod match_structures {
 
             #[test]
             fn TEST_NotRange_1() {
-                let character_range = "0123456789";
+                let characters = "0123456789";
                 let flags = 0;
-                let character_range = prepare_range_string(character_range, flags);
+                #[cfg(feature = "lookup-ranges")]
+                let character_range = prepare_range_upm_from_slice(&characters.chars().collect::<Vec<char>>(), flags);
+                #[cfg(not(feature = "lookup-ranges"))]
+                let character_range = prepare_range_string(characters, flags);
 
                 let me : Box<dyn Match> = Box::new(MatchEnd {});
                 let mn : Box<dyn Match> = Box::new(MatchNotRange::new(me, character_range, 0));
@@ -676,7 +712,11 @@ mod utils {
     use super::{
         match_structures::*,
         traits::Match,
+        types::CharacterRangeType,
     };
+
+    #[cfg(feature = "lookup-ranges")]
+    use collect_rs::containers::UnicodePointMap;
 
     use std::{
         fmt as std_fmt,
@@ -724,6 +764,7 @@ mod utils {
         chars.into_iter().collect()
     }
 
+    #[cfg(not(feature = "lookup-ranges"))]
     pub(crate) fn prepare_range_string_from_slice(
         chars : &[char],
         flags : i64,
@@ -746,6 +787,30 @@ mod utils {
         chars.dedup();
 
         chars.into_iter().collect()
+    }
+    #[cfg(feature = "lookup-ranges")]
+    pub(crate) fn prepare_range_upm_from_slice(
+        chars : &[char],
+        flags : i64,
+    ) -> UnicodePointMap {
+        let mut upm = UnicodePointMap::new('\u{100}');
+
+        if 0 == (super::constants::IGNORE_CASE & flags) {
+            for c in chars {
+                upm.push(*c);
+            }
+        } else {
+            for c in chars {
+                if c.is_ascii_alphabetic() {
+                    upm.push(c.to_ascii_lowercase());
+                    upm.push(c.to_ascii_uppercase());
+                } else {
+                    upm.push(*c);
+                }
+            }
+        }
+
+        upm
     }
 
 
@@ -811,7 +876,7 @@ mod utils {
         #[must_use]
         pub(crate) fn prepend_NotRange(
             &mut self,
-            character_range : String,
+            character_range : CharacterRangeType,
             flags : i64,
             following_minimum_required : usize,
         ) -> usize {
@@ -838,7 +903,7 @@ mod utils {
         #[must_use]
         pub(crate) fn prepend_Range(
             &mut self,
-            character_range : String,
+            character_range : CharacterRangeType,
             flags : i64,
             following_minimum_required : usize,
         ) -> usize {
@@ -950,12 +1015,13 @@ mod utils {
     mod tests {
         #![allow(non_snake_case)]
 
+        #[cfg(feature = "lookup-ranges")]
+        use super::prepare_range_upm_from_slice;
         use super::{
             super::constants,
             prepare_range_string,
             MatcherSequence,
         };
-
 
         mod TEST_MatcherSequence {
             #![allow(non_snake_case)]
@@ -1000,8 +1066,12 @@ mod utils {
                 let mut minimum_required = 0;
 
                 {
-                    let character_range = r"abcdef";
-                    let character_range = prepare_range_string(character_range, flags);
+                    let characters = r"abcdef";
+                    #[cfg(feature = "lookup-ranges")]
+                    let character_range =
+                        prepare_range_upm_from_slice(&characters.chars().collect::<Vec<char>>(), flags);
+                    #[cfg(not(feature = "lookup-ranges"))]
+                    let character_range = prepare_range_string(characters, flags);
 
                     minimum_required = matchers.prepend_Range(character_range, flags, minimum_required);
                 }
@@ -1035,8 +1105,12 @@ mod utils {
                 let mut minimum_required = 0;
 
                 {
-                    let character_range = r"abcdef";
-                    let character_range = prepare_range_string(character_range, flags);
+                    let characters = r"abcdef";
+                    #[cfg(feature = "lookup-ranges")]
+                    let character_range =
+                        prepare_range_upm_from_slice(&characters.chars().collect::<Vec<char>>(), flags);
+                    #[cfg(not(feature = "lookup-ranges"))]
+                    let character_range = prepare_range_string(characters, flags);
 
                     minimum_required = matchers.prepend_NotRange(character_range, flags, minimum_required);
                 }
@@ -1070,8 +1144,12 @@ mod utils {
                 let mut minimum_required = 0;
 
                 {
-                    let character_range = r"abcdef";
-                    let character_range = prepare_range_string(character_range, flags);
+                    let characters = r"abcdef";
+                    #[cfg(feature = "lookup-ranges")]
+                    let character_range =
+                        prepare_range_upm_from_slice(&characters.chars().collect::<Vec<char>>(), flags);
+                    #[cfg(not(feature = "lookup-ranges"))]
+                    let character_range = prepare_range_string(characters, flags);
 
                     minimum_required = matchers.prepend_Range(character_range, flags, minimum_required);
                 }
@@ -1105,8 +1183,12 @@ mod utils {
                 let mut minimum_required = 0;
 
                 {
-                    let character_range = r"abcdef";
-                    let character_range = prepare_range_string(character_range, flags);
+                    let characters = r"abcdef";
+                    #[cfg(feature = "lookup-ranges")]
+                    let character_range =
+                        prepare_range_upm_from_slice(&characters.chars().collect::<Vec<char>>(), flags);
+                    #[cfg(not(feature = "lookup-ranges"))]
+                    let character_range = prepare_range_string(characters, flags);
 
                     minimum_required = matchers.prepend_NotRange(character_range, flags, minimum_required);
                 }
@@ -1159,6 +1241,10 @@ mod utils {
 
                 {
                     let characters = r"\/";
+                    #[cfg(feature = "lookup-ranges")]
+                    let character_range =
+                        prepare_range_upm_from_slice(&characters.chars().collect::<Vec<char>>(), flags);
+                    #[cfg(not(feature = "lookup-ranges"))]
                     let character_range = prepare_range_string(characters, flags);
 
                     minimum_required = matchers.prepend_Range(character_range, flags, minimum_required);
@@ -1177,6 +1263,10 @@ mod utils {
 
                 {
                     let characters = r"abcdefghijklmnopqrstuvwxyz";
+                    #[cfg(feature = "lookup-ranges")]
+                    let character_range =
+                        prepare_range_upm_from_slice(&characters.chars().collect::<Vec<char>>(), flags);
+                    #[cfg(not(feature = "lookup-ranges"))]
                     let character_range = prepare_range_string(characters, flags);
 
                     minimum_required = matchers.prepend_Range(character_range, flags, minimum_required);
@@ -1411,7 +1501,6 @@ impl CompiledMatcher {
                 escaped = false;
 
                 if matches!(state, ParseState::None) {
-
                     state = ParseState::InLiteral;
                 }
             } else {
@@ -1468,6 +1557,9 @@ impl CompiledMatcher {
                                     s.push('-');
                                 }
 
+                                #[cfg(feature = "lookup-ranges")]
+                                let character_range = crate::utils::prepare_range_upm_from_slice(s.as_slice(), flags);
+                                #[cfg(not(feature = "lookup-ranges"))]
                                 let character_range =
                                     crate::utils::prepare_range_string_from_slice(s.as_slice(), flags);
 
@@ -3218,4 +3310,3 @@ mod tests {
 
 
 /* ///////////////////////////// end of file //////////////////////////// */
-

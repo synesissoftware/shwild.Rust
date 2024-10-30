@@ -61,11 +61,17 @@ null-feature = []
 # Crate-specific features:
 #
 
+lookup-ranges = [
+	"dep:collect-rs"
+]
+
 
 # ##########################################################
 # Dependencies
 
 [dependencies]
+
+collect-rs = { path = "../../collect-rs", optional = true }
 
 
 [dev-dependencies]
