@@ -143,7 +143,7 @@ mod match_structures {
         /// The next matcher.
         next :             Box<dyn Match>,
         /// The range characters against which to evaluate.
-        characters :       String,
+        character_range :       String,
         /// The minimum_required size of this and all subsequent instances.
         #[cfg_attr(debug_assertions, allow(unused))]
         minimum_required : usize,
@@ -156,7 +156,7 @@ mod match_structures {
         /// The next matcher.
         next :             Box<dyn Match>,
         /// The range characters against which to evaluate.
-        characters :       String,
+        character_range :       String,
         /// The minimum_required size of this and all subsequent instances.
         #[cfg_attr(debug_assertions, allow(unused))]
         minimum_required : usize,
@@ -212,7 +212,7 @@ mod match_structures {
     impl MatchNotRange {
         pub(crate) fn new(
             next : Box<dyn Match>,
-            characters : String,
+            character_range : String,
             _flags : i64,
         ) -> Self {
             // NOTE: this is a not-currently-implemented feature
@@ -220,7 +220,7 @@ mod match_structures {
 
             Self {
                 next,
-                characters,
+                character_range,
                 // flags,
                 minimum_required,
             }
@@ -230,7 +230,7 @@ mod match_structures {
     impl MatchRange {
         pub(crate) fn new(
             next : Box<dyn Match>,
-            characters : String,
+            character_range : String,
             _flags : i64,
         ) -> Self {
             // NOTE: this is a not-currently-implemented feature
@@ -238,7 +238,7 @@ mod match_structures {
 
             Self {
                 next,
-                characters,
+                character_range,
                 // flags,
                 minimum_required,
             }
@@ -318,7 +318,7 @@ mod match_structures {
 
             let c0 = slice.chars().next().unwrap();
 
-            if self.characters.contains(c0) {
+            if self.character_range.contains(c0) {
                 return false;
             }
 
@@ -339,7 +339,7 @@ mod match_structures {
 
             let c0 = slice.chars().next().unwrap();
 
-            if !self.characters.contains(c0) {
+            if !self.character_range.contains(c0) {
                 return false;
             }
 
@@ -478,12 +478,12 @@ mod match_structures {
 
             #[test]
             fn TEST_Range_1() {
-                let characters = "0123456789";
+                let character_range = "0123456789";
                 let flags = 0;
-                let characters = prepare_range_string(characters, flags);
+                let character_range = prepare_range_string(character_range, flags);
 
                 let me : Box<dyn Match> = Box::new(MatchEnd {});
-                let mr : Box<dyn Match> = Box::new(MatchRange::new(me, characters, 0));
+                let mr : Box<dyn Match> = Box::new(MatchRange::new(me, character_range, 0));
 
                 let matcher : &dyn Match = &*mr;
 
@@ -513,12 +513,12 @@ mod match_structures {
 
             #[test]
             fn TEST_NotRange_1() {
-                let characters = "0123456789";
+                let character_range = "0123456789";
                 let flags = 0;
-                let characters = prepare_range_string(characters, flags);
+                let character_range = prepare_range_string(character_range, flags);
 
                 let me : Box<dyn Match> = Box::new(MatchEnd {});
-                let mn : Box<dyn Match> = Box::new(MatchNotRange::new(me, characters, 0));
+                let mn : Box<dyn Match> = Box::new(MatchNotRange::new(me, character_range, 0));
 
                 let matcher : &dyn Match = &*mn;
 
@@ -811,7 +811,7 @@ mod utils {
         #[must_use]
         pub(crate) fn prepend_NotRange(
             &mut self,
-            characters : String,
+            character_range : String,
             flags : i64,
             following_minimum_required : usize,
         ) -> usize {
@@ -821,7 +821,7 @@ mod utils {
 
             // NOW: `next` is the head of the list, and `self.matcher0` is `MatchEnd`
 
-            let mut matcher : Box<dyn Match> = Box::new(MatchNotRange::new(next, characters, flags));
+            let mut matcher : Box<dyn Match> = Box::new(MatchNotRange::new(next, character_range, flags));
 
             std_mem::swap(&mut self.matcher0, &mut matcher);
 
@@ -838,7 +838,7 @@ mod utils {
         #[must_use]
         pub(crate) fn prepend_Range(
             &mut self,
-            characters : String,
+            character_range : String,
             flags : i64,
             following_minimum_required : usize,
         ) -> usize {
@@ -848,7 +848,7 @@ mod utils {
 
             // NOW: `next` is the head of the list, and `self.matcher0` is `MatchEnd`
 
-            let mut matcher : Box<dyn Match> = Box::new(MatchRange::new(next, characters, flags));
+            let mut matcher : Box<dyn Match> = Box::new(MatchRange::new(next, character_range, flags));
 
             std_mem::swap(&mut self.matcher0, &mut matcher);
 
@@ -1000,10 +1000,10 @@ mod utils {
                 let mut minimum_required = 0;
 
                 {
-                    let characters = r"abcdef";
-                    let characters = prepare_range_string(characters, flags);
+                    let character_range = r"abcdef";
+                    let character_range = prepare_range_string(character_range, flags);
 
-                    minimum_required = matchers.prepend_Range(characters, flags, minimum_required);
+                    minimum_required = matchers.prepend_Range(character_range, flags, minimum_required);
                 }
 
                 assert_eq!(1, minimum_required);
@@ -1035,10 +1035,10 @@ mod utils {
                 let mut minimum_required = 0;
 
                 {
-                    let characters = r"abcdef";
-                    let characters = prepare_range_string(characters, flags);
+                    let character_range = r"abcdef";
+                    let character_range = prepare_range_string(character_range, flags);
 
-                    minimum_required = matchers.prepend_NotRange(characters, flags, minimum_required);
+                    minimum_required = matchers.prepend_NotRange(character_range, flags, minimum_required);
                 }
 
                 assert_eq!(1, minimum_required);
@@ -1070,10 +1070,10 @@ mod utils {
                 let mut minimum_required = 0;
 
                 {
-                    let characters = r"abcdef";
-                    let characters = prepare_range_string(characters, flags);
+                    let character_range = r"abcdef";
+                    let character_range = prepare_range_string(character_range, flags);
 
-                    minimum_required = matchers.prepend_Range(characters, flags, minimum_required);
+                    minimum_required = matchers.prepend_Range(character_range, flags, minimum_required);
                 }
 
                 assert_eq!(1, minimum_required);
@@ -1105,10 +1105,10 @@ mod utils {
                 let mut minimum_required = 0;
 
                 {
-                    let characters = r"abcdef";
-                    let characters = prepare_range_string(characters, flags);
+                    let character_range = r"abcdef";
+                    let character_range = prepare_range_string(character_range, flags);
 
-                    minimum_required = matchers.prepend_NotRange(characters, flags, minimum_required);
+                    minimum_required = matchers.prepend_NotRange(character_range, flags, minimum_required);
                 }
 
                 assert_eq!(1, minimum_required);
@@ -1159,27 +1159,27 @@ mod utils {
 
                 {
                     let characters = r"\/";
-                    let characters = prepare_range_string(characters, flags);
+                    let character_range = prepare_range_string(characters, flags);
 
-                    minimum_required = matchers.prepend_Range(characters, flags, minimum_required);
+                    minimum_required = matchers.prepend_Range(character_range, flags, minimum_required);
                 }
 
                 assert_eq!(5, minimum_required);
 
                 {
                     let characters = r":";
-                    let characters = prepare_range_string(characters, flags);
+                    let literal = characters.into();
 
-                    minimum_required = matchers.prepend_Literal(characters, flags, minimum_required);
+                    minimum_required = matchers.prepend_Literal(literal, flags, minimum_required);
                 }
 
                 assert_eq!(6, minimum_required);
 
                 {
                     let characters = r"abcdefghijklmnopqrstuvwxyz";
-                    let characters = prepare_range_string(characters, flags);
+                    let character_range = prepare_range_string(characters, flags);
 
-                    minimum_required = matchers.prepend_Range(characters, flags, minimum_required);
+                    minimum_required = matchers.prepend_Range(character_range, flags, minimum_required);
                 }
 
                 assert_eq!(7, minimum_required);
@@ -1468,7 +1468,7 @@ impl CompiledMatcher {
                                     s.push('-');
                                 }
 
-                                let characters =
+                                let character_range =
                                     crate::utils::prepare_range_string_from_slice(s.as_slice(), flags);
 
                                 num_bytes += 1;
@@ -1483,9 +1483,9 @@ impl CompiledMatcher {
                                 };
 
                                 minimum_required = if matches!(state, ParseState::InRange) {
-                                    matchers.prepend_Range(characters, flags, minimum_required)
+                                    matchers.prepend_Range(character_range, flags, minimum_required)
                                 } else {
-                                    matchers.prepend_NotRange(characters, flags, minimum_required)
+                                    matchers.prepend_NotRange(character_range, flags, minimum_required)
                                 };
 
                                 num_matchers += 1;
