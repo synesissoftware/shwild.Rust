@@ -1,7 +1,7 @@
 
 # rustfmt.toml for shwild.Rust
 #
-# configured for cargo-fmt 1.81.0
+# configured for cargo-fmt 1.84.0
 
 # array_width=60 # deprecated
 # attr_fn_like_width=70 # deprecated
