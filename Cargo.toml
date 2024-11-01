@@ -71,7 +71,7 @@ lookup-ranges = [
 
 [dependencies]
 
-collect-rs = { path = "../../collect-rs", optional = true }
+collect-rs = { version = "0.1", optional = true }
 
 
 [dev-dependencies]
