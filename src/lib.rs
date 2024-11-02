@@ -312,11 +312,10 @@ mod match_structures {
             &self,
             slice : &str,
         ) -> bool {
-            if slice.is_empty() {
-                return false;
-            }
-
-            let c0 = slice.chars().next().unwrap();
+            let c0 = match slice.chars().next() {
+                Some(c0) => c0,
+                None => return false,
+            };
 
             if self.characters.contains(c0) {
                 return false;
