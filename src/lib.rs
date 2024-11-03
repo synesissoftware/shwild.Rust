@@ -3310,4 +3310,103 @@ mod tests {
 }
 
 
+#[cfg(all(test, feature = "test-regex"))]
+mod regex_comparision_tests {
+    #![allow(non_snake_case)]
+
+    use super::CompiledMatcher;
+
+    use regex::Regex;
+
+
+    #[test]
+    fn TEST_WITH_Regex_STAR_brown_STAR() {
+        let re = Regex::new("brown").unwrap();
+        let cm = CompiledMatcher::from_pattern_and_flags("*brown*", 0).unwrap();
+
+
+        assert!(!re.is_match(""));
+        assert!(!cm.matches(""));
+
+        assert!(re.is_match("brown"));
+        assert!(cm.matches("brown"));
+
+        assert!(!re.is_match("brawn"));
+        assert!(!cm.matches("brawn"));
+
+        assert!(re.is_match("browner"));
+        assert!(cm.matches("browner"));
+
+        assert!(re.is_match("imbrown"));
+        assert!(cm.matches("imbrown"));
+    }
+
+    #[test]
+    fn TEST_WITH_Regex_STAR_brown() {
+        let re = Regex::new("brown$").unwrap();
+        let cm = CompiledMatcher::from_pattern_and_flags("*brown", 0).unwrap();
+
+
+        assert!(!re.is_match(""));
+        assert!(!cm.matches(""));
+
+        assert!(re.is_match("brown"));
+        assert!(cm.matches("brown"));
+
+        assert!(!re.is_match("brawn"));
+        assert!(!cm.matches("brawn"));
+
+        assert!(!re.is_match("browner"));
+        assert!(!cm.matches("browner"));
+
+        assert!(re.is_match("imbrown"));
+        assert!(cm.matches("imbrown"));
+    }
+
+    #[test]
+    fn TEST_WITH_Regex_brown_STAR() {
+        let re = Regex::new("^brown").unwrap();
+        let cm = CompiledMatcher::from_pattern_and_flags("brown*", 0).unwrap();
+
+
+        assert!(!re.is_match(""));
+        assert!(!cm.matches(""));
+
+        assert!(re.is_match("brown"));
+        assert!(cm.matches("brown"));
+
+        assert!(!re.is_match("brawn"));
+        assert!(!cm.matches("brawn"));
+
+        assert!(re.is_match("browner"));
+        assert!(cm.matches("browner"));
+
+        assert!(!re.is_match("imbrown"));
+        assert!(!cm.matches("imbrown"));
+    }
+
+    #[test]
+    fn TEST_WITH_Regex_Windows_PATH() {
+        let re = Regex::new(r#"^[A-Z]:\\.+\\.+\.(?:com|exe)$"#).unwrap();
+        let cm = CompiledMatcher::from_pattern_and_flags(r"[A-Z]:\\?*\\?*.[ce][ox][em]", 0).unwrap();
+
+
+        assert!(!re.is_match(""));
+        assert!(!cm.matches(""));
+
+        assert!(re.is_match(r"C:\directory\file.exe"));
+        assert!(cm.matches(r"C:\directory\file.exe"));
+
+        assert!(re.is_match(r"X:\dir\filesystem.exe"));
+        assert!(cm.matches(r"X:\dir\filesystem.exe"));
+
+        assert!(!re.is_match(r"X:\filesystem.exe"));
+        assert!(!cm.matches(r"X:\filesystem.exe"));
+
+        assert!(!re.is_match(r"C:\directory\file.bat"));
+        assert!(!cm.matches(r"C:\directory\file.bat"));
+    }
+}
+
+
 /* ///////////////////////////// end of file //////////////////////////// */

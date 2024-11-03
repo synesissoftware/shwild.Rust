@@ -34,6 +34,7 @@
 		"default",
 		"lookup-ranges",
 		"null-feature",
+		"test-regex",
 	],
 	"rust-analyzer.completion.autoimport.enable": false,
 	"rust-analyzer.showUnlinkedFileNotification": false,
