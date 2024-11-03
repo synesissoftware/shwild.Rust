@@ -1,7 +1,6 @@
 // benches/range_string-creation_functions.rs : evaluates performance of different range-string creation-function approaches
 
 #![allow(non_snake_case)]
-
 #![feature(ascii_char)]
 
 use shwild;
@@ -24,7 +23,8 @@ mod constants {
     pub(crate) const RANGE_STRING_ALPHABET : &str = "abcdefghijklmnopqrstuvwxyz";
     pub(crate) const RANGE_STRING_ALPHABET_MIXED_CASE : &str = "abcDefGHijklMNOPqrstUVwXyz";
     pub(crate) const RANGE_STRING_DIGITS : &str = "0123456789";
-    pub(crate) const RANGE_STRING_MIXED_ASCII : &str = "!\"#$%&'()*+,-./3x0123456789:;<=>?4x@ABCDEFGHIJKLMNO5xPQRSTUVWXYZ[\\]^_6x`abcdefghijklmno7xpqrstuvwxyz{|}~";
+    pub(crate) const RANGE_STRING_MIXED_ASCII : &str =
+        "!\"#$%&'()*+,-./3x0123456789:;<=>?4x@ABCDEFGHIJKLMNO5xPQRSTUVWXYZ[\\]^_6x`abcdefghijklmno7xpqrstuvwxyz{|}~";
 }
 
 
@@ -290,10 +290,7 @@ mod utils {
 
             bytes.dedup();
 
-            unsafe {
-
-                String::from_utf8_unchecked(bytes)
-            }
+            unsafe { String::from_utf8_unchecked(bytes) }
         } else {
             let mut bytes : Vec<u8> = Vec::with_capacity(chars.len());
 
@@ -305,10 +302,7 @@ mod utils {
 
             bytes.dedup();
 
-            unsafe {
-
-                String::from_utf8_unchecked(bytes)
-            }
+            unsafe { String::from_utf8_unchecked(bytes) }
         }
     }
 }
@@ -323,26 +317,21 @@ mod implementation {
         input_string : &str,
         flags : i64,
     ) -> BenchmarkId {
-        let parameter =
-        if 0 != (flags & shwild::IGNORE_CASE) {
+        let parameter = if 0 != (flags & shwild::IGNORE_CASE) {
             format!("I:'{input_string}'")
         } else {
             format!("'{input_string}'")
         };
 
-        BenchmarkId::new(
-            format!("`{benchmarked_function_name}()`"),
-            parameter,
-        )
+        BenchmarkId::new(format!("`{benchmarked_function_name}()`"), parameter)
     }
 }
-
 
 
 fn BENCHMARK_range_string_from_slice_X_WITH_(
     c : &mut Criterion,
     input_string : &str,
-    flags: i64,
+    flags : i64,
 ) {
     let input = input_string.chars().collect::<Vec<_>>();
 
@@ -350,7 +339,7 @@ fn BENCHMARK_range_string_from_slice_X_WITH_(
 
     c.bench_with_input(id, &input, |b, input| {
         b.iter(|| {
-            let s = utils::range_string_from_slice_X(input.as_slice(), flags);
+            let s = utils::range_string_from_slice_X(black_box(input.as_slice()), black_box(flags));
 
             let _ = black_box(s);
         })
@@ -360,7 +349,7 @@ fn BENCHMARK_range_string_from_slice_X_WITH_(
 fn BENCHMARK_range_string_from_slice_1_WITH_(
     c : &mut Criterion,
     input_string : &str,
-    flags: i64,
+    flags : i64,
 ) {
     let input = input_string.chars().collect::<Vec<_>>();
 
@@ -368,7 +357,7 @@ fn BENCHMARK_range_string_from_slice_1_WITH_(
 
     c.bench_with_input(id, &input, |b, input| {
         b.iter(|| {
-            let s = utils::range_string_from_slice_1(input.as_slice(), flags);
+            let s = utils::range_string_from_slice_1(black_box(input.as_slice()), black_box(flags));
 
             let _ = black_box(s);
         })
@@ -378,7 +367,7 @@ fn BENCHMARK_range_string_from_slice_1_WITH_(
 fn BENCHMARK_range_string_from_slice_2_WITH_(
     c : &mut Criterion,
     input_string : &str,
-    flags: i64,
+    flags : i64,
 ) {
     let input = input_string.chars().collect::<Vec<_>>();
 
@@ -386,7 +375,7 @@ fn BENCHMARK_range_string_from_slice_2_WITH_(
 
     c.bench_with_input(id, &input, |b, input| {
         b.iter(|| {
-            let s = utils::range_string_from_slice_2(input.as_slice(), flags);
+            let s = utils::range_string_from_slice_2(black_box(input.as_slice()), black_box(flags));
 
             let _ = black_box(s);
         })
@@ -548,7 +537,6 @@ pub fn BENCHMARK_range_string_from_slice_2_WITH_ALPHABET_MIXED_CASE_IGNORING_CAS
 
     BENCHMARK_range_string_from_slice_2_WITH_(c, input_string, flags);
 }
-
 
 
 criterion_group!(

@@ -2,6 +2,8 @@
 
 **SH**ell-compatible **WILD**cards, for **Rust**.
 
+[![Crates.io](https://img.shields.io/crates/v/shwild.svg)](https://crates.io/crates/shwild)
+
 
 ## Table of Contents <!-- omit in toc -->
 
@@ -78,8 +80,6 @@ The `shwild::Error` enum is used to represent a parse result, defined as:
 
 ```Rust
 pub enum Error {
-    /// Parsing was successful.
-    Ok,
     /// Parse error encountered.
     ParseError {
         line :    usize,

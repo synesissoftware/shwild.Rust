@@ -18,8 +18,6 @@ use std::{
 #[derive(Debug)]
 #[derive(PartialEq)]
 pub enum Error {
-    /// Parsing was successful.
-    Ok,
     /// Parse error encountered.
     ParseError {
         line :    usize,
@@ -50,7 +48,6 @@ impl Error {
         f : &mut std_fmt::Formatter<'_>,
     ) -> std_fmt::Result {
         match self {
-            Self::Ok => write!(f, "the operating completed successfully"),
             Self::ParseError {
                 line,
                 column,
@@ -331,7 +328,10 @@ mod match_structures {
                 return false;
             }
 
-            let c0 = slice.chars().next().unwrap();
+            let c0 = match slice.chars().next() {
+                Some(c0) => c0,
+                None => return false,
+            };
 
             #[cfg(feature = "lookup-ranges")]
             if self.character_range.contains_key(&c0) {
@@ -357,7 +357,10 @@ mod match_structures {
                 return false;
             }
 
-            let c0 = slice.chars().next().unwrap();
+            let c0 = match slice.chars().next() {
+                Some(c0) => c0,
+                None => return false,
+            };
 
             #[cfg(feature = "lookup-ranges")]
             if !self.character_range.contains_key(&c0) {
@@ -437,9 +440,6 @@ mod match_structures {
             MatchWild1,
             MatchWildN,
         };
-
-        #[cfg(feature = "lookup-ranges")]
-        use collect_rs::containers::UnicodePointMap;
 
 
         mod TESTING_MatchEnd {
@@ -1022,6 +1022,7 @@ mod utils {
             prepare_range_string,
             MatcherSequence,
         };
+
 
         mod TEST_MatcherSequence {
             #![allow(non_snake_case)]

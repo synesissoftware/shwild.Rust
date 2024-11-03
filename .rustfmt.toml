@@ -1,7 +1,7 @@
 
 # rustfmt.toml for shwild.Rust
 #
-# configured for cargo-fmt 1.81.0
+# configured for cargo-fmt 1.84.0
 
 # array_width=60 # deprecated
 # attr_fn_like_width=70 # deprecated
@@ -60,9 +60,9 @@ reorder_modules=true
 # report_fixme="Always"
 # report_todo="Never"
 # required_version="????"
-# single_line_if_else_max_width=0 # deprecated
 short_array_element_width_threshold=1
-# show_parse_errors=true
+show_parse_errors=true
+# single_line_if_else_max_width=0 # deprecated
 skip_children=false
 space_after_colon=true
 space_before_colon=true
