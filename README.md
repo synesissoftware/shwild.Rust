@@ -104,6 +104,7 @@ The following crate features are defined:
 | Name                        | Effect                                | Is `"default"`? | Dependent feature(s)                  |
 | --------------------------- | ------------------------------------- | --------------- | ------------------------------------- |
 | `"lookup-ranges"`           | Causes match/non-match ranges to be implemented in terms of `UnicodePointMap` (from **collect-rs** crate), resulting in significant performance improvements in parsing and matching | Yes | |
+| `"test-regex"`              | Introduces a dependency to **regex** crate to support benchmark/example program(s) | **No** | |
 
 
 ### Functions
@@ -183,9 +184,10 @@ Defect reports, feature requests, and pull requests are welcome on https://githu
 
 ### Dependencies
 
-**shwild.Rust** has one dependency, which is optional:
+**shwild.Rust** has two dependencies, both optional:
 
 * [**collect-rs**]() - required, for more efficient range matching, if feature `"lookup-ranges"` is specified;
+* [**regex**]() - required, by some benchmark/example programs only, if feature `"test-regex"` is specified;
 
 
 #### Dev Dependencies

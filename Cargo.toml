@@ -15,7 +15,7 @@ license = "BSD-3-Clause"
 name = "shwild"
 readme = "README.md"
 repository = "https://github.com/synesissoftware/shwild.Rust"
-version = "0.1.1"
+version = "0.1.2"
 
 
 # ##########################################################
@@ -24,6 +24,13 @@ version = "0.1.1"
 [lib]
 name = "shwild"
 path = "src/lib.rs"
+
+[[bench]]
+name = "cw-regex"
+harness = false
+required-features = [
+	"test-regex",
+]
 
 [[bench]]
 name = "range_string-creation_functions"
@@ -37,9 +44,12 @@ harness = false
 name = "shwild-matches"
 harness = false
 
-# [[bin]]
-# name = "character-play"
-# path = "test/scratch/character-play/main.rs"
+[[bin]]
+name = "character-play"
+path = "test/scratch/character-play/main.rs"
+required-features = [
+	"test-regex",
+]
 
 [[example]]
 name = "list-matching-files"
@@ -56,6 +66,7 @@ path = "examples/list-matching-files-compiled/main.rs"
 [features]
 
 default = [
+	"lookup-ranges",
 ]
 
 # General features:
@@ -71,7 +82,11 @@ null-feature = []
 #
 
 lookup-ranges = [
-	"dep:collect-rs"
+	"dep:collect-rs",
+]
+
+test-regex = [
+	"dep:regex",
 ]
 
 
@@ -81,6 +96,7 @@ lookup-ranges = [
 [dependencies]
 
 collect-rs = { version = "0.2", optional = true }
+regex = { version = "1.11", optional = true }
 
 
 [dev-dependencies]
