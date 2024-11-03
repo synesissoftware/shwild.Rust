@@ -32,6 +32,7 @@
 	"rust-analyzer.cargo.noDefaultFeatures": true,
 	"rust-analyzer.cargo.features": [
 		"default",
+		"lookup-ranges",
 		"null-feature",
 	],
 	"rust-analyzer.completion.autoimport.enable": false,

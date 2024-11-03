@@ -2,6 +2,7 @@
 # directories (by name)
 
 /_build/
+/scratch/
 /target/
 
 
@@ -12,7 +13,7 @@
 
 .DS_Store
 
-Cargo.lock
+#Cargo.lock
 
 
 # files (by pattern)

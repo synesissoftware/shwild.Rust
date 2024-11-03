@@ -15,7 +15,7 @@ license = "BSD-3-Clause"
 name = "shwild"
 readme = "README.md"
 repository = "https://github.com/synesissoftware/shwild.Rust"
-version = "0.1.0"
+version = "0.1.1"
 
 
 # ##########################################################
@@ -51,6 +51,9 @@ path = "examples/list-matching-files-compiled/main.rs"
 
 [features]
 
+default = [
+]
+
 # General features:
 #
 # - "_NEVER_TO_BE_ENABLED" - this is a placeholder feature and must NEVER be specified;
@@ -63,16 +66,22 @@ null-feature = []
 # Crate-specific features:
 #
 
+lookup-ranges = [
+	"dep:collect-rs"
+]
+
 
 # ##########################################################
 # Dependencies
 
 [dependencies]
 
+collect-rs = { version = "0.2", optional = true }
+
 
 [dev-dependencies]
 
-criterion = "0.5"
+criterion = { version = "0.5" }
 test_help-rs = { version = "0.1" }
 
 

@@ -13,6 +13,7 @@
 - [Components](#components)
 	- [Constants](#constants)
 	- [Enumerations](#enumerations)
+	- [Features](#features)
 	- [Functions](#functions)
 	- [Macros](#macros)
 	- [Structures](#structures)
@@ -52,7 +53,7 @@
 The library (and other **shwild** variants) support the following pattern elements:
 
 * **Literal** - a non-empty string fragment, as in `"Where are the"`, which matches the exact same string fragment in the input;
-* **Wild-1** - represented by the single character `'?'` in the pattern, which represents a match of exactly any one character. In the above example `r"Where are the* [🐼🐻]s\?"` the `'?'` is _not_ interpreted as a wild-1 because it is escaped by the `'\'` character;
+* **Wild-1** - represented by the single character `'?'` in the pattern, which represents a match of exactly any one character. In the above example `r"Where are the* [🐼🐻]s\?"` the `'?'` is _not_ interpreted as a wild-1 because it is escaped by the `'\'` character and instead part of the literal fragment `"s?"`;
 * **Wild-N** - represented by the single character `'*'` in the pattern, which represents a match of any number of characters;
 * **Range** - represented by a sequence of characters within `'['` and `']'`, as in the `"[🐼🐻]"` fragment in the above example, which will match to any one of range character in the input. As well as an unordered sequence of literal characters, ranges may also capture contiguous sequences, as in `"[zc-aja]"` (any of characters `'a'`, `'b'`, `'c'`, `'j'`, `'z'`) or in `"[abm-PrZ]"` (any of characters `'a'`, `'b'`, `'m'`, `'M'`, `'n'`, `'N'`, `'o'`, `'O'`, `'p'`, `'P'`, `'r'`, `'Z'`);
 * **Not-range** - represented in the same form as a **Range** but where the first range character is `'^'` and the remaining characters represent a set of characters that cannot appear (at the requisite position) in the input;
@@ -94,6 +95,15 @@ The `shwild::Result` enum is a specialized `std::result::Result` type for **shwi
 ```Rust
 pub type Result<T> = std_result::Result<T, shwild::Error>;
 ```
+
+
+### Features
+
+The following crate features are defined:
+
+| Name                        | Effect                                | Is `"default"`? | Dependent feature(s)                  |
+| --------------------------- | ------------------------------------- | --------------- | ------------------------------------- |
+| `"lookup-ranges"`           | Causes match/non-match ranges to be implemented in terms of `UnicodePointMap` (from **collect-rs** crate), resulting in significant performance improvements in parsing and matching | Yes | |
 
 
 ### Functions
@@ -173,7 +183,9 @@ Defect reports, feature requests, and pull requests are welcome on https://githu
 
 ### Dependencies
 
-There are no external dependencies.
+**shwild.Rust** has one dependency, which is optional:
+
+* [**collect-rs**]() - required, for more efficient range matching, if feature `"lookup-ranges"` is specified;
 
 
 #### Dev Dependencies

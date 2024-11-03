@@ -110,9 +110,24 @@ mod traits {
 }
 
 
+mod types {
+
+    #[cfg(feature = "lookup-ranges")]
+    use collect_rs::containers::UnicodePointMap;
+
+    #[cfg(feature = "lookup-ranges")]
+    pub(super) type CharacterRangeType = UnicodePointMap;
+    #[cfg(not(feature = "lookup-ranges"))]
+    pub(super) type CharacterRangeType = String;
+}
+
+
 mod match_structures {
 
-    use super::traits::Match;
+    use super::{
+        traits::Match,
+        types::CharacterRangeType,
+    };
 
 
     /// Marks the end of the string, and the root of the reverse match
@@ -140,7 +155,7 @@ mod match_structures {
         /// The next matcher.
         next :             Box<dyn Match>,
         /// The range characters against which to evaluate.
-        characters :       String,
+        character_range :  CharacterRangeType,
         /// The minimum_required size of this and all subsequent instances.
         #[cfg_attr(debug_assertions, allow(unused))]
         minimum_required : usize,
@@ -153,7 +168,7 @@ mod match_structures {
         /// The next matcher.
         next :             Box<dyn Match>,
         /// The range characters against which to evaluate.
-        characters :       String,
+        character_range :  CharacterRangeType,
         /// The minimum_required size of this and all subsequent instances.
         #[cfg_attr(debug_assertions, allow(unused))]
         minimum_required : usize,
@@ -209,7 +224,7 @@ mod match_structures {
     impl MatchNotRange {
         pub(crate) fn new(
             next : Box<dyn Match>,
-            characters : String,
+            character_range : CharacterRangeType,
             _flags : i64,
         ) -> Self {
             // NOTE: this is a not-currently-implemented feature
@@ -217,7 +232,7 @@ mod match_structures {
 
             Self {
                 next,
-                characters,
+                character_range,
                 // flags,
                 minimum_required,
             }
@@ -227,7 +242,7 @@ mod match_structures {
     impl MatchRange {
         pub(crate) fn new(
             next : Box<dyn Match>,
-            characters : String,
+            character_range : CharacterRangeType,
             _flags : i64,
         ) -> Self {
             // NOTE: this is a not-currently-implemented feature
@@ -235,7 +250,7 @@ mod match_structures {
 
             Self {
                 next,
-                characters,
+                character_range,
                 // flags,
                 minimum_required,
             }
@@ -309,12 +324,21 @@ mod match_structures {
             &self,
             slice : &str,
         ) -> bool {
+            if slice.is_empty() {
+                return false;
+            }
+
             let c0 = match slice.chars().next() {
                 Some(c0) => c0,
                 None => return false,
             };
 
-            if self.characters.contains(c0) {
+            #[cfg(feature = "lookup-ranges")]
+            if self.character_range.contains_key(&c0) {
+                return false;
+            }
+            #[cfg(not(feature = "lookup-ranges"))]
+            if self.character_range.contains(c0) {
                 return false;
             }
 
@@ -333,9 +357,17 @@ mod match_structures {
                 return false;
             }
 
-            let c0 = slice.chars().next().unwrap();
+            let c0 = match slice.chars().next() {
+                Some(c0) => c0,
+                None => return false,
+            };
 
-            if !self.characters.contains(c0) {
+            #[cfg(feature = "lookup-ranges")]
+            if !self.character_range.contains_key(&c0) {
+                return false;
+            }
+            #[cfg(not(feature = "lookup-ranges"))]
+            if !self.character_range.contains(c0) {
                 return false;
             }
 
@@ -394,6 +426,8 @@ mod match_structures {
     mod tests {
         #![allow(non_snake_case)]
 
+        #[cfg(feature = "lookup-ranges")]
+        use super::super::utils::prepare_range_upm_from_slice;
         use super::{
             super::{
                 traits::Match,
@@ -476,10 +510,13 @@ mod match_structures {
             fn TEST_Range_1() {
                 let characters = "0123456789";
                 let flags = 0;
-                let characters = prepare_range_string(characters, flags);
+                #[cfg(feature = "lookup-ranges")]
+                let character_range = prepare_range_upm_from_slice(&characters.chars().collect::<Vec<char>>(), flags);
+                #[cfg(not(feature = "lookup-ranges"))]
+                let character_range = prepare_range_string(characters, flags);
 
                 let me : Box<dyn Match> = Box::new(MatchEnd {});
-                let mr : Box<dyn Match> = Box::new(MatchRange::new(me, characters, 0));
+                let mr : Box<dyn Match> = Box::new(MatchRange::new(me, character_range, 0));
 
                 let matcher : &dyn Match = &*mr;
 
@@ -511,10 +548,13 @@ mod match_structures {
             fn TEST_NotRange_1() {
                 let characters = "0123456789";
                 let flags = 0;
-                let characters = prepare_range_string(characters, flags);
+                #[cfg(feature = "lookup-ranges")]
+                let character_range = prepare_range_upm_from_slice(&characters.chars().collect::<Vec<char>>(), flags);
+                #[cfg(not(feature = "lookup-ranges"))]
+                let character_range = prepare_range_string(characters, flags);
 
                 let me : Box<dyn Match> = Box::new(MatchEnd {});
-                let mn : Box<dyn Match> = Box::new(MatchNotRange::new(me, characters, 0));
+                let mn : Box<dyn Match> = Box::new(MatchNotRange::new(me, character_range, 0));
 
                 let matcher : &dyn Match = &*mn;
 
@@ -672,7 +712,11 @@ mod utils {
     use super::{
         match_structures::*,
         traits::Match,
+        types::CharacterRangeType,
     };
+
+    #[cfg(feature = "lookup-ranges")]
+    use collect_rs::containers::UnicodePointMap;
 
     use std::{
         fmt as std_fmt,
@@ -720,6 +764,7 @@ mod utils {
         chars.into_iter().collect()
     }
 
+    #[cfg(not(feature = "lookup-ranges"))]
     pub(crate) fn prepare_range_string_from_slice(
         chars : &[char],
         flags : i64,
@@ -742,6 +787,30 @@ mod utils {
         chars.dedup();
 
         chars.into_iter().collect()
+    }
+    #[cfg(feature = "lookup-ranges")]
+    pub(crate) fn prepare_range_upm_from_slice(
+        chars : &[char],
+        flags : i64,
+    ) -> UnicodePointMap {
+        let mut upm = UnicodePointMap::new('\u{100}');
+
+        if 0 == (super::constants::IGNORE_CASE & flags) {
+            for c in chars {
+                upm.push(*c);
+            }
+        } else {
+            for c in chars {
+                if c.is_ascii_alphabetic() {
+                    upm.push(c.to_ascii_lowercase());
+                    upm.push(c.to_ascii_uppercase());
+                } else {
+                    upm.push(*c);
+                }
+            }
+        }
+
+        upm
     }
 
 
@@ -807,7 +876,7 @@ mod utils {
         #[must_use]
         pub(crate) fn prepend_NotRange(
             &mut self,
-            characters : String,
+            character_range : CharacterRangeType,
             flags : i64,
             following_minimum_required : usize,
         ) -> usize {
@@ -817,7 +886,7 @@ mod utils {
 
             // NOW: `next` is the head of the list, and `self.matcher0` is `MatchEnd`
 
-            let mut matcher : Box<dyn Match> = Box::new(MatchNotRange::new(next, characters, flags));
+            let mut matcher : Box<dyn Match> = Box::new(MatchNotRange::new(next, character_range, flags));
 
             std_mem::swap(&mut self.matcher0, &mut matcher);
 
@@ -834,7 +903,7 @@ mod utils {
         #[must_use]
         pub(crate) fn prepend_Range(
             &mut self,
-            characters : String,
+            character_range : CharacterRangeType,
             flags : i64,
             following_minimum_required : usize,
         ) -> usize {
@@ -844,7 +913,7 @@ mod utils {
 
             // NOW: `next` is the head of the list, and `self.matcher0` is `MatchEnd`
 
-            let mut matcher : Box<dyn Match> = Box::new(MatchRange::new(next, characters, flags));
+            let mut matcher : Box<dyn Match> = Box::new(MatchRange::new(next, character_range, flags));
 
             std_mem::swap(&mut self.matcher0, &mut matcher);
 
@@ -946,6 +1015,8 @@ mod utils {
     mod tests {
         #![allow(non_snake_case)]
 
+        #[cfg(feature = "lookup-ranges")]
+        use super::prepare_range_upm_from_slice;
         use super::{
             super::constants,
             prepare_range_string,
@@ -997,9 +1068,13 @@ mod utils {
 
                 {
                     let characters = r"abcdef";
-                    let characters = prepare_range_string(characters, flags);
+                    #[cfg(feature = "lookup-ranges")]
+                    let character_range =
+                        prepare_range_upm_from_slice(&characters.chars().collect::<Vec<char>>(), flags);
+                    #[cfg(not(feature = "lookup-ranges"))]
+                    let character_range = prepare_range_string(characters, flags);
 
-                    minimum_required = matchers.prepend_Range(characters, flags, minimum_required);
+                    minimum_required = matchers.prepend_Range(character_range, flags, minimum_required);
                 }
 
                 assert_eq!(1, minimum_required);
@@ -1032,9 +1107,13 @@ mod utils {
 
                 {
                     let characters = r"abcdef";
-                    let characters = prepare_range_string(characters, flags);
+                    #[cfg(feature = "lookup-ranges")]
+                    let character_range =
+                        prepare_range_upm_from_slice(&characters.chars().collect::<Vec<char>>(), flags);
+                    #[cfg(not(feature = "lookup-ranges"))]
+                    let character_range = prepare_range_string(characters, flags);
 
-                    minimum_required = matchers.prepend_NotRange(characters, flags, minimum_required);
+                    minimum_required = matchers.prepend_NotRange(character_range, flags, minimum_required);
                 }
 
                 assert_eq!(1, minimum_required);
@@ -1067,9 +1146,13 @@ mod utils {
 
                 {
                     let characters = r"abcdef";
-                    let characters = prepare_range_string(characters, flags);
+                    #[cfg(feature = "lookup-ranges")]
+                    let character_range =
+                        prepare_range_upm_from_slice(&characters.chars().collect::<Vec<char>>(), flags);
+                    #[cfg(not(feature = "lookup-ranges"))]
+                    let character_range = prepare_range_string(characters, flags);
 
-                    minimum_required = matchers.prepend_Range(characters, flags, minimum_required);
+                    minimum_required = matchers.prepend_Range(character_range, flags, minimum_required);
                 }
 
                 assert_eq!(1, minimum_required);
@@ -1102,9 +1185,13 @@ mod utils {
 
                 {
                     let characters = r"abcdef";
-                    let characters = prepare_range_string(characters, flags);
+                    #[cfg(feature = "lookup-ranges")]
+                    let character_range =
+                        prepare_range_upm_from_slice(&characters.chars().collect::<Vec<char>>(), flags);
+                    #[cfg(not(feature = "lookup-ranges"))]
+                    let character_range = prepare_range_string(characters, flags);
 
-                    minimum_required = matchers.prepend_NotRange(characters, flags, minimum_required);
+                    minimum_required = matchers.prepend_NotRange(character_range, flags, minimum_required);
                 }
 
                 assert_eq!(1, minimum_required);
@@ -1155,27 +1242,35 @@ mod utils {
 
                 {
                     let characters = r"\/";
-                    let characters = prepare_range_string(characters, flags);
+                    #[cfg(feature = "lookup-ranges")]
+                    let character_range =
+                        prepare_range_upm_from_slice(&characters.chars().collect::<Vec<char>>(), flags);
+                    #[cfg(not(feature = "lookup-ranges"))]
+                    let character_range = prepare_range_string(characters, flags);
 
-                    minimum_required = matchers.prepend_Range(characters, flags, minimum_required);
+                    minimum_required = matchers.prepend_Range(character_range, flags, minimum_required);
                 }
 
                 assert_eq!(5, minimum_required);
 
                 {
                     let characters = r":";
-                    let characters = prepare_range_string(characters, flags);
+                    let literal = characters.into();
 
-                    minimum_required = matchers.prepend_Literal(characters, flags, minimum_required);
+                    minimum_required = matchers.prepend_Literal(literal, flags, minimum_required);
                 }
 
                 assert_eq!(6, minimum_required);
 
                 {
                     let characters = r"abcdefghijklmnopqrstuvwxyz";
-                    let characters = prepare_range_string(characters, flags);
+                    #[cfg(feature = "lookup-ranges")]
+                    let character_range =
+                        prepare_range_upm_from_slice(&characters.chars().collect::<Vec<char>>(), flags);
+                    #[cfg(not(feature = "lookup-ranges"))]
+                    let character_range = prepare_range_string(characters, flags);
 
-                    minimum_required = matchers.prepend_Range(characters, flags, minimum_required);
+                    minimum_required = matchers.prepend_Range(character_range, flags, minimum_required);
                 }
 
                 assert_eq!(7, minimum_required);
@@ -1463,7 +1558,11 @@ impl CompiledMatcher {
                                     s.push('-');
                                 }
 
-                                let characters = crate::utils::prepare_range_string_from_slice(s.as_slice(), flags);
+                                #[cfg(feature = "lookup-ranges")]
+                                let character_range = crate::utils::prepare_range_upm_from_slice(s.as_slice(), flags);
+                                #[cfg(not(feature = "lookup-ranges"))]
+                                let character_range =
+                                    crate::utils::prepare_range_string_from_slice(s.as_slice(), flags);
 
                                 num_bytes += 1;
                                 match Self::parse_(matchers, &pattern[num_bytes..], flags, line, column) {
@@ -1477,9 +1576,9 @@ impl CompiledMatcher {
                                 };
 
                                 minimum_required = if matches!(state, ParseState::InRange) {
-                                    matchers.prepend_Range(characters, flags, minimum_required)
+                                    matchers.prepend_Range(character_range, flags, minimum_required)
                                 } else {
-                                    matchers.prepend_NotRange(characters, flags, minimum_required)
+                                    matchers.prepend_NotRange(character_range, flags, minimum_required)
                                 };
 
                                 num_matchers += 1;
