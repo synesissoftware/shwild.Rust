@@ -51,6 +51,9 @@ path = "examples/list-matching-files-compiled/main.rs"
 
 [features]
 
+default = [
+]
+
 # General features:
 #
 # - "_NEVER_TO_BE_ENABLED" - this is a placeholder feature and must NEVER be specified;
