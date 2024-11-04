@@ -10,6 +10,7 @@
 use std::{
     error as std_error,
     fmt as std_fmt,
+    matches as std_matches,
     result as std_result,
 };
 
@@ -1480,7 +1481,7 @@ impl CompiledMatcher {
         let mut num_bytes = 0;
 
         for c in pattern.chars() {
-            debug_assert!(continuum_prior.is_none() || matches!(state, ParseState::InNotRange | ParseState::InRange));
+            debug_assert!(continuum_prior.is_none() || std_matches!(state, ParseState::InNotRange | ParseState::InRange));
 
             if escaped {
                 match c {
@@ -1501,7 +1502,7 @@ impl CompiledMatcher {
 
                 escaped = false;
 
-                if matches!(state, ParseState::None) {
+                if std_matches!(state, ParseState::None) {
                     state = ParseState::InLiteral;
                 }
             } else {
@@ -1575,7 +1576,7 @@ impl CompiledMatcher {
                                     },
                                 };
 
-                                minimum_required = if matches!(state, ParseState::InRange) {
+                                minimum_required = if std_matches!(state, ParseState::InRange) {
                                     matchers.prepend_Range(character_range, flags, minimum_required)
                                 } else {
                                     matchers.prepend_NotRange(character_range, flags, minimum_required)
