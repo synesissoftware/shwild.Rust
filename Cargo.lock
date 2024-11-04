@@ -31,9 +31,9 @@ checksum = "ace50bade8e6234aa140d9a2f552bbee1db4d353f69b8217bc503490fc1a9f26"
 
 [[package]]
 name = "base-traits"
-version = "0.0.8"
+version = "0.0.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "556031355dea4fc81a56aa4850032c9b433c926e7296c30780f63ece19ecf082"
+checksum = "a9c676f0beeccff874a11e4853c9b6f254cdc64ab1135a63b2968602820067e5"
 
 [[package]]
 name = "bumpalo"
@@ -423,6 +423,7 @@ dependencies = [
 name = "shwild"
 version = "0.1.2"
 dependencies = [
+ "base-traits",
  "collect-rs",
  "criterion",
  "regex",
