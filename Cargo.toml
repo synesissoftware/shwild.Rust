@@ -95,7 +95,13 @@ test-regex = [
 
 [dependencies]
 
-collect-rs = { version = "0.2", optional = true }
+base-traits = "*"
+
+# base-traits = { version = "0", default-features = false, features = [
+# 	"implement-ASI64-for-built_ins",
+# ]}
+collect-rs = { version = "0.2", optional = true, default-features = false, features = [
+]}
 regex = { version = "1.11", optional = true }
 
 
