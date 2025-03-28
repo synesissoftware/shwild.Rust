@@ -9,14 +9,14 @@
 
 ## Functional improvements
 
-* [ ] special cases (for compiled only) such as `"*brown*"` could just be `strstr()`;
 * [ ] **no-std**;
 * [ ] ...;
 
 
 ## Performance improvements
 
-* \<none>
+* [ ] special cases (for compiled only) such as `"*brown*"` could just be `strstr()`;
+* [ ] ...;
 
 
 <!-- ########################### end of file ########################### -->
