@@ -8,14 +8,34 @@ authors = [
 	"Matt Wilson <matthew@synesis.com.au>",
 	"Zach Struck <zachstruck@gmail.com>",
 ]
-description = "shwild (for Rust)"
+categories = [
+	"command-line-interface",
+	"parser-implementations",
+	"development-tools",
+	"text-processing",
+]
+description = """
+**shwild** is a small, standalone library, implemented in C++ with a C and a C++ API, that provides shell-compatible wildcard matching.
+
+**shwild.Rust** is a **Rust** port, with minimal API differences. The design emphasis is on simplicity-of-use, modularity, and performance.
+"""
+documentation = "https://docs.rs/shwild"
 edition = "2021"
+exclude = [
+	"target",
+	".github"
+]
 homepage = "https://github.com/synesissoftware/shwild.Rust"
+keywords = [
+	"pattern-matching",
+	"shell",
+	"wildcards",
+]
 license = "BSD-3-Clause"
 name = "shwild"
 readme = "README.md"
 repository = "https://github.com/synesissoftware/shwild.Rust"
-version = "0.1.2"
+version = "0.1.3"
 
 
 # ##########################################################
@@ -44,7 +64,7 @@ harness = false
 name = "shwild-matches"
 harness = false
 
-[[bin]]
+[[example]]
 name = "character-play"
 path = "test/scratch/character-play/main.rs"
 required-features = [
