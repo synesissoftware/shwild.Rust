@@ -7,9 +7,12 @@
 * added **EXAMPLES.md** and per-example documentation;
 * **README.md** badges, dependency links, related projects, and `null-feature` documentation;
 * added crate-level `//!` documentation;
+* added CI (`.github/workflows/ci.yml`) and quality scripts (`scripts/fmt`, checkers);
+* added `rust-version` (MSRV 1.74);
 * renamed `.rustfmt.toml` => **rustfmt.toml**; updated formatting settings;
 * added `.gitattributes`;
 * shortened `description` in **Cargo.toml**;
+* Clippy and test-naming fixes for CI;
 
 
 ## 0.1.3 - 28th March 2025

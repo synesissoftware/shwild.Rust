@@ -2,8 +2,6 @@
 
 #![allow(non_snake_case)]
 
-use shwild;
-
 use regex::Regex;
 
 use criterion::{

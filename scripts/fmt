@@ -1,0 +1,12 @@
+#! /usr/bin/env bash
+set -euo pipefail
+
+RUSTFMT="$(rustup which --toolchain nightly rustfmt 2>/dev/null || true)"
+if [[ -z "${RUSTFMT}" ]]; then
+	echo "error: nightly rustfmt is required (see rustfmt.toml)" >&2
+	echo "  rustup component add rustfmt --toolchain nightly" >&2
+	exit 1
+fi
+
+export RUSTFMT
+exec cargo fmt -- --unstable-features "$@"

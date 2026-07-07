@@ -23,7 +23,7 @@ fn main() {
     let matchers = patterns
         .iter()
         .map(|pattern| {
-            shwild::CompiledMatcher::from_pattern_and_flags(&pattern, 0).unwrap_or_else(|e| {
+            shwild::CompiledMatcher::from_pattern_and_flags(pattern, 0).unwrap_or_else(|e| {
                 eprintln!("failed to parse pattern '{pattern}': {e}");
 
                 std_process::exit(1);

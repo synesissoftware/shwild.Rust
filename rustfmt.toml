@@ -1,6 +1,8 @@
 
 # rustfmt.toml for shwild.Rust
 #
+# Requires nightly rustfmt with unstable features enabled — use ./scripts/fmt
+#
 # configured for cargo-fmt 1.84.0
 
 # array_width=60 # deprecated

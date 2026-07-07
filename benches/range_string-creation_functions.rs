@@ -1,9 +1,6 @@
 // benches/range_string-creation_functions.rs : evaluates performance of different range-string creation-function approaches
 
 #![allow(non_snake_case)]
-#![feature(ascii_char)]
-
-use shwild;
 
 use criterion::{
     black_box,
@@ -68,7 +65,7 @@ mod utils {
         chars.dedup();
 
         chars.into_iter().collect() // appears to be (marginally) faster for `Vec<>`, although it's very close
-        // chars.as_slice().iter().collect()
+                                    // chars.as_slice().iter().collect()
     }
 
     pub(super) fn range_string_from_slice_1(
@@ -134,7 +131,7 @@ mod utils {
         chars.dedup();
 
         chars.into_iter().collect() // appears to be (marginally) faster for `Vec<>`, although it's very close
-        // chars.as_slice().iter().collect()
+                                    // chars.as_slice().iter().collect()
     }
 
     pub(super) fn range_string_from_slice_3(
@@ -239,37 +236,6 @@ mod utils {
 
         chars.into_iter().collect()
         // chars.as_slice().iter().collect()
-    }
-
-    #[allow(unexpected_cfgs)]
-    #[cfg(feature = "auto-buffer")]
-    pub(super) fn range_string_from_slice_6(
-        chars : &[char],
-        flags : i64,
-    ) -> String {
-        let mut chars = if 0 != (shwild::IGNORE_CASE & flags) {
-            let mut ci_chars = auto_buffer::AutoBuffer::<char, 50>::with_capacity(chars.len() * 2);
-
-            for (ix, c) in chars.iter().enumerate() {
-                if c.is_alphabetic() {
-                    ci_chars.push(c.to_ascii_uppercase());
-
-                    ci_chars.push(c.to_ascii_lowercase());
-                } else {
-                    ci_chars.push(*c);
-                }
-            }
-
-            ci_chars
-        } else {
-            chars.into()
-        };
-
-        chars.sort_unstable();
-
-        chars.dedup();
-
-        chars.into_iter().collect()
     }
 
     pub(super) fn range_string_from_slice_7(

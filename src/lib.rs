@@ -149,7 +149,6 @@ mod traits {
         /// # Returns:
         /// - `true` - indicates a full match; or
         /// - `false` - if not a full match.
-
         fn matches(
             &self,
             slice : &str,
@@ -348,11 +347,7 @@ mod match_structures {
             let slice_starts_with_literal = slice.starts_with(&self.literal)
                 || match &self.literal_uppercase {
                     Some(literal_uppercase) => {
-                        if slice.len() >= literal_uppercase.len() {
-                            slice.to_uppercase().starts_with(literal_uppercase)
-                        } else {
-                            false
-                        }
+                        slice.len() >= literal_uppercase.len() && slice.to_uppercase().starts_with(literal_uppercase)
                     },
                     None => false,
                 };
@@ -474,13 +469,12 @@ mod match_structures {
     mod tests {
         #![allow(non_snake_case)]
 
+        #[cfg(not(feature = "lookup-ranges"))]
+        use super::super::utils::prepare_range_string;
         #[cfg(feature = "lookup-ranges")]
         use super::super::utils::prepare_range_upm_from_slice;
         use super::{
-            super::{
-                traits::Match,
-                utils::prepare_range_string,
-            },
+            super::traits::Match,
             MatchEnd,
             MatchLiteral,
             MatchNotRange,
@@ -1937,7 +1931,6 @@ mod tests {
     #![allow(non_snake_case)]
 
     use crate as shwild;
-    use crate::shwild_matches;
 
 
     mod TEST_CompiledMatcher_PARSING {
@@ -3154,10 +3147,10 @@ mod tests {
 
                 assert!(!matcher.matches(""));
                 assert!(!matcher.matches("Where are the bears?"));
-                assert_eq!(true, matcher.matches("Where are the 🐻s?"));
-                assert_eq!(true, matcher.matches("Where are the 🐼s?"));
-                assert_eq!(true, matcher.matches("Where are their 🐻s?"));
-                assert_eq!(true, matcher.matches("Where are the big brown 🐻s?"));
+                assert!(matcher.matches("Where are the 🐻s?"));
+                assert!(matcher.matches("Where are the 🐼s?"));
+                assert!(matcher.matches("Where are their 🐻s?"));
+                assert!(matcher.matches("Where are the big brown 🐻s?"));
                 assert!(!matcher.matches("Where are the teddy-🐻s?"));
             }
         }
