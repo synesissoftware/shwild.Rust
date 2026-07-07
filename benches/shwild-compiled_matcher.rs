@@ -2,14 +2,13 @@
 
 #![allow(non_snake_case)]
 
-use shwild;
-
 use criterion::{
-    black_box,
     criterion_group,
     criterion_main,
     Criterion,
 };
+
+use std::hint::black_box;
 
 
 mod constants {

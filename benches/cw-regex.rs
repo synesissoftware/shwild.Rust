@@ -2,17 +2,14 @@
 
 #![allow(non_snake_case)]
 
-use shwild;
-
-use regex::Regex;
-
 use criterion::{
-    black_box,
     criterion_group,
     criterion_main,
     Criterion,
 };
+use regex::Regex;
 
+use std::hint::black_box;
 
 mod constants {
     pub(crate) const S_TQBFJOTLD : &str = "The quick brown fox jumps over the lazy dog";

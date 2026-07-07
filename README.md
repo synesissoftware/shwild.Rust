@@ -1,8 +1,15 @@
-# shwild <!-- omit in toc -->
+# shwild.Rust <!-- omit in toc -->
 
-**SH**ell-compatible **WILD**cards, for **Rust**.
-
+![Language](https://img.shields.io/badge/Rust-000000?style=flat&logo=rust&logoColor=white)
+[![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 [![Crates.io](https://img.shields.io/crates/v/shwild.svg)](https://crates.io/crates/shwild)
+[![GitHub release](https://img.shields.io/github/v/release/synesissoftware/shwild.Rust.svg)](https://github.com/synesissoftware/shwild.Rust/releases/latest)
+![MSRV](https://img.shields.io/badge/MSRV-1.79-lightgrey)
+[![CI](https://github.com/synesissoftware/shwild.Rust/actions/workflows/ci.yml/badge.svg)](https://github.com/synesissoftware/shwild.Rust/actions/workflows/ci.yml)
+[![Last Commit](https://img.shields.io/github/last-commit/synesissoftware/shwild.Rust)](https://github.com/synesissoftware/shwild.Rust/commits/master)
+[![docs.rs](https://img.shields.io/docsrs/shwild/badge.svg)](https://docs.rs/shwild)
+
+**SH**ell-compatible **WILD**cards, for **Rust** — part of the cross-language **shwild** family.
 
 
 ## Table of Contents <!-- omit in toc -->
@@ -30,9 +37,7 @@
 
 ## Introduction
 
-**shwild** is a small, standalone library, implemented in C++ with a C and a C++ API, that provides shell-compatible wildcard matching.
-
-**shwild.Rust** is a **Rust** port, with minimal API differences. The design emphasis is on simplicity-of-use, modularity, and performance.
+**shwild** is a small, standalone library, implemented in C++ with a C and a C++ API, that provides shell-compatible wildcard matching. **shwild.Rust** is a **Rust** port, with minimal API differences. The design emphasis is on simplicity-of-use, modularity, and performance.
 
 ```Rust
 	let pattern = r"Where are the* [🐼🐻]s\?";
@@ -64,7 +69,7 @@ The library (and other **shwild** variants) support the following pattern elemen
 Reference in **Cargo.toml** in the usual way:
 
 ```toml
-shwild = { version = "~0.1" }
+shwild = { version = "0.1" }
 ```
 
 
@@ -104,6 +109,7 @@ The following crate features are defined:
 | Name                        | Effect                                | Is `"default"`? | Dependent feature(s)                  |
 | --------------------------- | ------------------------------------- | --------------- | ------------------------------------- |
 | `"lookup-ranges"`           | Causes match/non-match ranges to be implemented in terms of `UnicodePointMap` (from **collect-rs** crate), resulting in significant performance improvements in parsing and matching | Yes | |
+| `"null-feature"`            | A feature that has no effect (and, thus, is useful for simplifying driver scripts) | **No** | |
 | `"test-regex"`              | Introduces a dependency to **regex** crate to support benchmark/example program(s) | **No** | |
 
 
@@ -167,7 +173,7 @@ No public traits are defined at this time.
 
 ## Examples
 
-T.B.C.
+Examples are provided in the ```examples``` directory, along with a markdown description for each. A detailed list TOC of them is provided in [EXAMPLES.md](./EXAMPLES.md).
 
 
 ## Project Information
@@ -186,8 +192,8 @@ Defect reports, feature requests, and pull requests are welcome on https://githu
 
 **shwild.Rust** has two dependencies, both optional:
 
-* [**collect-rs**]() - required, for more efficient range matching, if feature `"lookup-ranges"` is specified;
-* [**regex**]() - required, by some benchmark/example programs only, if feature `"test-regex"` is specified;
+* [**collect-rs**](https://github.com/synesissoftware/collect-rs) - required, for more efficient range matching, if feature `"lookup-ranges"` is specified;
+* [**regex**](https://github.com/rust-lang/regex) - required, by some benchmark/example programs only, if feature `"test-regex"` is specified;
 
 
 #### Dev Dependencies
@@ -200,7 +206,9 @@ Crates upon which **shwild** has development dependencies:
 
 ### Related projects
 
-None at this time.
+* [**shwild**](https://github.com/synesissoftware/shwild/);
+* [**shwild.Go**](https://github.com/synesissoftware/shwild.Go/);
+* [**collect-rs**](https://github.com/synesissoftware/collect-rs/);
 
 
 ### License

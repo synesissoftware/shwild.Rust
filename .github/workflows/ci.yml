@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+      - dev
+      - boilerplate
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  check:
+    name: Test, Clippy, Fmt, Checkers
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      - name: Install nightly rustfmt
+        run: rustup toolchain install nightly --profile minimal --component rustfmt
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: cargo test
+        run: cargo test --locked
+
+      - name: cargo clippy
+        run: cargo clippy --all-targets --locked -- -D warnings
+
+      - name: cargo build (examples)
+        run: cargo build --examples --locked
+
+      - name: cargo build (character-play example)
+        run: cargo build --example character-play --features test-regex --locked
+
+      - name: cargo doc
+        run: cargo doc --no-deps --locked
+
+      - name: rustfmt
+        run: ./scripts/fmt --check
+
+      - name: DOC_76 checker
+        run: python3 scripts/check_doc_76.py
+
+      - name: RUST_TEST_NAMING checker
+        run: python3 scripts/check_test_names.py
+
+      - name: DERIVE_LAYOUT checker
+        run: python3 scripts/check_derives.py
+
+  msrv:
+    name: MSRV (1.79)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@1.79.0
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: cargo check (library)
+        # Full `cargo test` needs dev-deps (criterion → clap_lex 2024 edition),
+        # which exceeds MSRV; the stable job runs the full test suite.
+        # MSRV 1.79: default `lookup-ranges` → collect-rs → base-traits uses
+        # `CStr::count_bytes()` (stabilized in Rust 1.79).
+        run: cargo check --lib --locked

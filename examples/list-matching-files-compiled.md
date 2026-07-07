@@ -1,5 +1,14 @@
-// Example program illustrating use of shwild to filter by name files found
-// in the executing directory
+# shwild.Rust Example - **list-matching-files-compiled**
+
+## Summary
+
+An example using **shwild.Rust**'s `CompiledMatcher` to list files in the current directory whose paths match one or more shell wildcard pattern(s) given on the command-line. Each pattern is parsed once up front; this is preferable when the same pattern(s) will be matched repeatedly. When no patterns are specified, `"*"` is assumed.
+
+
+## Source
+
+```Rust
+// examples/list-matching-files-compiled/main.rs : filter files using `CompiledMatcher`
 
 use std::{
     env as std_env,
@@ -23,7 +32,7 @@ fn main() {
     let matchers = patterns
         .iter()
         .map(|pattern| {
-            shwild::CompiledMatcher::from_pattern_and_flags(pattern, 0).unwrap_or_else(|e| {
+            shwild::CompiledMatcher::from_pattern_and_flags(&pattern, 0).unwrap_or_else(|e| {
                 eprintln!("failed to parse pattern '{pattern}': {e}");
 
                 std_process::exit(1);
@@ -64,3 +73,41 @@ fn main() {
         },
     };
 }
+```
+
+
+## Running and output
+
+When executed, as in:
+
+```bash
+$ cargo run --example list-matching-files-compiled
+```
+
+it gives output similar to:
+
+```
+searching in '.' with pattern(s) ["*"]
+	./Cargo.toml
+	./LICENSE
+	./README.md
+	...
+```
+
+With pattern argument(s), as in:
+
+```bash
+$ cargo run --example list-matching-files-compiled -- '*.md'
+```
+
+it gives output similar to:
+
+```
+searching in '.' with pattern(s) ["*.md"]
+	./README.md
+	./CHANGES.md
+	./TODO.md
+```
+
+
+<!-- ########################### end of file ########################### -->

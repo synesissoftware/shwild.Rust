@@ -8,14 +8,31 @@ authors = [
 	"Matt Wilson <matthew@synesis.com.au>",
 	"Zach Struck <zachstruck@gmail.com>",
 ]
-description = "shwild (for Rust)"
+categories = [
+	"command-line-interface",
+	"parser-implementations",
+	"development-tools",
+	"text-processing",
+]
+description = "Shell-compatible wildcard matching library"
+documentation = "https://docs.rs/shwild"
 edition = "2021"
+exclude = [
+	"target",
+	".github"
+]
 homepage = "https://github.com/synesissoftware/shwild.Rust"
+keywords = [
+	"pattern-matching",
+	"shell",
+	"wildcards",
+]
 license = "BSD-3-Clause"
 name = "shwild"
 readme = "README.md"
 repository = "https://github.com/synesissoftware/shwild.Rust"
-version = "0.1.2"
+rust-version = "1.79"
+version = "0.2.0"
 
 
 # ##########################################################
@@ -44,7 +61,7 @@ harness = false
 name = "shwild-matches"
 harness = false
 
-[[bin]]
+[[example]]
 name = "character-play"
 path = "test/scratch/character-play/main.rs"
 required-features = [
@@ -102,13 +119,17 @@ base-traits = "*"
 # ]}
 collect-rs = { version = "0.2", optional = true, default-features = false, features = [
 ]}
-regex = { version = "1.11", optional = true }
+regex = { version = "1.11", optional = true, default-features = false, features = [
+]}
 
 
 [dev-dependencies]
 
-criterion = { version = "0.5" }
-test_help-rs = { version = "0.1" }
+criterion = { version = "0.8", default-features = false, features = [
+	"html_reports",
+]}
+test_help-rs = { version = "0.1", default-features = false, features = [
+]}
 
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
