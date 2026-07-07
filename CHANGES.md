@@ -4,9 +4,11 @@
 ## 0.2.0 - 8th July 2026
 
 * added `assert_shwild_matches!()` and `assert_shwild_not_matches!()` test assertion macros, available with the `"assertions"` feature (enabled by default);
-* added optional dependency on [**base-traits**](https://github.com/synesissoftware/base-traits) (via `"assertions"`; minimal features: `implement-AsI64-for-built_ins`);
+* added `"flexible-flags-type"` feature — optional [**base-traits**](https://github.com/synesissoftware/base-traits) dependency (`implement-AsI64-for-built_ins`) allowing macro `flags` parameters to be any type implementing `AsI64`; when disabled, `flags` must be `i64`;
+* `"assertions"` no longer implies **base-traits**; use `"full"` to enable assertions, flexible flags, and lookup ranges together;
+* extended `shwild_matches!()` 3-parameter form with the same flexible-`flags` behaviour;
+* added **macros** benchmark (`benches/macros.rs`);
 * crate-level and macro `///` documentation for the assertion macros;
-* added macro benchmarks
 * **README.md** macros and dependencies sections updated;
 
 

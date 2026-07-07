@@ -91,6 +91,12 @@ default = [
 	"lookup-ranges",
 ]
 
+full = [
+	"assertions",
+	"flexible-flags-type",
+	"lookup-ranges",
+]
+
 # General features:
 #
 # - "_NEVER_TO_BE_ENABLED" - this is a placeholder feature and must NEVER be specified;
@@ -103,10 +109,14 @@ null-feature = []
 # Crate-specific features:
 #
 # - "assertions" - enable assertions;
+# - "flexible-flags-type" - allows flags parameters to be any type for which `base_traits::I64` is implemented;
 # - "lookup-ranges" - enable lookup ranges;
 # - "test-regex" - enable test regex;
 
 assertions = [
+]
+
+flexible-flags-type = [
 	"dep:base-traits",
 ]
 

@@ -1945,9 +1945,18 @@ macro_rules! shwild_matches {
     ($pattern:expr, $input:expr $(,)?) => {
         $crate::matches($pattern, $input, 0)
     };
-    ($pattern:expr, $input:expr, $flags:expr $(,)?) => {
-        $crate::matches($pattern, $input, $flags)
-    };
+    ($pattern:expr, $input:expr, $flags:expr $(,)?) => {{
+        #[cfg(feature = "flexible-flags-type")]
+        let flags = {
+            let flags : &dyn base_traits::AsI64 = &$flags;
+
+            flags.as_i64()
+        };
+        #[cfg(not(feature = "flexible-flags-type"))]
+        let flags : i64 = $flags;
+
+        $crate::matches($pattern, $input, flags)
+    }};
 }
 
 /// Defines the macro `assert_shwild_matches!()`.
@@ -1971,8 +1980,14 @@ macro_rules! assert_shwild_matches {
     ($expected_pattern:expr, $actual:expr, $flags:expr) => {
         let expected_pattern : &str = &$expected_pattern;
         let actual = &$actual;
-        let flags : &dyn base_traits::AsI64 = &$flags;
-        let flags = flags.as_i64();
+        #[cfg(feature = "flexible-flags-type")]
+        let flags = {
+            let flags : &dyn base_traits::AsI64 = &$flags;
+
+            flags.as_i64()
+        };
+        #[cfg(not(feature = "flexible-flags-type"))]
+        let flags : i64 = $flags;
 
         match $crate::matches(expected_pattern, actual, flags) {
             Err(e) => {
@@ -2013,8 +2028,14 @@ macro_rules! assert_shwild_not_matches {
     ($expected_pattern:expr, $actual:expr, $flags:expr) => {
         let expected_pattern : &str = &$expected_pattern;
         let actual = &$actual;
-        let flags : &dyn base_traits::AsI64 = &$flags;
-        let flags = flags.as_i64();
+        #[cfg(feature = "flexible-flags-type")]
+        let flags = {
+            let flags : &dyn base_traits::AsI64 = &$flags;
+
+            flags.as_i64()
+        };
+        #[cfg(not(feature = "flexible-flags-type"))]
+        let flags : i64 = $flags;
 
         match $crate::matches(expected_pattern, actual, flags) {
             Err(e) => {
@@ -3559,6 +3580,73 @@ mod tests {
         #[should_panic(expected = "assertion failed: actual value 'D' matches unexpectedly with the pattern '[a-d]'")]
         fn TEST_assert_shwild_not_matches_UNEXPECTED_MATCH_WITH__IGNORE_CASE__1() {
             assert_shwild_not_matches!("[a-d]", "D", IGNORE_CASE);
+        }
+    }
+
+
+    #[cfg(feature = "flexible-flags-type")]
+    mod TEST_FLEXIBLE_FLAGS_TYPE {
+        #![allow(non_snake_case)]
+
+        use super::*;
+
+        use base_traits::AsI64;
+
+
+        struct Flags(i64);
+
+        impl AsI64 for Flags {
+            fn as_i64(&self) -> i64 {
+                self.0
+            }
+        }
+
+
+        #[test]
+        fn TEST_shwild_matches_WITH__AsI64__IGNORE_CASE_1() {
+            assert_eq!(Ok(true), shwild_matches!("[a-d]", "A", IGNORE_CASE));
+            assert_eq!(Ok(false), shwild_matches!("[a-d]", "A", 0i64));
+        }
+
+        #[test]
+        fn TEST_shwild_matches_WITH__AsI64__i64_1() {
+            let flags = IGNORE_CASE;
+
+            assert_eq!(Ok(true), shwild_matches!("[a-d]", "B", flags));
+            assert_eq!(Ok(false), shwild_matches!("[a-d]", "B", 0i64));
+        }
+
+        #[test]
+        fn TEST_shwild_matches_WITH__AsI64__Flags_1() {
+            let flags = Flags(IGNORE_CASE);
+
+            assert_eq!(Ok(true), shwild_matches!("[a-d]", "C", flags));
+            assert_eq!(Ok(false), shwild_matches!("[a-d]", "C", Flags(0)));
+        }
+
+        #[cfg(feature = "assertions")]
+        mod TEST_ASSERTION_MATCHES {
+            #![allow(non_snake_case)]
+
+            use super::*;
+
+
+            #[test]
+            fn TEST_assert_shwild_matches_WITH__AsI64__Flags_1() {
+                assert_shwild_matches!("[a-d]", "D", Flags(IGNORE_CASE));
+                assert_shwild_matches!("[a-d]", "d", Flags(0));
+            }
+
+            #[test]
+            fn TEST_assert_shwild_not_matches_WITH__AsI64__Flags_1() {
+                assert_shwild_not_matches!("[a-d]", "e", Flags(0));
+                assert_shwild_not_matches!("[a-d]", "D", Flags(0));
+            }
+
+            #[test]
+            fn TEST_assert_shwild_not_matches_WITH__AsI64__IGNORE_CASE_1() {
+                assert_shwild_not_matches!("[a-d]", "e", IGNORE_CASE);
+            }
         }
     }
 }

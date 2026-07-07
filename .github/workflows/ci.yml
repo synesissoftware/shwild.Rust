@@ -42,6 +42,9 @@ jobs:
       - name: cargo test ("test-regex")
         run: cargo test --no-default-features --features test-regex --locked
 
+      - name: cargo test ("full")
+        run: cargo test --no-default-features --features full --locked
+
       - name: cargo clippy
         run: cargo clippy --all-targets --locked -- -D warnings
 
