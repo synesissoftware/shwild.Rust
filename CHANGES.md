@@ -1,0 +1,42 @@
+# shwild.Rust - CHANGES <!-- omit in toc -->
+
+
+## 0.1.3 - 28th March 2025
+
+* crates.io packaging metadata — `categories`, `keywords`, `documentation`, and expanded `description`;
+* added `exclude` for `target` and `.github` in **Cargo.toml**;
+* added **TODO.md**;
+* **character-play** changed from `[[bin]]` to `[[example]]`;
+
+
+## 0.1.2 - 3rd November 2024
+
+* added `test-regex` feature — optional **regex** dependency for benchmarks and scratch programs;
+* enabled `lookup-ranges` in default features;
+* added **cw-regex** benchmark;
+* added **character-play** scratch program;
+* added `regex_comparision_tests` unit tests (gated on `test-regex`);
+
+
+## 0.1.1 - 3rd November 2024
+
+* added `lookup-ranges` feature — optional **collect-rs** dependency for `UnicodePointMap`-based range matching;
+* added **Cargo.lock**;
+* README: added Features section; clarified Wild-1 escape behaviour in pattern elements;
+
+
+## 0.1.0 - 3rd November 2024
+
+* first public release;
+* added `matches()` and `shwild_matches!()`;
+* added `CompiledMatcher`;
+* added `Error`, `Result`, and `IGNORE_CASE`;
+* added example programs **list-matching-files** and **list-matching-files-compiled**;
+* added benchmarks **range_string-creation_functions**, **shwild-compiled_matcher**, and **shwild-matches**;
+* added **README.md**;
+
+
+All history before this day is moot!
+
+
+<!-- ########################### end of file ########################### -->
