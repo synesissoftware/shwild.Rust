@@ -31,7 +31,7 @@ license = "BSD-3-Clause"
 name = "shwild"
 readme = "README.md"
 repository = "https://github.com/synesissoftware/shwild.Rust"
-rust-version = "1.74"
+rust-version = "1.79"
 version = "0.1.4"
 
 
