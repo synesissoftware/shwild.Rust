@@ -3,12 +3,13 @@
 #![allow(non_snake_case)]
 
 use criterion::{
-    black_box,
     criterion_group,
     criterion_main,
     // BenchmarkId,
     Criterion,
 };
+
+use std::hint::black_box;
 
 
 mod constants {

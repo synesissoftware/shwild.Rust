@@ -118,7 +118,7 @@ regex = { version = "1.11", optional = true }
 
 [dev-dependencies]
 
-criterion = { version = "0.5" }
+criterion = { version = "0.6" }
 test_help-rs = { version = "0.1" }
 
 
