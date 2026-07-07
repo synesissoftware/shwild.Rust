@@ -170,7 +170,7 @@ No public traits are defined at this time.
 
 ## Examples
 
-T.B.C.
+Examples are provided in the ```examples``` directory, along with a markdown description for each. A detailed list TOC of them is provided in [EXAMPLES.md](./EXAMPLES.md).
 
 
 ## Project Information
