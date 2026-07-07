@@ -1,3 +1,51 @@
+//! Shell-compatible wildcard matching for Rust — part of the cross-language
+//! **shwild** family.
+//!
+//! **shwild** provides shell-style pattern matching: literals, `?` (any one
+//! character), `*` (any number of characters), `[`…`]` ranges, `[^`…`]`
+//! not-ranges, escapes, and case flags. **shwild.Rust** is a port with
+//! minimal API differences from the original **C/C++** library; the design
+//! emphasis is simplicity-of-use, modularity, and performance.
+//!
+//! (See [**shwild.Go**][sg] for the Go implementation.)
+//!
+//! # Installation
+//!
+//! Reference in **Cargo.toml** in the usual way:
+//!
+//! ```toml
+//! shwild = { version = "0.1" }
+//! ```
+//!
+//! # Components
+//!
+//! * [`matches()`] — parse `pattern` and test `input` in one step;
+//! * [`shwild_matches!`] — shorthand for [`matches()`] (2- or 3-arg);
+//! * [`CompiledMatcher`] — parse once, match many times;
+//! * [`Error`] and [`Result`] — parse/match error reporting;
+//! * [`IGNORE_CASE`] — flag for case-insensitive matching;
+//!
+//! # Features
+//!
+//! * `lookup-ranges` (default) — range matching via **collect-rs**
+//!   `UnicodePointMap`;
+//! * `null-feature` — no effect; useful for driver scripts;
+//! * `test-regex` — optional **regex** dependency for benchmarks and
+//!   scratch programs;
+//!
+//! # Examples
+//!
+//! ```
+//! use shwild::shwild_matches;
+//!
+//! assert_eq!(Ok(true), shwild_matches!("*.rs", "lib.rs"));
+//! ```
+//!
+//! Further examples are in the repository **examples** directory and in
+//! the project [README](https://github.com/synesissoftware/shwild.Rust).
+//!
+//! [sg]: https://github.com/synesissoftware/shwild.Go
+
 // src/lib.rs : Definition of the shwild Rust package
 
 // ///////////////////////////////////////////////

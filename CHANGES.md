@@ -1,6 +1,17 @@
 # shwild.Rust - CHANGES <!-- omit in toc -->
 
 
+## 0.1.4 - 7th July 2026
+
+* added **CHANGES.md** (back-filled) and **NEWS.md**;
+* added **EXAMPLES.md** and per-example documentation;
+* **README.md** badges, dependency links, related projects, and `null-feature` documentation;
+* added crate-level `//!` documentation;
+* renamed `.rustfmt.toml` => **rustfmt.toml**; updated formatting settings;
+* added `.gitattributes`;
+* shortened `description` in **Cargo.toml**;
+
+
 ## 0.1.3 - 28th March 2025
 
 * crates.io packaging metadata — `categories`, `keywords`, `documentation`, and expanded `description`;

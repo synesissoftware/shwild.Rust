@@ -67,7 +67,7 @@ The library (and other **shwild** variants) support the following pattern elemen
 Reference in **Cargo.toml** in the usual way:
 
 ```toml
-shwild = { version = "~0.1" }
+shwild = { version = "0.1" }
 ```
 
 
@@ -107,6 +107,7 @@ The following crate features are defined:
 | Name                        | Effect                                | Is `"default"`? | Dependent feature(s)                  |
 | --------------------------- | ------------------------------------- | --------------- | ------------------------------------- |
 | `"lookup-ranges"`           | Causes match/non-match ranges to be implemented in terms of `UnicodePointMap` (from **collect-rs** crate), resulting in significant performance improvements in parsing and matching | Yes | |
+| `"null-feature"`            | A feature that has no effect (and, thus, is useful for simplifying driver scripts) | **No** | |
 | `"test-regex"`              | Introduces a dependency to **regex** crate to support benchmark/example program(s) | **No** | |
 
 
@@ -189,8 +190,8 @@ Defect reports, feature requests, and pull requests are welcome on https://githu
 
 **shwild.Rust** has two dependencies, both optional:
 
-* [**collect-rs**]() - required, for more efficient range matching, if feature `"lookup-ranges"` is specified;
-* [**regex**]() - required, by some benchmark/example programs only, if feature `"test-regex"` is specified;
+* [**collect-rs**](https://github.com/synesissoftware/collect-rs) - required, for more efficient range matching, if feature `"lookup-ranges"` is specified;
+* [**regex**](https://github.com/rust-lang/regex) - required, by some benchmark/example programs only, if feature `"test-regex"` is specified;
 
 
 #### Dev Dependencies
@@ -203,7 +204,9 @@ Crates upon which **shwild** has development dependencies:
 
 ### Related projects
 
-None at this time.
+* [**shwild**](https://github.com/synesissoftware/shwild/);
+* [**shwild.Go**](https://github.com/synesissoftware/shwild.Go/);
+* [**collect-rs**](https://github.com/synesissoftware/collect-rs/);
 
 
 ### License
