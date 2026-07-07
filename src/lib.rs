@@ -1966,7 +1966,6 @@ macro_rules! shwild_matches {
 #[macro_export]
 macro_rules! assert_shwild_matches {
     ($expected_pattern:expr, $actual:expr) => {
-
         assert_shwild_matches!($expected_pattern, $actual, 0i64);
     };
     ($expected_pattern:expr, $actual:expr, $flags:expr) => {
@@ -2009,7 +2008,6 @@ macro_rules! assert_shwild_matches {
 #[macro_export]
 macro_rules! assert_shwild_not_matches {
     ($expected_pattern:expr, $actual:expr) => {
-
         assert_shwild_not_matches!($expected_pattern, $actual, 0i64);
     };
     ($expected_pattern:expr, $actual:expr, $flags:expr) => {
