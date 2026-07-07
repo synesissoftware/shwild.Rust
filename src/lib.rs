@@ -1969,7 +1969,7 @@ macro_rules! assert_shwild_not_matches {
                 panic!("could not evaluate actual value due to a failure in the parsing of expected pattern '{}': {}", expected_pattern, e);
             },
             Ok(b) => {
-                assert!(!b, "assertion failed: actual value '{}' match unexpectedly with the pattern '{}'", actual, expected_pattern);
+                assert!(!b, "assertion failed: actual value '{}' matches unexpectedly with the pattern '{}'", actual, expected_pattern);
             }
         }
     };
