@@ -6,6 +6,7 @@
 * added `assert_shwild_matches!()` and `assert_shwild_not_matches!()` test assertion macros, available with the `"assertions"` feature (enabled by default);
 * added optional dependency on [**base-traits**](https://github.com/synesissoftware/base-traits) (via `"assertions"`; minimal features: `implement-AsI64-for-built_ins`);
 * crate-level and macro `///` documentation for the assertion macros;
+* added macro benchmarks
 * **README.md** macros and dependencies sections updated;
 
 
