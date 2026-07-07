@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 [![Crates.io](https://img.shields.io/crates/v/shwild.svg)](https://crates.io/crates/shwild)
 [![GitHub release](https://img.shields.io/github/v/release/synesissoftware/shwild.Rust.svg)](https://github.com/synesissoftware/shwild.Rust/releases/latest)
-![MSRV](https://img.shields.io/badge/MSRV-1.74-lightgrey)
+![MSRV](https://img.shields.io/badge/MSRV-1.79-lightgrey)
 [![CI](https://github.com/synesissoftware/shwild.Rust/actions/workflows/ci.yml/badge.svg)](https://github.com/synesissoftware/shwild.Rust/actions/workflows/ci.yml)
 [![Last Commit](https://img.shields.io/github/last-commit/synesissoftware/shwild.Rust)](https://github.com/synesissoftware/shwild.Rust/commits/master)
 [![docs.rs](https://img.shields.io/docsrs/shwild/badge.svg)](https://docs.rs/shwild)

@@ -8,7 +8,7 @@
 * **README.md** badges, dependency links, related projects, and `null-feature` documentation;
 * added crate-level `//!` documentation;
 * added CI (`.github/workflows/ci.yml`) and quality scripts (`scripts/fmt`, checkers);
-* added `rust-version` (MSRV 1.74);
+* added `rust-version` (MSRV 1.79);
 * renamed `.rustfmt.toml` => **rustfmt.toml**; updated formatting settings;
 * added `.gitattributes`;
 * shortened `description` in **Cargo.toml**;

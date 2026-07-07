@@ -55,16 +55,18 @@ jobs:
         run: python3 scripts/check_derives.py
 
   msrv:
-    name: MSRV (1.74)
+    name: MSRV (1.79)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - uses: dtolnay/rust-toolchain@1.74.0
+      - uses: dtolnay/rust-toolchain@1.79.0
 
       - uses: Swatinem/rust-cache@v2
 
       - name: cargo check (library)
         # Full `cargo test` needs dev-deps (criterion → clap_lex 2024 edition),
-        # which exceeds MSRV 1.74; the stable job runs the full test suite.
+        # which exceeds MSRV; the stable job runs the full test suite.
+        # MSRV 1.79: default `lookup-ranges` → collect-rs → base-traits uses
+        # `CStr::count_bytes()` (stabilized in Rust 1.79).
         run: cargo check --lib --locked
