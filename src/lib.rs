@@ -1426,7 +1426,10 @@ pub type Result<T> = std_result::Result<T, Error>;
 /// # Examples:
 ///
 /// ```
-/// let matcher = shwild::CompiledMatcher::from_pattern_and_flags("a[bc]c?", shwild::IGNORE_CASE).unwrap();
+/// let matcher = shwild::CompiledMatcher::from_pattern_and_flags(
+///     "a[bc]c?",
+///     shwild::IGNORE_CASE,
+/// ).unwrap();
 ///
 /// assert!(matcher.matches("abcd"));
 /// assert!(matcher.matches("accd"));
