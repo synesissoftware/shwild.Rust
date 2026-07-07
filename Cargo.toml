@@ -14,11 +14,7 @@ categories = [
 	"development-tools",
 	"text-processing",
 ]
-description = """
-**shwild** is a small, standalone library, implemented in C++ with a C and a C++ API, that provides shell-compatible wildcard matching.
-
-**shwild.Rust** is a **Rust** port, with minimal API differences. The design emphasis is on simplicity-of-use, modularity, and performance.
-"""
+description = "Shell-compatible wildcard matching library"
 documentation = "https://docs.rs/shwild"
 edition = "2021"
 exclude = [
