@@ -2014,9 +2014,8 @@ mod tests {
     #![allow(non_snake_case)]
 
     use crate::{
-        assert_shwild_matches,
         self as shwild,
-        shwild_matches,
+        constants::*,
     };
 
 
@@ -2024,8 +2023,6 @@ mod tests {
         #![allow(non_snake_case)]
 
         use super::*;
-
-        use crate::constants::*;
 
 
         #[test]
@@ -3440,7 +3437,6 @@ mod tests {
     mod TEST_ASSERTION_MATCHES {
         #![allow(non_snake_case)]
 
-        use super::*;
 
 
         #[test]
