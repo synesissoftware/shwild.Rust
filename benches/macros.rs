@@ -138,6 +138,7 @@ mod macros_benches {
         let flags = 0;
 
         let inputs = [
+            // insert list:
             "",
             " ",
             "a",
@@ -164,6 +165,7 @@ mod macros_benches {
         let flags = 0;
 
         let inputs = [
+            // insert list:
             "",
             " ",
             "a",
@@ -190,6 +192,7 @@ mod macros_benches {
         let flags = 0;
 
         let inputs = [
+            // insert list:
             "",
             " ",
             "a",
@@ -216,6 +219,7 @@ mod macros_benches {
         let flags = 0;
 
         let inputs = [
+            // insert list:
             "",
             " ",
             "a",
@@ -242,6 +246,7 @@ mod macros_benches {
         let flags = 0;
 
         let inputs = [
+            // insert list:
             "",
             " ",
             "a",
@@ -268,6 +273,7 @@ mod macros_benches {
         let flags = 0;
 
         let inputs = [
+            // insert list:
             "",
             " ",
             "a",
@@ -363,6 +369,7 @@ mod assertion_benches {
         let pattern = constants::patterns::NRANGE_CONTINUUM_SIMPLE;
 
         let inputs = [
+            // insert list:
             " ",
             "_",
         ];
@@ -380,6 +387,7 @@ mod assertion_benches {
         let pattern = constants::patterns::NRANGE_CONTINUUM_REVERSE;
 
         let inputs = [
+            // insert list:
             " ",
             "_",
         ];
@@ -397,6 +405,7 @@ mod assertion_benches {
         let pattern = constants::patterns::NRANGE_CONTINUUM_CROSSCASE;
 
         let inputs = [
+            // insert list:
             " ",
             "_",
         ];
@@ -414,6 +423,7 @@ mod assertion_benches {
         let pattern = constants::patterns::RANGE_CONTINUUM_SIMPLE;
 
         let inputs = [
+            // insert list:
             "a",
             "b",
             "c",
@@ -433,6 +443,7 @@ mod assertion_benches {
         let pattern = constants::patterns::RANGE_CONTINUUM_REVERSE;
 
         let inputs = [
+            // insert list:
             "a",
             "b",
             "c",
@@ -452,6 +463,7 @@ mod assertion_benches {
         let pattern = constants::patterns::RANGE_CONTINUUM_CROSSCASE;
 
         let inputs = [
+            // insert list:
             "a",
             "b",
             "c",
@@ -532,6 +544,7 @@ mod assertion_benches {
         let pattern = constants::patterns::NRANGE_CONTINUUM_SIMPLE;
 
         let inputs = [
+            // insert list:
             "a",
             "b",
             "c",
@@ -553,6 +566,7 @@ mod assertion_benches {
         let pattern = constants::patterns::NRANGE_CONTINUUM_REVERSE;
 
         let inputs = [
+            // insert list:
             "a",
             "b",
             "c",
@@ -574,6 +588,7 @@ mod assertion_benches {
         let pattern = constants::patterns::NRANGE_CONTINUUM_CROSSCASE;
 
         let inputs = [
+            // insert list:
             "a",
             "b",
             "c",
@@ -595,6 +610,7 @@ mod assertion_benches {
         let pattern = constants::patterns::RANGE_CONTINUUM_SIMPLE;
 
         let inputs = [
+            // insert list:
             "",
             " ",
             "aa",
@@ -614,6 +630,7 @@ mod assertion_benches {
         let pattern = constants::patterns::RANGE_CONTINUUM_REVERSE;
 
         let inputs = [
+            // insert list:
             "",
             " ",
             "aa",
@@ -633,6 +650,7 @@ mod assertion_benches {
         let pattern = constants::patterns::RANGE_CONTINUUM_CROSSCASE;
 
         let inputs = [
+            // insert list:
             "",
             " ",
             "aa",
