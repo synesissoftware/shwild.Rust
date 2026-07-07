@@ -1,7 +1,7 @@
 # shwild.Rust - CHANGES <!-- omit in toc -->
 
 
-## 0.1.4 - 7th July 2026
+## 0.1.4 - 8th July 2026
 
 * added **CHANGES.md** (back-filled) and **NEWS.md**;
 * added **EXAMPLES.md** and per-example documentation;
@@ -13,6 +13,7 @@
 * added `.gitattributes`;
 * shortened `description` in **Cargo.toml**;
 * Clippy and test-naming fixes for CI;
+* upgraded **criterion** from 0.5 => 0.7;
 
 
 ## 0.1.3 - 28th March 2025
