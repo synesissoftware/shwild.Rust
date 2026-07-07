@@ -1,8 +1,13 @@
-# shwild <!-- omit in toc -->
+# shwild.Rust <!-- omit in toc -->
 
-**SH**ell-compatible **WILD**cards, for **Rust**.
-
+![Language](https://img.shields.io/badge/Rust-000000?style=flat&logo=rust&logoColor=white)
+[![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 [![Crates.io](https://img.shields.io/crates/v/shwild.svg)](https://crates.io/crates/shwild)
+[![GitHub release](https://img.shields.io/github/v/release/synesissoftware/shwild.Rust.svg)](https://github.com/synesissoftware/shwild.Rust/releases/latest)
+[![Last Commit](https://img.shields.io/github/last-commit/synesissoftware/shwild.Rust)](https://github.com/synesissoftware/shwild.Rust/commits/master)
+[![docs.rs](https://docs.rs/shwild/badge.svg)](https://docs.rs/shwild)
+
+**SH**ell-compatible **WILD**cards, for **Rust** — part of the cross-language **shwild** family.
 
 
 ## Table of Contents <!-- omit in toc -->
@@ -30,9 +35,7 @@
 
 ## Introduction
 
-**shwild** is a small, standalone library, implemented in C++ with a C and a C++ API, that provides shell-compatible wildcard matching.
-
-**shwild.Rust** is a **Rust** port, with minimal API differences. The design emphasis is on simplicity-of-use, modularity, and performance.
+**shwild** is a small, standalone library, implemented in C++ with a C and a C++ API, that provides shell-compatible wildcard matching. **shwild.Rust** is a **Rust** port, with minimal API differences. The design emphasis is on simplicity-of-use, modularity, and performance.
 
 ```Rust
 	let pattern = r"Where are the* [🐼🐻]s\?";
