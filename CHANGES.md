@@ -13,7 +13,7 @@
 * added `.gitattributes`;
 * shortened `description` in **Cargo.toml**;
 * Clippy and test-naming fixes for CI; `check_test_names.py` allows `__CONSTRUCT__` padding;
-* upgraded **criterion** from 0.5 => 0.7;
+* upgraded **criterion** from 0.5 => 0.8;
 
 
 ## 0.1.3 - 28th March 2025
