@@ -1,6 +1,14 @@
 # shwild.Rust - CHANGES <!-- omit in toc -->
 
 
+## 0.2.0 - 8th July 2026
+
+* added `assert_shwild_matches!()` and `assert_shwild_not_matches!()` test assertion macros;
+* added required dependency on [**base-traits**](https://github.com/synesissoftware/base-traits) (minimal features: `implement-AsI64-for-built_ins`);
+* crate-level and macro `///` documentation for the assertion macros;
+* **README.md** macros and dependencies sections updated;
+
+
 ## 0.1.4 - 8th July 2026
 
 * added **CHANGES.md** (back-filled) and **NEWS.md**;

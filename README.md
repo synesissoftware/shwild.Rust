@@ -69,7 +69,7 @@ The library (and other **shwild** variants) support the following pattern elemen
 Reference in **Cargo.toml** in the usual way:
 
 ```toml
-shwild = { version = "0.1" }
+shwild = { version = "0.2" }
 ```
 
 
@@ -133,6 +133,16 @@ pub mod shwild {
 
 The `shwild::shwild_matches!()` macro is a shorthand for the `shwild::matches()` function, providing 2-parameter and 3-parameter forms. The 2-parameter form passes 0 for the `flags` parameter.
 
+The `shwild::assert_shwild_matches!()` and `shwild::assert_shwild_not_matches!()` macros are test-oriented counterparts that panic on failure. Each provides 2-parameter and 3-parameter forms; the 2-parameter form passes 0 for the `flags` parameter. A parse error in the pattern panics with a descriptive message rather than returning `Err`.
+
+```Rust
+	use shwild::{assert_shwild_matches, assert_shwild_not_matches, IGNORE_CASE};
+
+	assert_shwild_matches!("[a-d]", "b");
+	assert_shwild_not_matches!("[a-d]", "e");
+	assert_shwild_matches!("[a-d]", "B", IGNORE_CASE);
+```
+
 
 ### Structures
 
@@ -190,8 +200,9 @@ Defect reports, feature requests, and pull requests are welcome on https://githu
 
 ### Dependencies
 
-**shwild.Rust** has two dependencies, both optional:
+**shwild.Rust** has one required dependency and two optional dependencies:
 
+* [**base-traits**](https://github.com/synesissoftware/base-traits) - required; supports the `flags` parameter type in `assert_shwild_matches!()` and `assert_shwild_not_matches!()` via `AsI64`;
 * [**collect-rs**](https://github.com/synesissoftware/collect-rs) - required, for more efficient range matching, if feature `"lookup-ranges"` is specified;
 * [**regex**](https://github.com/rust-lang/regex) - required, by some benchmark/example programs only, if feature `"test-regex"` is specified;
 
@@ -208,6 +219,7 @@ Crates upon which **shwild** has development dependencies:
 
 * [**shwild**](https://github.com/synesissoftware/shwild/);
 * [**shwild.Go**](https://github.com/synesissoftware/shwild.Go/);
+* [**base-traits**](https://github.com/synesissoftware/base-traits/);
 * [**collect-rs**](https://github.com/synesissoftware/collect-rs/);
 
 

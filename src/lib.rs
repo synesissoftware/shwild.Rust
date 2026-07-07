@@ -14,13 +14,16 @@
 //! Reference in **Cargo.toml** in the usual way:
 //!
 //! ```toml
-//! shwild = { version = "0.1" }
+//! shwild = { version = "0.2" }
 //! ```
 //!
 //! # Components
 //!
 //! * [`matches()`] — parse `pattern` and test `input` in one step;
 //! * [`shwild_matches!`] — shorthand for [`matches()`] (2- or 3-arg);
+//! * [`assert_shwild_matches!`] — test assertion that `actual` matches;
+//! * [`assert_shwild_not_matches!`] — test assertion that `actual` does
+//!   not match;
 //! * [`CompiledMatcher`] — parse once, match many times;
 //! * [`Error`] and [`Result`] — parse/match error reporting;
 //! * [`IGNORE_CASE`] — flag for case-insensitive matching;
@@ -39,6 +42,16 @@
 //! use shwild::shwild_matches;
 //!
 //! assert_eq!(Ok(true), shwild_matches!("*.rs", "lib.rs"));
+//! ```
+//!
+//! In unit tests, prefer [`assert_shwild_matches!`] and
+//! [`assert_shwild_not_matches!`]:
+//!
+//! ```
+//! use shwild::{assert_shwild_matches, assert_shwild_not_matches};
+//!
+//! assert_shwild_matches!("[a-d]", "b");
+//! assert_shwild_not_matches!("[a-d]", "e");
 //! ```
 //!
 //! Further examples are in the repository **examples** directory and in
@@ -1929,6 +1942,16 @@ macro_rules! shwild_matches {
     };
 }
 
+/// Defines the macro `assert_shwild_matches!()`.
+///
+/// # Parameters:
+/// - `$expected_pattern` - the pattern against which `$actual` is
+///   evaluated;
+/// - `$actual` - the string to be evaluated;
+/// - `$flags` - flags that moderate the evaluation;
+///
+/// Panics if `$expected_pattern` is invalid or if `$actual` does not match.
+/// The 2-parameter form passes 0 for the `flags` parameter.
 #[macro_export]
 macro_rules! assert_shwild_matches {
     ($expected_pattern:expr, $actual:expr) => {
@@ -1952,6 +1975,16 @@ macro_rules! assert_shwild_matches {
     };
 }
 
+/// Defines the macro `assert_shwild_not_matches!()`.
+///
+/// # Parameters:
+/// - `$expected_pattern` - the pattern against which `$actual` is
+///   evaluated;
+/// - `$actual` - the string to be evaluated;
+/// - `$flags` - flags that moderate the evaluation;
+///
+/// Panics if `$expected_pattern` is invalid or if `$actual` matches. The
+/// 2-parameter form passes 0 for the `flags` parameter.
 #[macro_export]
 macro_rules! assert_shwild_not_matches {
     ($expected_pattern:expr, $actual:expr) => {

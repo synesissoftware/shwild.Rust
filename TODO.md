@@ -68,7 +68,8 @@ Proposed module layout:
 
 ```
 src/
-  lib.rs              # crate docs, re-exports, matches(), shwild_matches! macro;
+  lib.rs              # crate docs, re-exports, matches(), shwild_matches!,
+                      # assert_shwild_matches!/assert_shwild_not_matches!;
                       # #[cfg(test)] API unit tests (stay here)
   constants.rs        # IGNORE_CASE
   error.rs            # Error + Display/Error trait impls
