@@ -44,4 +44,8 @@ word must preserve its exact correct case - e.g.
 `TEST_AutoBuffer_WITH_INTERNAL_SIZE()`, `TEST_doom_scope_1()`,
 `TEST_type_name_only_WITH_SomeCustomType()`.
 
+When a construct is embedded as a SHOUTING_SNAKE_CASE constant (or other
+construct name), use an extra underscore on each side as a delimiter - e.g.
+`TEST_MatcherSequence_WITH_Range_HAVING__IGNORE_CASE__1()`.
+
 Run `./scripts/check_test_names.py` to verify compliance.

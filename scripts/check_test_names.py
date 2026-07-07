@@ -3,6 +3,10 @@
 Verify RUST_TEST_NAMING: test functions and test modules use TEST_ prefix
 and SHOUTING_SNAKE_CASE, except words that name a specific Rust construct
 (type, function, macro, field, etc.) which must preserve exact case.
+
+When a construct name is embedded as a SHOUTING_SNAKE_CASE constant (or
+PascalCase construct), it may be delimited with an extra underscore on
+each side — e.g. HAVING__IGNORE_CASE__1.
 """
 
 from __future__ import annotations
@@ -47,6 +51,45 @@ def atom_violation(atom: str) -> str | None:
     )
 
 
+def parse_padded_construct(
+    segments: list[str], start: int
+) -> tuple[str | None, int, list[str]]:
+    """Parse __CONSTRUCT__ padding around a shouting or PascalCase atom."""
+    violations: list[str] = []
+    i = start
+    while i < len(segments) and not segments[i]:
+        i += 1
+    if i >= len(segments):
+        return None, i, [f"empty segment padding without construct"]
+
+    seg = segments[i]
+    atom: str | None = None
+
+    if seg.isupper():
+        parts = [seg]
+        i += 1
+        while i < len(segments) and segments[i] and segments[i].isupper():
+            parts.append(segments[i])
+            i += 1
+        atom = "_".join(parts)
+        reason = atom_violation(atom)
+        if reason:
+            violations.append(reason)
+    elif seg[0].isupper() and is_pascal_case_atom(seg):
+        atom = seg
+        reason = atom_violation(atom)
+        if reason:
+            violations.append(reason)
+        i += 1
+    else:
+        return None, start, [f"empty segment padding without construct"]
+
+    while i < len(segments) and not segments[i]:
+        i += 1
+
+    return atom, i, violations
+
+
 def parse_name_atoms(rest: str) -> tuple[list[str], list[str]]:
     """Split a test name body into atoms; return (atoms, violations)."""
     atoms: list[str] = []
@@ -57,8 +100,12 @@ def parse_name_atoms(rest: str) -> tuple[list[str], list[str]]:
     while i < len(segments):
         seg = segments[i]
         if not seg:
-            violations.append(f"empty segment in '{rest}'")
-            i += 1
+            atom, i, viols = parse_padded_construct(segments, i)
+            violations.extend(viols)
+            if atom:
+                atoms.append(atom)
+            elif not viols:
+                violations.append(f"empty segment in '{rest}'")
             continue
 
         if seg.isupper() or seg.isdigit():

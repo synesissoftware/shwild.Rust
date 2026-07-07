@@ -12,7 +12,7 @@
 * renamed `.rustfmt.toml` => **rustfmt.toml**; updated formatting settings;
 * added `.gitattributes`;
 * shortened `description` in **Cargo.toml**;
-* Clippy and test-naming fixes for CI;
+* Clippy and test-naming fixes for CI; `check_test_names.py` allows `__CONSTRUCT__` padding;
 * upgraded **criterion** from 0.5 => 0.7;
 
 
