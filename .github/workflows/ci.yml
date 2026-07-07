@@ -33,6 +33,9 @@ jobs:
       - name: cargo test (no default features)
         run: cargo test --no-default-features --locked
 
+      - name: cargo test ("assertions")
+        run: cargo test --no-default-features --features assertions --locked
+
       - name: cargo test ("lookup-ranges")
         run: cargo test --no-default-features --features lookup-ranges --locked
 

@@ -21,15 +21,18 @@
 //!
 //! * [`matches()`] — parse `pattern` and test `input` in one step;
 //! * [`shwild_matches!`] — shorthand for [`matches()`] (2- or 3-arg);
-//! * [`assert_shwild_matches!`] — test assertion that `actual` matches;
+//! * [`assert_shwild_matches!`] — test assertion that `actual` matches
+//!   (requires `"assertions"` feature);
 //! * [`assert_shwild_not_matches!`] — test assertion that `actual` does
-//!   not match;
+//!   not match (requires `"assertions"` feature);
 //! * [`CompiledMatcher`] — parse once, match many times;
 //! * [`Error`] and [`Result`] — parse/match error reporting;
 //! * [`IGNORE_CASE`] — flag for case-insensitive matching;
 //!
 //! # Features
 //!
+//! * `assertions` (default) — [`assert_shwild_matches!`] and
+//!   [`assert_shwild_not_matches!`] via **base-traits**;
 //! * `lookup-ranges` (default) — range matching via **collect-rs**
 //!   `UnicodePointMap`;
 //! * `null-feature` — no effect; useful for driver scripts;
@@ -45,13 +48,16 @@
 //! ```
 //!
 //! In unit tests, prefer [`assert_shwild_matches!`] and
-//! [`assert_shwild_not_matches!`]:
+//! [`assert_shwild_not_matches!`] (requires `"assertions"` feature):
 //!
 //! ```
+//! # #[cfg(feature = "assertions")]
+//! # {
 //! use shwild::{assert_shwild_matches, assert_shwild_not_matches};
 //!
 //! assert_shwild_matches!("[a-d]", "b");
 //! assert_shwild_not_matches!("[a-d]", "e");
+//! # }
 //! ```
 //!
 //! Further examples are in the repository **examples** directory and in
@@ -1539,7 +1545,9 @@ impl CompiledMatcher {
         let mut num_bytes = 0;
 
         for c in pattern.chars() {
-            debug_assert!(continuum_prior.is_none() || std_matches!(state, ParseState::InNotRange | ParseState::InRange));
+            debug_assert!(
+                continuum_prior.is_none() || std_matches!(state, ParseState::InNotRange | ParseState::InRange)
+            );
 
             if escaped {
                 match c {
@@ -1944,6 +1952,8 @@ macro_rules! shwild_matches {
 
 /// Defines the macro `assert_shwild_matches!()`.
 ///
+/// Available when the `"assertions"` feature is enabled.
+///
 /// # Parameters:
 /// - `$expected_pattern` - the pattern against which `$actual` is
 ///   evaluated;
@@ -1952,6 +1962,7 @@ macro_rules! shwild_matches {
 ///
 /// Panics if `$expected_pattern` is invalid or if `$actual` does not match.
 /// The 2-parameter form passes 0 for the `flags` parameter.
+#[cfg(feature = "assertions")]
 #[macro_export]
 macro_rules! assert_shwild_matches {
     ($expected_pattern:expr, $actual:expr) => {
@@ -1966,16 +1977,25 @@ macro_rules! assert_shwild_matches {
 
         match $crate::matches(expected_pattern, actual, flags) {
             Err(e) => {
-                panic!("could not evaluate actual value due to a failure in the parsing of expected pattern '{}': {}", expected_pattern, e);
+                panic!(
+                    "could not evaluate actual value due to a failure in the parsing of expected pattern '{}': {}",
+                    expected_pattern, e
+                );
             },
             Ok(b) => {
-                assert!(b, "assertion failed: actual value '{}' does not match the expected pattern '{}'", actual, expected_pattern);
-            }
+                assert!(
+                    b,
+                    "assertion failed: actual value '{}' does not match the expected pattern '{}'",
+                    actual, expected_pattern
+                );
+            },
         }
     };
 }
 
 /// Defines the macro `assert_shwild_not_matches!()`.
+///
+/// Available when the `"assertions"` feature is enabled.
 ///
 /// # Parameters:
 /// - `$expected_pattern` - the pattern against which `$actual` is
@@ -1985,6 +2005,7 @@ macro_rules! assert_shwild_matches {
 ///
 /// Panics if `$expected_pattern` is invalid or if `$actual` matches. The
 /// 2-parameter form passes 0 for the `flags` parameter.
+#[cfg(feature = "assertions")]
 #[macro_export]
 macro_rules! assert_shwild_not_matches {
     ($expected_pattern:expr, $actual:expr) => {
@@ -1999,11 +2020,18 @@ macro_rules! assert_shwild_not_matches {
 
         match $crate::matches(expected_pattern, actual, flags) {
             Err(e) => {
-                panic!("could not evaluate actual value due to a failure in the parsing of expected pattern '{}': {}", expected_pattern, e);
+                panic!(
+                    "could not evaluate actual value due to a failure in the parsing of expected pattern '{}': {}",
+                    expected_pattern, e
+                );
             },
             Ok(b) => {
-                assert!(!b, "assertion failed: actual value '{}' matches unexpectedly with the pattern '{}'", actual, expected_pattern);
-            }
+                assert!(
+                    !b,
+                    "assertion failed: actual value '{}' matches unexpectedly with the pattern '{}'",
+                    actual, expected_pattern
+                );
+            },
         }
     };
 }
@@ -3434,9 +3462,11 @@ mod tests {
     }
 
 
+    #[cfg(feature = "assertions")]
     mod TEST_ASSERTION_MATCHES {
         #![allow(non_snake_case)]
 
+        use super::*;
 
 
         #[test]
@@ -3447,12 +3477,45 @@ mod tests {
 
             assert_shwild_matches!("?", "a");
             assert_shwild_matches!("?", "z");
+
+            assert_shwild_matches!("*", "");
+            assert_shwild_matches!("*", "anything");
+            assert_shwild_matches!("ab*", "ab");
+            assert_shwild_matches!("ab*", "abcd");
         }
 
         #[test]
-        #[should_panic(expected = "could not evaluate actual value due to a failure in the parsing of expected pattern '[a-d': pattern syntax error (at 0:4): incomplete range")]
-        fn TEST_assert_shwild_matches_2() {
+        fn TEST_assert_shwild_matches_WITH__IGNORE_CASE__1() {
+            assert_shwild_matches!("[a-d]", "A", IGNORE_CASE);
+            assert_shwild_matches!("[a-d]", "B", IGNORE_CASE);
+            assert_shwild_matches!("[a-d]", "C", IGNORE_CASE);
+            assert_shwild_matches!("[a-d]", "D", IGNORE_CASE);
+        }
+
+        #[test]
+        fn TEST_assert_shwild_matches_WITH_FLAGS_ZERO_1() {
+            assert_shwild_matches!("[a-d]", "a", 0i64);
+            assert_shwild_matches!("[a-d]", "d", 0);
+        }
+
+        #[test]
+        #[should_panic(
+            expected = "could not evaluate actual value due to a failure in the parsing of expected pattern '[a-d': pattern syntax error (at 0:4): incomplete range"
+        )]
+        fn TEST_assert_shwild_matches_PARSE_ERROR_1() {
             assert_shwild_matches!("[a-d", "a");
+        }
+
+        #[test]
+        #[should_panic(expected = "assertion failed: actual value 'e' does not match the expected pattern '[a-d]'")]
+        fn TEST_assert_shwild_matches_MISMATCH_1() {
+            assert_shwild_matches!("[a-d]", "e");
+        }
+
+        #[test]
+        #[should_panic(expected = "assertion failed: actual value 'A' does not match the expected pattern '[a-d]'")]
+        fn TEST_assert_shwild_matches_MISMATCH_WITHOUT__IGNORE_CASE__1() {
+            assert_shwild_matches!("[a-d]", "A");
         }
 
         #[test]
@@ -3463,6 +3526,41 @@ mod tests {
 
             assert_shwild_not_matches!("??", "a");
             assert_shwild_not_matches!("??", "z");
+
+            assert_shwild_not_matches!("ab", "a");
+            assert_shwild_not_matches!("ab", "abc");
+        }
+
+        #[test]
+        fn TEST_assert_shwild_not_matches_WITH__IGNORE_CASE__1() {
+            assert_shwild_not_matches!("[a-d]", "e", IGNORE_CASE);
+            assert_shwild_not_matches!("[a-d]", "E", IGNORE_CASE);
+        }
+
+        #[test]
+        fn TEST_assert_shwild_not_matches_WITH_FLAGS_ZERO_1() {
+            assert_shwild_not_matches!("[a-d]", "e", 0i64);
+            assert_shwild_not_matches!("[a-d]", "D", 0);
+        }
+
+        #[test]
+        #[should_panic(
+            expected = "could not evaluate actual value due to a failure in the parsing of expected pattern '[a-d': pattern syntax error (at 0:4): incomplete range"
+        )]
+        fn TEST_assert_shwild_not_matches_PARSE_ERROR_1() {
+            assert_shwild_not_matches!("[a-d", "a");
+        }
+
+        #[test]
+        #[should_panic(expected = "assertion failed: actual value 'a' matches unexpectedly with the pattern '[a-d]'")]
+        fn TEST_assert_shwild_not_matches_UNEXPECTED_MATCH_1() {
+            assert_shwild_not_matches!("[a-d]", "a");
+        }
+
+        #[test]
+        #[should_panic(expected = "assertion failed: actual value 'D' matches unexpectedly with the pattern '[a-d]'")]
+        fn TEST_assert_shwild_not_matches_UNEXPECTED_MATCH_WITH__IGNORE_CASE__1() {
+            assert_shwild_not_matches!("[a-d]", "D", IGNORE_CASE);
         }
     }
 }

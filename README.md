@@ -108,6 +108,7 @@ The following crate features are defined:
 
 | Name                        | Effect                                | Is `"default"`? | Dependent feature(s)                  |
 | --------------------------- | ------------------------------------- | --------------- | ------------------------------------- |
+| `"assertions"`              | Provides `assert_shwild_matches!()` and `assert_shwild_not_matches!()` test assertion macros (via **base-traits** `AsI64`) | Yes | |
 | `"lookup-ranges"`           | Causes match/non-match ranges to be implemented in terms of `UnicodePointMap` (from **collect-rs** crate), resulting in significant performance improvements in parsing and matching | Yes | |
 | `"null-feature"`            | A feature that has no effect (and, thus, is useful for simplifying driver scripts) | **No** | |
 | `"test-regex"`              | Introduces a dependency to **regex** crate to support benchmark/example program(s) | **No** | |
@@ -133,10 +134,14 @@ pub mod shwild {
 
 The `shwild::shwild_matches!()` macro is a shorthand for the `shwild::matches()` function, providing 2-parameter and 3-parameter forms. The 2-parameter form passes 0 for the `flags` parameter.
 
-The `shwild::assert_shwild_matches!()` and `shwild::assert_shwild_not_matches!()` macros are test-oriented counterparts that panic on failure. Each provides 2-parameter and 3-parameter forms; the 2-parameter form passes 0 for the `flags` parameter. A parse error in the pattern panics with a descriptive message rather than returning `Err`.
+The `shwild::assert_shwild_matches!()` and `shwild::assert_shwild_not_matches!()` macros are test-oriented counterparts that panic on failure. Each provides 2-parameter and 3-parameter forms; the 2-parameter form passes 0 for the `flags` parameter. A parse error in the pattern panics with a descriptive message rather than returning `Err`. They are provided only when the feature `"assertions"` is enabled, which it is by default.
 
 ```Rust
-	use shwild::{assert_shwild_matches, assert_shwild_not_matches, IGNORE_CASE};
+	use shwild::{
+		assert_shwild_matches,
+		assert_shwild_not_matches,
+		IGNORE_CASE,
+	};
 
 	assert_shwild_matches!("[a-d]", "b");
 	assert_shwild_not_matches!("[a-d]", "e");
@@ -200,10 +205,10 @@ Defect reports, feature requests, and pull requests are welcome on https://githu
 
 ### Dependencies
 
-**shwild.Rust** has one required dependency and two optional dependencies:
+**shwild.Rust** has three optional dependencies:
 
-* [**base-traits**](https://github.com/synesissoftware/base-traits) - required; supports the `flags` parameter type in `assert_shwild_matches!()` and `assert_shwild_not_matches!()` via `AsI64`;
-* [**collect-rs**](https://github.com/synesissoftware/collect-rs) - required, for more efficient range matching, if feature `"lookup-ranges"` is specified;
+* [**base-traits**](https://github.com/synesissoftware/base-traits) - required if feature `"assertions"` is specified; supports the `flags` parameter type in `assert_shwild_matches!()` and `assert_shwild_not_matches!()` via `AsI64`;
+* [**collect-rs**](https://github.com/synesissoftware/collect-rs) - required if feature `"lookup-ranges"` is specified, for more efficient range matching;
 * [**regex**](https://github.com/rust-lang/regex) - required, by some benchmark/example programs only, if feature `"test-regex"` is specified;
 
 

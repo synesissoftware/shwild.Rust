@@ -83,6 +83,7 @@ path = "examples/list-matching-files-compiled/main.rs"
 [features]
 
 default = [
+	"assertions",
 	"lookup-ranges",
 ]
 
@@ -97,8 +98,13 @@ null-feature = []
 
 # Crate-specific features:
 #
+# - "assertions" - enable assertions;
 # - "lookup-ranges" - enable lookup ranges;
 # - "test-regex" - enable test regex;
+
+assertions = [
+	"dep:base-traits",
+]
 
 lookup-ranges = [
 	"dep:collect-rs",
@@ -114,7 +120,8 @@ test-regex = [
 
 [dependencies]
 
-base-traits = { version = "0", default-features = false, features = [
+base-traits = { version = "0", optional = true, default-features = false, features = [
+	"implement-AsI64-for-built_ins",
 ]}
 collect-rs = { version = "0.2", optional = true, default-features = false, features = [
 ]}

@@ -3,8 +3,8 @@
 
 ## 0.2.0 - 8th July 2026
 
-* added `assert_shwild_matches!()` and `assert_shwild_not_matches!()` test assertion macros;
-* added required dependency on [**base-traits**](https://github.com/synesissoftware/base-traits) (minimal features: `implement-AsI64-for-built_ins`);
+* added `assert_shwild_matches!()` and `assert_shwild_not_matches!()` test assertion macros, available with the `"assertions"` feature (enabled by default);
+* added optional dependency on [**base-traits**](https://github.com/synesissoftware/base-traits) (via `"assertions"`; minimal features: `implement-AsI64-for-built_ins`);
 * crate-level and macro `///` documentation for the assertion macros;
 * **README.md** macros and dependencies sections updated;
 
@@ -34,16 +34,16 @@
 
 ## 0.1.2 - 3rd November 2024
 
-* added `test-regex` feature — optional **regex** dependency for benchmarks and scratch programs;
-* enabled `lookup-ranges` in default features;
+* added `"test-regex"` feature — optional **regex** dependency for benchmarks and scratch programs;
+* enabled `"lookup-ranges"` in default features;
 * added **cw-regex** benchmark;
 * added **character-play** scratch program;
-* added `regex_comparision_tests` unit tests (gated on `test-regex`);
+* added `regex_comparision_tests` unit tests (gated on `"test-regex"`);
 
 
 ## 0.1.1 - 3rd November 2024
 
-* added `lookup-ranges` feature — optional **collect-rs** dependency for `UnicodePointMap`-based range matching;
+* added `"lookup-ranges"` feature — optional **collect-rs** dependency for `UnicodePointMap`-based range matching;
 * added **Cargo.lock**;
 * README: added Features section; clarified Wild-1 escape behaviour in pattern elements;
 
