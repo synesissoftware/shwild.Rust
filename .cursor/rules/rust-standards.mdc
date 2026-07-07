@@ -1,0 +1,51 @@
+---
+description: Rust coding standards for shwild.Rust (aligned with Synesis Information Systems' internal project standards)
+globs: **/*.rs
+alwaysApply: false
+---
+
+# Rust Software Quality Rules
+
+
+## DOC_76 (The 76-Rule for Documentation Comments)
+
+- Documentation comments (`///`, `//!`) on **public** constructs must be at
+  most **76 characters** per line, including leading indentation;
+- Wrap text **greedily** (pack to maximum width) — do not wrap early if the
+  next word fits on the current line;
+- Code blocks inside doc comments (triple backticks) are exempt;
+- List items in doc comments should end with a semicolon;
+- Inline comments (`//`) inside functions are limited to **100 characters**
+  per line, wrapped greedily;
+- Private/non-`pub` constructs are exempt from DOC_76 for their doc
+  comments;
+
+Run `./scripts/check_doc_76.py` to verify compliance.
+
+
+## DERIVE_LAYOUT (Derive Layout & Formatting)
+
+Multi-trait `#[derive(...)]` macros must be split into separate,
+single-trait lines, ordered alphabetically by trait name. Tightly coupled
+traits may remain on one line: `#[derive(Eq, PartialEq)]`,
+`#[derive(Ord, PartialOrd)]`.
+
+`rustfmt.toml` sets `merge_derives = false` to preserve this layout.
+
+Run `./scripts/check_derives.py` to verify compliance.
+
+
+## RUST_TEST_NAMING
+
+All test methods must use `SHOUTING_SNAKE_CASE` - e.g. `TEST_PARSING()` -
+except where a word in the snake case represents a specific construct (such
+as a struct, enum, type, function, macro, or field name), in which case that
+word must preserve its exact correct case - e.g.
+`TEST_AutoBuffer_WITH_INTERNAL_SIZE()`, `TEST_doom_scope_1()`,
+`TEST_type_name_only_WITH_SomeCustomType()`.
+
+When a construct is embedded as a SHOUTING_SNAKE_CASE constant (or other
+construct name), use an extra underscore on each side as a delimiter - e.g.
+`TEST_MatcherSequence_WITH_Range_HAVING__IGNORE_CASE__1()`.
+
+Run `./scripts/check_test_names.py` to verify compliance.

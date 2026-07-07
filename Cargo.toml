@@ -14,11 +14,7 @@ categories = [
 	"development-tools",
 	"text-processing",
 ]
-description = """
-**shwild** is a small, standalone library, implemented in C++ with a C and a C++ API, that provides shell-compatible wildcard matching.
-
-**shwild.Rust** is a **Rust** port, with minimal API differences. The design emphasis is on simplicity-of-use, modularity, and performance.
-"""
+description = "Shell-compatible wildcard matching library"
 documentation = "https://docs.rs/shwild"
 edition = "2021"
 exclude = [
@@ -35,7 +31,8 @@ license = "BSD-3-Clause"
 name = "shwild"
 readme = "README.md"
 repository = "https://github.com/synesissoftware/shwild.Rust"
-version = "0.1.3"
+rust-version = "1.79"
+version = "0.1.4"
 
 
 # ##########################################################
@@ -115,14 +112,19 @@ test-regex = [
 
 [dependencies]
 
-collect-rs = { version = "0.2", optional = true }
-regex = { version = "1.11", optional = true }
+collect-rs = { version = "0.2", optional = true, default-features = false, features = [
+]}
+regex = { version = "1.11", optional = true, default-features = false, features = [
+]}
 
 
 [dev-dependencies]
 
-criterion = { version = "0.5" }
-test_help-rs = { version = "0.1" }
+criterion = { version = "0.8", default-features = false, features = [
+	"html_reports",
+]}
+test_help-rs = { version = "0.1", default-features = false, features = [
+]}
 
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

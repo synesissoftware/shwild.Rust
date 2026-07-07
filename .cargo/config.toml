@@ -1,0 +1,3 @@
+# .cargo/config.toml
+#
+# Formatting requires nightly rustfmt — use ./scripts/fmt (see rustfmt.toml).
