@@ -66,7 +66,6 @@ mod utils {
         chars.dedup();
 
         chars.into_iter().collect() // appears to be (marginally) faster for `Vec<>`, although it's very close
-                                    // chars.as_slice().iter().collect()
     }
 
     pub(super) fn range_string_from_slice_1(
@@ -132,7 +131,6 @@ mod utils {
         chars.dedup();
 
         chars.into_iter().collect() // appears to be (marginally) faster for `Vec<>`, although it's very close
-                                    // chars.as_slice().iter().collect()
     }
 
     pub(super) fn range_string_from_slice_3(
@@ -164,7 +162,6 @@ mod utils {
         chars.dedup();
 
         chars.into_iter().collect()
-        // chars.as_slice().iter().collect()
     }
 
     pub(super) fn range_string_from_slice_4(
@@ -207,7 +204,6 @@ mod utils {
         chars.dedup();
 
         chars.into_iter().collect()
-        // chars.as_slice().iter().collect()
     }
 
     pub(super) fn range_string_from_slice_5(
@@ -236,7 +232,6 @@ mod utils {
         chars.dedup();
 
         chars.into_iter().collect()
-        // chars.as_slice().iter().collect()
     }
 
     pub(super) fn range_string_from_slice_7(
