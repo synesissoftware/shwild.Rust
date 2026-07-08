@@ -1,10 +1,14 @@
 
 # rustfmt.toml for shwild.Rust
 #
-# Requires nightly rustfmt with unstable features enabled — use ./scripts/fmt
+# Requires nightly rustfmt with unstable features enabled, e.g.:
 #
-# configured for cargo-fmt 1.84.0
-
+#   ./scripts/fmt
+#
+# Or:
+#
+#   RUSTFMT="$(rustup which --toolchain nightly rustfmt)" cargo fmt -- --unstable-features
+#
 # array_width=60 # deprecated
 # attr_fn_like_width=70 # deprecated
 binop_separator="Front"
