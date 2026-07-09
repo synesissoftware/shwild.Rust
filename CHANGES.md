@@ -12,6 +12,11 @@
 * **README.md** macros and dependencies sections updated;
 
 
+## 0.1.5 - 9th July 2026
+
+* bunch of boilerplate improvements: .gitattributes; .vimrc; EXAMPLES.md; VS Code settings; ignores; license; rustfmt.toml;
+
+
 ## 0.1.4 - 8th July 2026
 
 * added **CHANGES.md** (back-filled) and **NEWS.md**;

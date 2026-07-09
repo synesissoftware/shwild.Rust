@@ -1,4 +1,4 @@
-# shwild.Rust Examples
+# shwild.Rust Examples <!-- omit it toc -->
 
 |Name|Source & Description|Summary|
 |---|---|---|
