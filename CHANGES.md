@@ -12,6 +12,13 @@
 * **README.md** macros and dependencies sections updated;
 
 
+## 0.1.6 - 10th July 2026
+
+* preparatory changes;
+* consistency fixes;
+* added **benches/macros.rs**;
+
+
 ## 0.1.5 - 9th July 2026
 
 * bunch of boilerplate improvements: .gitattributes; .vimrc; EXAMPLES.md; VS Code settings; ignores; license; rustfmt.toml;
@@ -21,7 +28,7 @@
 
 * added **CHANGES.md** (back-filled) and **NEWS.md**;
 * added **EXAMPLES.md** and per-example documentation;
-* **README.md** badges, dependency links, related projects, and `null-feature` documentation;
+* **README.md** badges, dependency links, related projects, and `"null-feature"` documentation;
 * added crate-level `//!` documentation;
 * added CI (`.github/workflows/ci.yml`) and quality scripts (`scripts/fmt`, checkers);
 * added `rust-version` (MSRV 1.79);
