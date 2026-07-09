@@ -1,6 +1,13 @@
 # shwild.Rust - CHANGES <!-- omit in toc -->
 
 
+## 0.1.6 - 10th July 2026
+
+* preparatory changes;
+* consistency fixes;
+* added **benches/macros.rs**;
+
+
 ## 0.1.5 - 9th July 2026
 
 * bunch of boilerplate improvements: .gitattributes; .vimrc; EXAMPLES.md; VS Code settings; ignores; license; rustfmt.toml;
@@ -10,7 +17,7 @@
 
 * added **CHANGES.md** (back-filled) and **NEWS.md**;
 * added **EXAMPLES.md** and per-example documentation;
-* **README.md** badges, dependency links, related projects, and `null-feature` documentation;
+* **README.md** badges, dependency links, related projects, and `"null-feature"` documentation;
 * added crate-level `//!` documentation;
 * added CI (`.github/workflows/ci.yml`) and quality scripts (`scripts/fmt`, checkers);
 * added `rust-version` (MSRV 1.79);
@@ -31,16 +38,16 @@
 
 ## 0.1.2 - 3rd November 2024
 
-* added `test-regex` feature — optional **regex** dependency for benchmarks and scratch programs;
-* enabled `lookup-ranges` in default features;
+* added `"test-regex"` feature — optional **regex** dependency for benchmarks and scratch programs;
+* enabled `"lookup-ranges"` in default features;
 * added **cw-regex** benchmark;
 * added **character-play** scratch program;
-* added `regex_comparision_tests` unit tests (gated on `test-regex`);
+* added `regex_comparision_tests` unit tests (gated on `"test-regex"`);
 
 
 ## 0.1.1 - 3rd November 2024
 
-* added `lookup-ranges` feature — optional **collect-rs** dependency for `UnicodePointMap`-based range matching;
+* added `"lookup-ranges"` feature — optional **collect-rs** dependency for `UnicodePointMap`-based range matching;
 * added **Cargo.lock**;
 * README: added Features section; clarified Wild-1 escape behaviour in pattern elements;
 

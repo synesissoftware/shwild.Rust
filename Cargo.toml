@@ -32,7 +32,7 @@ name = "shwild"
 readme = "README.md"
 repository = "https://github.com/synesissoftware/shwild.Rust"
 rust-version = "1.79"
-version = "0.1.5"
+version = "0.1.6"
 
 
 # ##########################################################
@@ -48,6 +48,10 @@ harness = false
 required-features = [
 	"test-regex",
 ]
+
+[[bench]]
+name = "macros"
+harness = false
 
 [[bench]]
 name = "range_string-creation_functions"
@@ -97,6 +101,8 @@ null-feature = []
 
 # Crate-specific features:
 #
+# - "lookup-ranges" - enable lookup ranges;
+# - "test-regex" - enable test regex;
 
 lookup-ranges = [
 	"dep:collect-rs",
