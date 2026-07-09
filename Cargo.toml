@@ -97,6 +97,8 @@ null-feature = []
 
 # Crate-specific features:
 #
+# - "lookup-ranges" - enable lookup ranges;
+# - "test-regex" - enable test regex;
 
 lookup-ranges = [
 	"dep:collect-rs",
