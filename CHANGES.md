@@ -5,6 +5,7 @@
 
 * preparatory changes;
 * consistency fixes;
+* added **benches/macros.rs**;
 
 
 ## 0.1.5 - 9th July 2026

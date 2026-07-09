@@ -50,6 +50,10 @@ required-features = [
 ]
 
 [[bench]]
+name = "macros"
+harness = false
+
+[[bench]]
 name = "range_string-creation_functions"
 harness = false
 
