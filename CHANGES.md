@@ -1,7 +1,17 @@
 # shwild.Rust - CHANGES <!-- omit in toc -->
 
 
-## 0.1.6 - 10th July 2026
+## 0.2.0 - 10th July 2026
+
+* added `assert_shwild_matches!()` and `assert_shwild_not_matches!()` test assertion macros, available with the `"assertions"` feature (enabled by default);
+* added `"flexible-flags-type"` feature — optional [**base-traits**](https://github.com/synesissoftware/base-traits) dependency (`implement-AsI64-for-built_ins`) allowing macro `flags` parameters to be any type implementing `AsI64`; when disabled, `flags` must be `i64`;
+* `"assertions"` no longer implies **base-traits**; use `"full"` to enable assertions, flexible flags, and lookup ranges together;
+* extended `shwild_matches!()` 3-parameter form with the same flexible-`flags` behaviour;
+* crate-level and macro `///` documentation for the assertion macros;
+* **README.md** macros and dependencies sections updated;
+
+
+## 0.1.6 - 9th July 2026
 
 * preparatory changes;
 * consistency fixes;

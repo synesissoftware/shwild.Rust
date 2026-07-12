@@ -2,6 +2,7 @@
 
 | Date                  | News Item                                 |
 | --------------------- | ----------------------------------------- |
+| 10th July 2026        | shwild.Rust 0.2.0 released                |
 | 9th July 2026         | shwild.Rust 0.1.6 released                |
 | 9th July 2026         | shwild.Rust 0.1.5 released                |
 | 7th July 2026         | shwild.Rust 0.1.4 released                |

@@ -33,11 +33,17 @@ jobs:
       - name: cargo test (no default features)
         run: cargo test --no-default-features --locked
 
+      - name: cargo test ("assertions")
+        run: cargo test --no-default-features --features assertions --locked
+
       - name: cargo test ("lookup-ranges")
         run: cargo test --no-default-features --features lookup-ranges --locked
 
       - name: cargo test ("test-regex")
         run: cargo test --no-default-features --features test-regex --locked
+
+      - name: cargo test ("full")
+        run: cargo test --no-default-features --features full --locked
 
       - name: cargo clippy
         run: cargo clippy --all-targets --locked -- -D warnings
