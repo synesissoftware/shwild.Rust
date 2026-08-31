@@ -1,0 +1,11 @@
+# Pinned Rust toolchain for local formatting and CI.
+#
+# Keep the nightly channel explicit: rustfmt.toml uses unstable options.
+# Update this channel deliberately and keep CI in sync.
+
+[toolchain]
+channel = "nightly-2026-08-08"
+components = [
+	"clippy",
+	"rustfmt",
+]

@@ -7,7 +7,9 @@ An example using **shwild.Rust**'s `CompiledMatcher` to list files in the curren
 
 ## Source
 
-```Rust
+[Source](./list-matching-files-compiled/main.rs)
+
+```rust
 // examples/list-matching-files-compiled/main.rs : filter files using `CompiledMatcher`
 
 use std::{
@@ -76,7 +78,7 @@ fn main() {
 ```
 
 
-## Running and output
+## Execution
 
 When executed, as in:
 

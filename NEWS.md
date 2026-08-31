@@ -2,8 +2,9 @@
 
 | Date                  | News Item                                 |
 | --------------------- | ----------------------------------------- |
-| 10th July 2026        | shwild.Rust 0.2.0 released                |
-| 9th July 2026         | shwild.Rust 0.1.6 released                |
+| 31st August 2026      | [shwild.Rust 0.2.1](https://github.com/synesissoftware/shwild.Rust/releases/tag/0.2.1) released |
+| 10th July 2026        | [shwild.Rust 0.2.0](https://github.com/synesissoftware/shwild.Rust/releases/tag/0.2.0) released |
+| 9th July 2026         | [shwild.Rust 0.1.6](https://github.com/synesissoftware/shwild.Rust/releases/tag/0.1.6) released |
 | 9th July 2026         | shwild.Rust 0.1.5 released                |
 | 7th July 2026         | shwild.Rust 0.1.4 released                |
 | 28th March 2025       | shwild.Rust 0.1.3 released                |

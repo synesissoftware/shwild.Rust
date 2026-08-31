@@ -1,6 +1,17 @@
 # shwild.Rust - Changes <!-- omit in toc -->
 
 
+## 0.2.1 - 31st August 2026
+
+* completed CI coverage for feature combinations, examples, documentation,
+  Clippy, formatting, custom checkers, and package validation;
+* pinned the nightly Rust toolchain used for project formatting;
+* completed Cargo package metadata, docs.rs configuration, and package
+  exclusions;
+* updated **README.md** and example catalogues with current feature and
+  source-link information;
+
+
 ## 0.2.0 - 10th July 2026
 
 * added `assert_shwild_matches!()` and `assert_shwild_not_matches!()` test assertion macros, available with the `"assertions"` feature (enabled by default);

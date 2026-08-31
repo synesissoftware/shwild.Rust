@@ -7,7 +7,9 @@ A scratch program that exercises **regex** crate matching behaviour for Unicode 
 
 ## Source
 
-```Rust
+[Scratch source](../test/scratch/character-play/main.rs)
+
+```rust
 // test/scratch/character-play/main.rs : Unicode matching experiments with **regex**
 
 use regex::Regex;
@@ -85,7 +87,7 @@ fn main() {
 ```
 
 
-## Running and output
+## Execution
 
 When executed, as in:
 

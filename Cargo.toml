@@ -10,16 +10,22 @@ authors = [
 ]
 categories = [
 	"command-line-interface",
-	"parser-implementations",
 	"development-tools",
+	"parser-implementations",
 	"text-processing",
 ]
 description = "Shell-compatible wildcard matching library"
 documentation = "https://docs.rs/shwild"
 edition = "2021"
 exclude = [
+	".cargo",
+	".cursor",
+	".github",
+	".vimrc",
+	".vscode",
+	"Cargo.toml.orig",
+	"scripts",
 	"target",
-	".github"
 ]
 homepage = "https://github.com/synesissoftware/shwild.Rust"
 keywords = [
@@ -32,7 +38,12 @@ name = "shwild"
 readme = "README.md"
 repository = "https://github.com/synesissoftware/shwild.Rust"
 rust-version = "1.79"
-version = "0.2.0"
+version = "0.2.1"
+
+[package.metadata.docs.rs]
+features = [
+	"full",
+]
 
 
 # ##########################################################
