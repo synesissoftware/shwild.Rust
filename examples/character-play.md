@@ -1,4 +1,4 @@
-# shwild.Rust Example - **character-play**
+# shwild.Rust - Example - **character-play**
 
 ## Summary
 

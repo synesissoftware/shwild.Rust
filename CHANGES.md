@@ -1,4 +1,4 @@
-# shwild.Rust - CHANGES <!-- omit in toc -->
+# shwild.Rust - Changes <!-- omit in toc -->
 
 
 ## 0.2.0 - 10th July 2026

@@ -1,4 +1,4 @@
-# shwild.Rust - NEWS <!-- omit in toc -->
+# shwild.Rust - News <!-- omit in toc -->
 
 | Date                  | News Item                                 |
 | --------------------- | ----------------------------------------- |

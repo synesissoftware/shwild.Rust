@@ -1,4 +1,4 @@
-# shwild.Rust Example - **list-matching-files**
+# shwild.Rust - Example - **list-matching-files**
 
 ## Summary
 
