@@ -6,29 +6,38 @@ on:
       - master
       - dev
       - boilerplate
+      - idiomatic
+      - rc1
+      - rc2
+      - rc3
   pull_request:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
   check:
-    name: Test, Clippy, Fmt, Checkers
+    name: Test, Clippy, Fmt, Docs, Checkers, Package
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@master
         with:
-          components: clippy
-
-      - name: Install nightly rustfmt
-        run: rustup toolchain install nightly --profile minimal --component rustfmt
+          toolchain: nightly-2026-08-08
+          components: clippy, rustfmt
 
       - uses: Swatinem/rust-cache@v2
 
-      - name: cargo test
-        run: cargo test --locked
+      - name: cargo test (all targets)
+        run: cargo test --all-targets --locked
 
       - name: cargo test (no default features)
         run: cargo test --no-default-features --locked
@@ -46,7 +55,7 @@ jobs:
         run: cargo test --no-default-features --features full --locked
 
       - name: cargo clippy
-        run: cargo clippy --all-targets --locked -- -D warnings
+        run: cargo clippy --all-targets --all-features --locked -- -D warnings
 
       - name: cargo build (examples)
         run: cargo build --examples --locked
@@ -55,7 +64,7 @@ jobs:
         run: cargo build --example character-play --features test-regex --locked
 
       - name: cargo doc
-        run: cargo doc --no-deps --locked
+        run: cargo doc --no-deps --all-features --locked
 
       - name: rustfmt
         run: ./scripts/fmt --check
@@ -68,6 +77,9 @@ jobs:
 
       - name: DERIVE_LAYOUT checker
         run: python3 scripts/check_derives.py
+
+      - name: cargo publish (dry run)
+        run: cargo publish --dry-run --locked
 
   msrv:
     name: MSRV (1.79)
