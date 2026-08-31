@@ -3,13 +3,10 @@
 
 ## 0.2.1 - 31st August 2026
 
-* completed CI coverage for feature combinations, examples, documentation,
-  Clippy, formatting, custom checkers, and package validation;
+* completed CI coverage for feature combinations, examples, documentation, Clippy, formatting, custom checkers, and package validation;
 * pinned the nightly Rust toolchain used for project formatting;
-* completed Cargo package metadata, docs.rs configuration, and package
-  exclusions;
-* updated **README.md** and example catalogues with current feature and
-  source-link information;
+* completed Cargo package metadata, docs.rs configuration, and package exclusions;
+* updated **README.md** and example catalogues with current feature and source-link information;
 
 
 ## 0.2.0 - 10th July 2026
