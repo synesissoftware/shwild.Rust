@@ -93,6 +93,10 @@ path = "examples/list-matching-files/main.rs"
 name = "list-matching-files-compiled"
 path = "examples/list-matching-files-compiled/main.rs"
 
+[[example]]
+name = "versions"
+path = "examples/versions/main.rs"
+
 
 # ##########################################################
 # Features
