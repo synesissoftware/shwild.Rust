@@ -14,7 +14,7 @@ categories = [
 	"parser-implementations",
 	"text-processing",
 ]
-description = "Shell-compatible wildcard matching library"
+description = "Shell-compatible wildcard matching library (for Rust)"
 documentation = "https://docs.rs/shwild"
 edition = "2021"
 exclude = [
@@ -39,6 +39,8 @@ readme = "README.md"
 repository = "https://github.com/synesissoftware/shwild.Rust"
 rust-version = "1.79"
 version = "0.2.1"
+
+# docs.rs builds the complete public API via the full feature set.
 
 [package.metadata.docs.rs]
 features = [
@@ -143,9 +145,11 @@ test-regex = [
 # ##########################################################
 # Dependencies
 
+[build-dependencies]
+
 [dependencies]
 
-base-traits = { version = "0", optional = true, default-features = false, features = [
+base-traits = { version = "0.1", optional = true, default-features = false, features = [
 	"implement-AsI64-for-built_ins",
 ]}
 collect-rs = { version = "0.2", optional = true, default-features = false, features = [
@@ -159,7 +163,7 @@ regex = { version = "1.11", optional = true, default-features = false, features 
 criterion = { version = "0.8", default-features = false, features = [
 	"html_reports",
 ]}
-test_help-rs = { version = "0.1", default-features = false, features = [
+test_help-rs = { version = "0.2", default-features = false, features = [
 ]}
 
 
