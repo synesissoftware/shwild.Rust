@@ -12,6 +12,7 @@
 - [Source layout (deferred)](#source-layout-deferred)
 - [Functional improvements](#functional-improvements)
 - [Performance improvements](#performance-improvements)
+- [Packaging improvements](#packaging-improvements)
 
 
 ## Historical 0.1.4 boilerplate checklist
@@ -101,6 +102,11 @@ Suggested order of work:
 
 * [ ] special cases (for compiled only) such as `"*brown*"` could just be `strstr()`;
 * [ ] thorough optimisation review (including optional "unsafe");
+
+
+## Packaging improvements
+
+* \<none>
 
 
 <!-- ########################### end of file ########################### -->
