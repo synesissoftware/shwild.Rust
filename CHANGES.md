@@ -1,6 +1,17 @@
 # shwild.Rust - Changes <!-- omit in toc -->
 
 
+## 0.2.2 - 12th September 2026
+
+* removed the Rust-specific Cursor rule superseded by shared workspace standards;
+* strengthened CI with stable toolchain checks, warnings-as-errors documentation, pinned nightly formatting, and example packaging;
+* refreshed repository metadata, editor configuration, ignore rules, and Rust formatting configuration;
+* added the **versions** example and excluded development-only files from published packages;
+* documented the MSRV and canonicalised **Cargo.toml** dependency metadata;
+* updated **base-traits**, **collect-rs**, and **test_help-rs** to current compatible releases;
+* improved the test-name checker and retained the full feature and packaging validation matrix;
+
+
 ## 0.2.1 - 31st August 2026
 
 * completed CI coverage for feature combinations, examples, documentation, Clippy, formatting, custom checkers, and package validation;
