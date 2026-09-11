@@ -38,7 +38,7 @@ name = "shwild"
 readme = "README.md"
 repository = "https://github.com/synesissoftware/shwild.Rust"
 rust-version = "1.79"
-version = "0.2.1"
+version = "0.2.2"
 
 # docs.rs builds the complete public API via the full feature set.
 

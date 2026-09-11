@@ -3,6 +3,7 @@
 
 | Date              | News Item                  | Details                                |
 | ----------------- | -------------------------- | -------------------------------------- |
+| 12th September 2026 | [shwild.Rust 0.2.2](https://github.com/synesissoftware/shwild.Rust/releases/tag/0.2.2) released | CI, packaging, and dependency updates |
 | 31st August 2026  | [shwild.Rust 0.2.1](https://github.com/synesissoftware/shwild.Rust/releases/tag/0.2.1) released | Full CI and packaging metadata         |
 | 10th July 2026    | [shwild.Rust 0.2.0](https://github.com/synesissoftware/shwild.Rust/releases/tag/0.2.0) released | Assertion macros and flexible flags    |
 | 9th July 2026     | [shwild.Rust 0.1.6](https://github.com/synesissoftware/shwild.Rust/releases/tag/0.1.6) released | Benches and consistency fixes          |
